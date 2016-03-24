@@ -2,8 +2,11 @@ package io.nobt.core.domain;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 public class Nobt {
+
+	private UUID id;
 
 	private String name;
 
@@ -11,6 +14,7 @@ public class Nobt {
 
 	public Nobt(String name) {
 		this.name = name;
+		this.id = UUID.randomUUID();
 	}
 
 	public String getName() {
@@ -24,4 +28,9 @@ public class Nobt {
 	public void addExpense(Expense expense) {
 		this.expenses.add(expense);
 	}
+
+	public UUID getId() {
+		return id;
+	}
+
 }
