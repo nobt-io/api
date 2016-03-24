@@ -1,0 +1,7 @@
+---
+applications:
+- name: nobt-io
+  memory: 128MB
+  host: nobt-io
+  buildpack: java_buildpack
+  path: target/rest-api-0.0.1-SNAPSHOT-jar-with-dependencies.jar

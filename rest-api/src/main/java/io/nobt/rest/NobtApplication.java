@@ -1,5 +1,6 @@
 package io.nobt.rest;
 
+import static spark.Spark.port;
 import static spark.Spark.post;
 
 import com.google.gson.Gson;
@@ -17,6 +18,8 @@ public class NobtApplication {
 		Gson gson = new Gson();
 		JsonParser parser = new JsonParser();
 		NobtDao nobtDao = new InMemoryNobtDao();
+
+		port(Integer.parseInt(System.getenv("PORT")));
 
 		post("/nobts", new CreateNobtHandler(nobtDao, gson, parser));
 		post("/nobts/:nobtId/expenses", new CreateExpenseHandler(nobtDao, gson, parser));
