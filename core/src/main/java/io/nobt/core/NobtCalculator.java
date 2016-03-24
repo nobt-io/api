@@ -21,7 +21,7 @@ import io.nobt.core.domain.Person;
  */
 public class NobtCalculator {
 
-	private static final int SCALE = 10;
+	private static final int SCALE = 2;
 
 	public Set<Transaction> calculate(Nobt nobt) {
 

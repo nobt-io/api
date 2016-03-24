@@ -41,4 +41,9 @@ public class InMemoryNobtDao implements NobtDao {
 		return expense;
 	}
 
+	@Override
+	public Nobt find(UUID nobtId) {
+		return nobtDatabase.get(nobtId);
+	}
+
 }

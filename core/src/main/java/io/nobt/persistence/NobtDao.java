@@ -14,4 +14,6 @@ public interface NobtDao {
 
 	Expense createExpense(UUID nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors);
 
+	Nobt find(UUID nobtId);
+
 }
