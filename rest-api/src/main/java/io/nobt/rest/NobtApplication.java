@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.dao.InMemoryNobtDao;
+import io.nobt.rest.handler.CreateExpenseHandler;
 import io.nobt.rest.handler.CreateNobtHandler;
 
 public class NobtApplication {
@@ -18,5 +19,6 @@ public class NobtApplication {
 		NobtDao nobtDao = new InMemoryNobtDao();
 
 		post("/nobts", new CreateNobtHandler(nobtDao, gson, parser));
+		post("/expenses", new CreateExpenseHandler(nobtDao, gson, parser));
 	}
 }

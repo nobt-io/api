@@ -3,11 +3,15 @@
  */
 package io.nobt.persistence.dao;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.Person;
 import io.nobt.persistence.NobtDao;
 
 /**
@@ -23,6 +27,18 @@ public class InMemoryNobtDao implements NobtDao {
 		Nobt nobt = new Nobt(nobtName);
 		nobtDatabase.put(nobt.getId(), nobt);
 		return nobt;
+	}
+
+	@Override
+	public Expense createExpense(UUID nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors) {
+
+		Nobt nobt = nobtDatabase.get(nobtId);
+
+		Expense expense = new Expense(name, amount, debtee);
+		expense.setDebtors(debtors);
+
+		nobt.addExpense(expense);
+		return expense;
 	}
 
 }
