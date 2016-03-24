@@ -19,6 +19,6 @@ public class NobtApplication {
 		NobtDao nobtDao = new InMemoryNobtDao();
 
 		post("/nobts", new CreateNobtHandler(nobtDao, gson, parser));
-		post("/expenses", new CreateExpenseHandler(nobtDao, gson, parser));
+		post("/nobts/:nobtId/expenses", new CreateExpenseHandler(nobtDao, gson, parser));
 	}
 }

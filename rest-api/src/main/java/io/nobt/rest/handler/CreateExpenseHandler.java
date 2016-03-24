@@ -32,7 +32,7 @@ public class CreateExpenseHandler implements Route {
 	public Object handle(Request req, Response resp) throws Exception {
 		JsonObject o = parser.parse(req.body()).getAsJsonObject();
 
-		UUID nobtId = UUID.fromString(o.get("nobtId").getAsString());
+		UUID nobtId = UUID.fromString(req.params(":nobtId"));
 		String name = o.get("name").getAsString();
 		BigDecimal amount = o.get("amount").getAsBigDecimal();
 		Person debtee = Person.personByName(o.get("debtee").getAsString());
