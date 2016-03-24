@@ -53,7 +53,7 @@ public class NobtCalculatorTest {
 
 		Set<Transaction> result = nobtCalculator.calculate(sampleNobt);
 
-		Assert.assertThat(result.size(), Matchers.is(6));
+		Assert.assertThat(result.size(), Matchers.is(5));
 		Assert.assertThat(result,
 				Matchers.anyOf(
 						Matchers.containsInAnyOrder(transaction("Thomas", 15, "Matthias"),

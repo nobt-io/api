@@ -39,6 +39,7 @@ public class CreateNobtHandler implements Route {
 		JsonObject o = parser.parse(req.body()).getAsJsonObject();
 		Nobt nobt = nobtDao.create(o.get("nobtName").getAsString());
 		resp.header("Location", req.url() + "/" + nobt.getId());
+		resp.status(201);
 		return gson.toJson(nobt);
 	}
 
