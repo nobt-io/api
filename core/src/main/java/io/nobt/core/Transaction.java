@@ -31,7 +31,7 @@ public class Transaction {
 	}
 
 	public static Transaction transaction(String debtor, double amount, String debtee) {
-		return transaction(personByName(debtor), new BigDecimal(amount).setScale(10, RoundingMode.HALF_UP),
+		return transaction(personByName(debtor), new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP),
 				personByName(debtee));
 	}
 

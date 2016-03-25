@@ -3,6 +3,7 @@ package io.nobt.core;
 import static io.nobt.core.Transaction.transaction;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,7 +69,7 @@ public class NobtCalculatorTest {
 	}
 
 	private BigDecimal amount(double amount) {
-		return new BigDecimal(amount);
+		return new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
 	}
 
 	private static Person person(String name) {
