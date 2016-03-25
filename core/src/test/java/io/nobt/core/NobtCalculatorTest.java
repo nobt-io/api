@@ -1,18 +1,19 @@
 package io.nobt.core;
 
-import static io.nobt.core.domain.Transaction.transaction;
-import static java.util.stream.Collectors.*;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import io.nobt.core.domain.*;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Set;
+
+import static io.nobt.core.domain.Transaction.transaction;
+import static java.util.stream.Collectors.toSet;
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 
 public class NobtCalculatorTest {
 
@@ -35,8 +36,13 @@ public class NobtCalculatorTest {
 
 		Assert.assertThat(result.size(), Matchers.is(4));
 		Assert.assertThat(result,
-				Matchers.containsInAnyOrder(transaction("Thomas", 5, "Hugo"), transaction("Matthias", 5, "Hugo"),
-						transaction("David", 5, "Hugo"), transaction("Thomas B.", 5, "Hugo")));
+				containsInAnyOrder(
+						transaction("Thomas", 5, "Hugo"),
+						transaction("Matthias", 5, "Hugo"),
+						transaction("David", 5, "Hugo"),
+						transaction("Thomas B.", 5, "Hugo")
+				)
+		);
 	}
 
 	@Test
@@ -53,16 +59,30 @@ public class NobtCalculatorTest {
 
 		Assert.assertThat(result.size(), Matchers.is(5));
 		Assert.assertThat(result,
-				Matchers.anyOf(
-						Matchers.containsInAnyOrder(transaction("Thomas", 15, "Matthias"),
-								transaction("David", 5, "Hugo"), transaction("David", 10, "Matthias"),
-								transaction("Thomas B.", 5, "Hugo"), transaction("Thomas B.", 10, "Matthias")),
-						Matchers.containsInAnyOrder(transaction("Thomas", 10, "Matthias"),
-								transaction("Thomas", 5, "Hugo"), transaction("David", 15, "Matthias"),
-								transaction("Thomas B.", 5, "Hugo"), transaction("Thomas B.", 10, "Matthias")),
-						Matchers.containsInAnyOrder(transaction("Thomas", 10, "Matthias"),
-								transaction("Thomas", 5, "Hugo"), transaction("David", 10, "Matthias"),
-								transaction("David", 5, "Hugo"), transaction("Thomas B.", 15, "Matthias"))));
+				anyOf(
+						containsInAnyOrder(
+								transaction("Thomas", 15, "Matthias"),
+								transaction("David", 5, "Hugo"),
+								transaction("David", 10, "Matthias"),
+								transaction("Thomas B.", 5, "Hugo"),
+								transaction("Thomas B.", 10, "Matthias")
+						),
+						containsInAnyOrder(
+								transaction("Thomas", 10, "Matthias"),
+								transaction("Thomas", 5, "Hugo"),
+								transaction("David", 15, "Matthias"),
+								transaction("Thomas B.", 5, "Hugo"),
+								transaction("Thomas B.", 10, "Matthias")
+						),
+						containsInAnyOrder(
+								transaction("Thomas", 10, "Matthias"),
+								transaction("Thomas", 5, "Hugo"),
+								transaction("David", 10, "Matthias"),
+								transaction("David", 5, "Hugo"),
+								transaction("Thomas B.", 15, "Matthias")
+						)
+				)
+		);
 	}
 
 	private BigDecimal amount(double amount) {
