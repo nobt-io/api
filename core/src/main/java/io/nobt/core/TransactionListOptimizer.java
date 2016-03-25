@@ -1,5 +1,7 @@
 package io.nobt.core;
 
+import io.nobt.core.domain.Transaction;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

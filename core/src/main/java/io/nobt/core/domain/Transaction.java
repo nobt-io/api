@@ -1,15 +1,12 @@
-package io.nobt.core;
-
-import static io.nobt.core.domain.Person.personByName;
+package io.nobt.core.domain;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import io.nobt.core.domain.Person;
+import static io.nobt.core.domain.Person.personByName;
 
 public class Transaction {
 

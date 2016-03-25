@@ -1,19 +1,25 @@
-package io.nobt.core;
+package io.nobt.core.domain;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Objects;
 
+import static java.math.RoundingMode.HALF_UP;
+
 public final class Amount {
 
-    private final BigDecimal value;
+	private static final RoundingMode ROUNDING_MODE = HALF_UP;
+	private static final int INTERNAL_SCALE = 10;
+	private static final int EXTERNAL_SCALE = 2;
+
+	private final BigDecimal value;
 
     private Amount(BigDecimal value) {
         this.value = value;
     }
 
     public static Amount fromBigDecimal(BigDecimal value) {
-        return new Amount(value.setScale(10, RoundingMode.HALF_UP));
+        return new Amount(value.setScale(INTERNAL_SCALE, ROUNDING_MODE));
     }
 
     public static Amount fromDouble(double value) {
@@ -21,7 +27,7 @@ public final class Amount {
     }
 
     public BigDecimal getRoundedValue() {
-        return value.setScale(2, RoundingMode.HALF_UP);
+        return value.setScale(EXTERNAL_SCALE, HALF_UP);
     }
 
     public boolean isPositive() {
@@ -35,6 +41,10 @@ public final class Amount {
     public Amount plus(Amount other) {
         return fromBigDecimal(value.add(other.value));
     }
+
+	public Amount divide(BigDecimal other) {
+		return fromBigDecimal(value.divide(other, INTERNAL_SCALE, HALF_UP));
+	}
 
     public Amount absolute() {
         return fromBigDecimal(value.abs());

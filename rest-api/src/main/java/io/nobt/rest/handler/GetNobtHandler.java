@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import io.nobt.core.NobtCalculator;
-import io.nobt.core.Transaction;
+import io.nobt.core.domain.Transaction;
 import io.nobt.core.domain.Nobt;
 import io.nobt.persistence.NobtDao;
 import spark.Request;

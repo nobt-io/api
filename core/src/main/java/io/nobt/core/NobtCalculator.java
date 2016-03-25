@@ -3,25 +3,20 @@
  */
 package io.nobt.core;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import io.nobt.core.domain.*;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import io.nobt.core.domain.Expense;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.Person;
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author Matthias
  *
  */
 public class NobtCalculator {
-
-	private static final int SCALE = 2;
 
 	public Set<Transaction> calculate(Nobt nobt) {
 
@@ -30,12 +25,11 @@ public class NobtCalculator {
 		for (Expense expense : nobt.getExpenses()) {
 			Person debtee = expense.getDebtee();
 
-			BigDecimal amountPerDebtor = expense.getAmount().divide(new BigDecimal(expense.getDebtors().size()), SCALE,
-					RoundingMode.HALF_UP);
+			Amount amountPerDebtor = expense.getAmountPerDebtor();
 
 			expenseTransactions.addAll(expense.getDebtors().stream()
-					.map(debtor -> Transaction.transaction(debtor, Amount.fromBigDecimal(amountPerDebtor), debtee))
-					.collect(Collectors.toList()));
+					.map(debtor -> Transaction.transaction(debtor, amountPerDebtor, debtee))
+					.collect(toList()));
 		}
 
 		TransactionListOptimizer optimizer = new TransactionListOptimizer(expenseTransactions);

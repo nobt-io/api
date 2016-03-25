@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import io.nobt.core.domain.Amount;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Person;
@@ -34,7 +35,7 @@ public class InMemoryNobtDao implements NobtDao {
 
 		Nobt nobt = nobtDatabase.get(nobtId);
 
-		Expense expense = new Expense(name, amount, debtee);
+		Expense expense = new Expense(name, Amount.fromBigDecimal(amount), debtee);
 		expense.setDebtors(debtors);
 
 		nobt.addExpense(expense);

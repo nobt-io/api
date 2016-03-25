@@ -1,9 +1,10 @@
 package io.nobt.core;
 
-import static io.nobt.core.Transaction.transaction;
+import static io.nobt.core.domain.Transaction.transaction;
 
 import java.util.Set;
 
+import io.nobt.core.domain.Transaction;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;

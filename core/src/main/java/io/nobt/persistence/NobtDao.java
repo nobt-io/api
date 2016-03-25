@@ -1,12 +1,12 @@
 package io.nobt.persistence;
 
-import java.math.BigDecimal;
-import java.util.Set;
-import java.util.UUID;
-
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Person;
+
+import java.math.BigDecimal;
+import java.util.Set;
+import java.util.UUID;
 
 public interface NobtDao {
 

@@ -1,6 +1,3 @@
-/**
- * 
- */
 package io.nobt.core.domain;
 
 import java.math.BigDecimal;
@@ -15,15 +12,11 @@ import java.util.Set;
 public class Expense {
 
 	private String name;
-
-	private BigDecimal amount;
-
+	private Amount amount;
 	private Person debtee;
-
 	private Set<Person> debtors = new HashSet<Person>();
 
-	public Expense(String name, BigDecimal amount, Person debtee) {
-		super();
+	public Expense(String name, Amount amount, Person debtee) {
 		this.name = name;
 		this.amount = amount;
 		this.debtee = debtee;
@@ -33,8 +26,12 @@ public class Expense {
 		return name;
 	}
 
-	public BigDecimal getAmount() {
+	public Amount getOverallAmount() {
 		return amount;
+	}
+
+	public Amount getAmountPerDebtor() {
+		return amount.divide(new BigDecimal(debtors.size()));
 	}
 
 	public Person getDebtee() {
@@ -50,34 +47,18 @@ public class Expense {
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(name, amount, debtee);
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Expense)) return false;
+		Expense expense = (Expense) o;
+		return Objects.equals(name, expense.name) &&
+				Objects.equals(amount, expense.amount) &&
+				Objects.equals(debtee, expense.debtee) &&
+				Objects.equals(debtors, expense.debtors);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Expense other = (Expense) obj;
-		if (amount == null) {
-			if (other.amount != null)
-				return false;
-		} else if (!amount.equals(other.amount))
-			return false;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (debtee == null) {
-			if (other.debtee != null)
-				return false;
-		} else if (!debtee.equals(other.debtee))
-			return false;
-		return true;
+	public int hashCode() {
+		return Objects.hash(name, amount, debtee, debtors);
 	}
 }

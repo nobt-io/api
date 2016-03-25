@@ -1,21 +1,18 @@
 package io.nobt.core;
 
-import static io.nobt.core.Transaction.transaction;
+import static io.nobt.core.domain.Transaction.transaction;
+import static java.util.stream.Collectors.*;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.nobt.core.domain.*;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import io.nobt.core.domain.Expense;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.Person;
 
 public class NobtCalculatorTest {
 
@@ -69,7 +66,7 @@ public class NobtCalculatorTest {
 	}
 
 	private BigDecimal amount(double amount) {
-		return new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP);
+		return Amount.fromDouble(amount).getRoundedValue();
 	}
 
 	private static Person person(String name) {
@@ -77,9 +74,9 @@ public class NobtCalculatorTest {
 	}
 
 	private static Expense expense(String name, BigDecimal amount, String spender, String... receivers) {
-		Set<Person> receiverPersons = Arrays.stream(receivers).map(Person::new).collect(Collectors.toSet());
+		Set<Person> receiverPersons = Arrays.stream(receivers).map(Person::new).collect(toSet());
 
-		Expense expense = new Expense(name, amount, person(spender));
+		Expense expense = new Expense(name, Amount.fromBigDecimal(amount), person(spender));
 		expense.setDebtors(receiverPersons);
 
 		return expense;
