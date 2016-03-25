@@ -30,14 +30,15 @@ public class CreateExpenseHandler implements Route {
 
 	@Override
 	public Object handle(Request req, Response resp) throws Exception {
+
 		JsonObject o = parser.parse(req.body()).getAsJsonObject();
 
 		UUID nobtId = UUID.fromString(req.params(":nobtId"));
 		String name = o.get("name").getAsString();
 		BigDecimal amount = o.get("amount").getAsBigDecimal();
-		Person debtee = Person.personByName(o.get("debtee").getAsString());
+		Person debtee = Person.forName(o.get("debtee").getAsString());
 		Set<Person> debtors = new HashSet<>();
-		o.get("debtors").getAsJsonArray().forEach((debtor) -> debtors.add(Person.personByName(debtor.getAsString())));
+		o.get("debtors").getAsJsonArray().forEach((debtor) -> debtors.add(Person.forName(debtor.getAsString())));
 
 		Expense expense = nobtDao.createExpense(nobtId, name, amount, debtee, debtors);
 		resp.status(201);

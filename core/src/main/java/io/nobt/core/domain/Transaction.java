@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import static io.nobt.core.domain.Person.personByName;
+import static io.nobt.core.domain.Person.forName;
 
 public class Transaction {
 
@@ -28,7 +28,7 @@ public class Transaction {
 	}
 
 	public static Transaction transaction(String debtor, double amount, String debtee) {
-		return transaction(personByName(debtor), Amount.fromDouble(amount), personByName(debtee));
+		return transaction(forName(debtor), Amount.fromDouble(amount), forName(debtee));
 	}
 
 	public static Transaction transaction(Person debtor, Amount amount, Person debtee) {

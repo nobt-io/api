@@ -17,9 +17,9 @@ public class ExpenseTest {
 	@Test
 	public void testShouldCalculateAmountPerDebtorBasedOnDebtorSet() throws Exception {
 
-		final Expense billa = new Expense("Billa", Amount.fromDouble(100), Person.personByName("Thomas"));
+		final Expense billa = new Expense("Billa", Amount.fromDouble(100), Person.forName("Thomas"));
 
-		final Set<Person> debtors = Arrays.asList("Lukas", "Matthias").stream().map(Person::personByName).collect(toSet());
+		final Set<Person> debtors = Arrays.asList("Lukas", "Matthias").stream().map(Person::forName).collect(toSet());
 		billa.setDebtors(debtors);
 
 		assertThat(billa.getAmountPerDebtor(), is(Amount.fromDouble(50)));
