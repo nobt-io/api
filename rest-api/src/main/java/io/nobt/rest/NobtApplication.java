@@ -6,13 +6,14 @@ import io.nobt.core.NobtCalculator;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.dao.InMemoryNobtDao;
 import io.nobt.rest.config.Config;
-import io.nobt.rest.encoding.ContentTypeCharsetParser;
 import io.nobt.rest.encoding.EncodingNotSpecifiedException;
+import io.nobt.rest.filter.EncodingAwareBodyParser;
 import io.nobt.rest.handler.CreateExpenseHandler;
 import io.nobt.rest.handler.CreateNobtHandler;
 import io.nobt.rest.handler.GetNobtHandler;
 import io.nobt.rest.handler.GetPersonsHandler;
 import io.nobt.rest.json.GsonFactory;
+import io.nobt.rest.json.JsonElementBodyParser;
 
 import static spark.Spark.*;
 
@@ -26,24 +27,17 @@ public class NobtApplication {
 		port(config.getPort());
 
 		JsonParser parser = new JsonParser();
+		final JsonElementBodyParser bodyParser = new JsonElementBodyParser(parser);
 		NobtDao nobtDao = new InMemoryNobtDao();
 		NobtCalculator calculator = new NobtCalculator();
 
-		final ContentTypeCharsetParser charsetParser = new ContentTypeCharsetParser();
+		// Spark does not respect the encoding specified in the content-type header
+		before(new EncodingAwareBodyParser());
 
-		before((req, res) -> {
-			if (req.requestMethod().equals("POST")) {
-				final String charset = charsetParser.parseCharset(req.contentType());
-				req.attribute("Content-Charset", charset);
-			}
-		});
-
-		post("/nobts", new CreateNobtHandler(nobtDao, gson, parser));
+		post("/nobts", "application/json", new CreateNobtHandler(nobtDao, gson, bodyParser));
 		get("/nobts/:nobtId", new GetNobtHandler(nobtDao, gson, calculator));
 		get("/nobts/:nobtId/persons", new GetPersonsHandler(nobtDao, gson));
-		post("/nobts/:nobtId/expenses", new CreateExpenseHandler(nobtDao, gson, parser));
-
-		after((req, res) -> res.header("Content-Type", "application/json"));
+		post("/nobts/:nobtId/expenses", "application/json", new CreateExpenseHandler(nobtDao, gson, bodyParser));
 
 		exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
 			response.status(400);

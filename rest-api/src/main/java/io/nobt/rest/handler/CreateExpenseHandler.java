@@ -2,10 +2,10 @@ package io.nobt.rest.handler;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Person;
 import io.nobt.persistence.NobtDao;
+import io.nobt.rest.json.JsonElementBodyParser;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -19,9 +19,9 @@ public class CreateExpenseHandler implements Route {
 
 	private NobtDao nobtDao;
 	private Gson gson;
-	private JsonParser parser;
+	private JsonElementBodyParser parser;
 
-	public CreateExpenseHandler(NobtDao nobtDao, Gson gson, JsonParser parser) {
+	public CreateExpenseHandler(NobtDao nobtDao, Gson gson, JsonElementBodyParser parser) {
 		this.nobtDao = nobtDao;
 		this.gson = gson;
 		this.parser = parser;
@@ -30,7 +30,7 @@ public class CreateExpenseHandler implements Route {
 	@Override
 	public Object handle(Request req, Response resp) throws Exception {
 
-		JsonObject o = parser.parse(req.body()).getAsJsonObject();
+		JsonObject o = parser.parse(req).getAsJsonObject();
 
 		UUID nobtId = UUID.fromString(req.params(":nobtId"));
 		String name = o.get("name").getAsString();

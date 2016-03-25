@@ -26,13 +26,15 @@ public class GetNobtHandler implements Route {
 	}
 
 	@Override
-	public Object handle(Request req, Response resp) throws Exception {
+	public Object handle(Request req, Response res) throws Exception {
 		Nobt nobt = nobtDao.find(UUID.fromString(req.params(":nobtId")));
 
 		Set<Transaction> transactions = calculator.calculate(nobt);
 
 		JsonObject json = gson.toJsonTree(nobt).getAsJsonObject();
 		json.add("transactions", gson.toJsonTree(transactions));
+
+		res.header("Content-Type", "application/json");
 
 		return gson.toJson(json);
 	}

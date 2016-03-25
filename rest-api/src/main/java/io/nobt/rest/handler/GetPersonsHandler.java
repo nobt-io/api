@@ -28,6 +28,8 @@ public class GetPersonsHandler implements Route {
 		final Nobt nobt = nobtDao.find(nobtId);
 		final Set<Person> participatingPersons = nobt.getParticipatingPersons();
 
+		response.header("Content-Type", "application/json");
+
 		return gson.toJson(participatingPersons);
 	}
 }
