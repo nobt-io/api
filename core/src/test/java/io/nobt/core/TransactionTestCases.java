@@ -17,6 +17,25 @@ public final class TransactionTestCases {
 	private TransactionTestCases() {
 	}
 
+	public static Object[] provideUnnecessaryTransactionExamples() {
+		return $(
+				$(
+					transaction(jacqueline, euro(10), jacqueline),
+					transaction(matthias, euro(5), lukas),
+					expected(
+							transaction(matthias, euro(5), lukas)
+					)
+				),
+				$(
+						transaction(matthias, euro(5), lukas),
+						transaction(jacqueline, euro(10), jacqueline),
+						expected(
+								transaction(matthias, euro(5), lukas)
+						)
+				)
+		);
+	}
+
 	public static Object[] provideCompensatingTransactionExamples() {
 		return $(
 				$(

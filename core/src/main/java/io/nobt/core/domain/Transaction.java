@@ -49,9 +49,19 @@ public class Transaction {
 		boolean threePersonsWithSameDebteeAndDebtor = debtee.equals(other.debtor);
 		boolean threePersonsWithSameDebteeAndDebtorReversed = debtor.equals(other.debtee);
 		boolean sameTransactionWithDifferentAmount = debtor.equals(other.debtor) && debtee.equals(other.debtee);
+		boolean thisTransactionIsOnlyAboutOnePerson = debtee.equals(debtor);
+		boolean otherTransactionIsOnlyAboutOnePerson = other.debtee.equals(other.debtor);
 
 		if (fourDifferentPersons || sameDebtorWithDifferentDebtees || sameDebteeWithDifferentDebtors) {
 			return transactions(this, other);
+		}
+
+		if (thisTransactionIsOnlyAboutOnePerson) {
+			return transactions(other);
+		}
+
+		if (otherTransactionIsOnlyAboutOnePerson) {
+			return transactions(this);
 		}
 
 		if (twoPersonsInDebtWithEachOther) {
