@@ -21,6 +21,7 @@
 		<JUnitParams.version>1.0.4</JUnitParams.version>
 		<spark.version>2.3</spark.version>
 		<gson.version>2.6.2</gson.version>
+		<rest-assured.version>2.9.0</rest-assured.version>
 	</properties>
 
 	<dependencies>
@@ -46,7 +47,7 @@
 
 			<dependency>
 				<groupId>org.mockito</groupId>
-				<artifactId>mockito-all</artifactId>
+				<artifactId>mockito-core</artifactId>
 				<version>${mockito.version}</version>
 			</dependency>
 
@@ -78,6 +79,12 @@
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
 				<version>${gson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.jayway.restassured</groupId>
+				<artifactId>rest-assured</artifactId>
+				<version>${rest-assured.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

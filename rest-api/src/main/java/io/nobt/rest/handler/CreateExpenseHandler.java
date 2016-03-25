@@ -1,20 +1,19 @@
 package io.nobt.rest.handler;
 
-import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Person;
 import io.nobt.persistence.NobtDao;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class CreateExpenseHandler implements Route {
 
@@ -44,5 +43,4 @@ public class CreateExpenseHandler implements Route {
 		resp.status(201);
 		return gson.toJson(expense);
 	}
-
 }

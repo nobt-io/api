@@ -1,18 +1,17 @@
 package io.nobt.rest.handler;
 
-import java.util.Set;
-import java.util.UUID;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
 import io.nobt.core.NobtCalculator;
-import io.nobt.core.domain.Transaction;
 import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtDao;
 import spark.Request;
 import spark.Response;
 import spark.Route;
+
+import java.util.Set;
+import java.util.UUID;
 
 public class GetNobtHandler implements Route {
 
