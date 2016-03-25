@@ -1,11 +1,13 @@
 package io.nobt.core;
 
+import io.nobt.core.domain.Amount;
 import io.nobt.core.domain.Transaction;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.nobt.core.PersonFactory.*;
 import static io.nobt.core.domain.Transaction.transaction;
 import static java.util.Collections.emptySet;
 import static junitparams.JUnitParamsRunner.$;
@@ -18,8 +20,8 @@ public final class TransactionTestCases {
 	public static Object[] provideCompensatingTransactionExamples() {
 		return $(
 				$(
-						transaction("Matthias", 10, "Thomas"),
-						transaction("Thomas", 10, "Matthias"),
+						transaction(matthias, euro(10), thomas),
+						transaction(thomas, euro(10), matthias),
 						noTransactions()
 				)
 		);
@@ -28,11 +30,11 @@ public final class TransactionTestCases {
 	public static Object[] provideNoActionTransactionExamples() {
 		return $(
 				$(
-						transaction("Matthias", 10, "Thomas"),
-						transaction("Harald", 10, "Simon"),
+						transaction(matthias, euro(10), thomas),
+						transaction(harald, euro(10), simon),
 						expected(
-								transaction("Matthias", 10, "Thomas"),
-								transaction("Harald", 10, "Simon")
+								transaction(matthias, euro(10), thomas),
+								transaction(harald, euro(10), simon)
 						))
 		);
 	}
@@ -40,10 +42,10 @@ public final class TransactionTestCases {
 	public static Object[] provideMergingTransactionExamples() {
 		return $(
 				$(
-						transaction("Matthias", 10, "Thomas"),
-						transaction("Matthias", 11, "Thomas"),
+						transaction(matthias, euro(10), thomas),
+						transaction(matthias, euro(11), thomas),
 						expected(
-								transaction("Matthias", 21, "Thomas")
+								transaction(matthias, euro(21), thomas)
 						)
 				)
 		);
@@ -52,53 +54,57 @@ public final class TransactionTestCases {
 	public static Object[] provideTriangulationTransactionExamples() {
 		return $(
 				$(
-						transaction("Matthias", 10, "Thomas"),
-						transaction("Thomas", 10, "Lukas"),
+						transaction(matthias, euro(10), thomas),
+						transaction(thomas, euro(10), lukas),
 						expected(
-								transaction("Matthias", 10, "Lukas")
+								transaction(matthias, euro(10), lukas)
 						)
 				),
 				$(
-						transaction("Matthias", 10, "Thomas"),
-						transaction("Thomas", 6, "David"),
+						transaction(matthias, euro(10), thomas),
+						transaction(thomas, euro(6), jacqueline),
 						expected(
-								transaction("Matthias", 6, "David"),
-								transaction("Matthias", 4, "Thomas")
+								transaction(matthias, euro(6), jacqueline),
+								transaction(matthias, euro(4), thomas)
 						)
 				),
 				$(
-						transaction("Matthias", 10, "Thomas"),
-						transaction("Thomas", 11, "David"),
+						transaction(matthias, euro(10), thomas),
+						transaction(thomas, euro(11), david),
 						expected(
-								transaction("Matthias", 10, "David"),
-								transaction("Thomas", 1, "David")
+								transaction(matthias, euro(10), david),
+								transaction(thomas, euro(1), david)
 						)
 				),
 				$(
-						transaction("Matthias", 10, "Thomas"),
-						transaction("Lukas", 10, "Matthias"),
+						transaction(matthias, euro(10), thomas),
+						transaction(lukas, euro(10), matthias),
 						expected(
-								transaction("Lukas", 10, "Thomas")
+								transaction(lukas, euro(10), thomas)
 						)
 				),
 				$(
-						transaction("Matthias", 10, "Thomas"),
-						transaction("Lukas", 6, "Matthias"),
+						transaction(matthias, euro(10), thomas),
+						transaction(lukas, euro(6), matthias),
 						expected(
-								transaction("Matthias", 4, "Thomas"),
-								transaction("Lukas", 6, "Thomas")
+								transaction(matthias, euro(4), thomas),
+								transaction(lukas, euro(6), thomas)
 						)
 				),
 				$(
-						transaction("Matthias", 10, "Thomas"),
-						transaction("Lukas", 11, "Matthias"),
+						transaction(matthias, euro(10), thomas),
+						transaction(lukas, euro(11), matthias),
 						expected(
-								transaction("Lukas", 1, "Matthias"),
-								transaction("Lukas", 10, "Thomas")
+								transaction(lukas, euro(1), matthias),
+								transaction(lukas, euro(10), thomas)
 
 						)
 				)
 				);
+	}
+
+	private static Amount euro(int amount) {
+		return Amount.fromDouble(amount);
 	}
 
 	private static Set<Object> noTransactions() {
