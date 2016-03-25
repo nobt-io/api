@@ -12,9 +12,9 @@ public class Nobt {
 
 	private Set<Expense> expenses = new HashSet<>();
 
-	public Nobt(String name) {
+	public Nobt(String name, UUID uuid) {
 		this.name = name;
-		this.id = UUID.randomUUID();
+		this.id = uuid;
 	}
 
 	public String getName() {
@@ -23,6 +23,17 @@ public class Nobt {
 
 	public Set<Expense> getExpenses() {
 		return expenses;
+	}
+
+	public Set<Person> getParticipatingPersons() {
+		final Set<Person> participatingPersons = expenses
+				.stream()
+				.map(Expense::getDebtors)
+				.collect(HashSet::new, HashSet::addAll, HashSet::addAll);
+
+		expenses.stream().map(Expense::getDebtee).forEach(participatingPersons::add);
+
+		return participatingPersons;
 	}
 
 	public void addExpense(Expense expense) {
