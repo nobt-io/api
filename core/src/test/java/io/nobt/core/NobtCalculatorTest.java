@@ -1,17 +1,17 @@
 package io.nobt.core;
 
 import io.nobt.core.domain.*;
+import io.nobt.util.Sets;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.Set;
+import java.util.UUID;
 
+import static io.nobt.core.PersonFactory.*;
 import static io.nobt.core.domain.Transaction.transaction;
-import static java.util.stream.Collectors.toSet;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 
@@ -27,8 +27,8 @@ public class NobtCalculatorTest {
 	@Test
 	public void testShouldSplitSingleExpenseEquallyAmongAllReceivers() {
 
-		Nobt sampleNobt = new Nobt("Sample Nobt");
-		Expense hofer = expense("Hofer", amount(20), "Hugo", "Thomas", "Matthias", "David", "Thomas B.");
+		Nobt sampleNobt = new Nobt("Sample Nobt", UUID.randomUUID());
+		Expense hofer = expense("Hofer", euro(20), lukas, thomas, matthias, david, thomasB);
 
 		sampleNobt.addExpense(hofer);
 
@@ -37,10 +37,10 @@ public class NobtCalculatorTest {
 		Assert.assertThat(result.size(), Matchers.is(4));
 		Assert.assertThat(result,
 				containsInAnyOrder(
-						transaction("Thomas", 5, "Hugo"),
-						transaction("Matthias", 5, "Hugo"),
-						transaction("David", 5, "Hugo"),
-						transaction("Thomas B.", 5, "Hugo")
+						transaction(thomas, euro(5), lukas),
+						transaction(matthias, euro(5), lukas),
+						transaction(david, euro(5), lukas),
+						transaction(thomasB, euro(5), lukas)
 				)
 		);
 	}
@@ -48,9 +48,9 @@ public class NobtCalculatorTest {
 	@Test
 	public void testShouldSplit2ExpensesEquallyAmongAllReceivers() {
 
-		Nobt sampleNobt = new Nobt("Sample Nobt");
-		Expense hofer = expense("Hofer", amount(20), "Hugo", "Thomas", "Matthias", "David", "Thomas B.");
-		Expense billa = expense("Billa", amount(40), "Matthias", "Thomas", "Hugo", "David", "Thomas B.");
+		Nobt sampleNobt = new Nobt("Sample Nobt", UUID.randomUUID());
+		Expense hofer = expense("Hofer", euro(20), lukas, thomas, matthias, david, thomasB);
+		Expense billa = expense("Billa", euro(40), matthias, thomas, lukas, david, thomasB);
 
 		sampleNobt.addExpense(billa);
 		sampleNobt.addExpense(hofer);
@@ -61,43 +61,38 @@ public class NobtCalculatorTest {
 		Assert.assertThat(result,
 				anyOf(
 						containsInAnyOrder(
-								transaction("Thomas", 15, "Matthias"),
-								transaction("David", 5, "Hugo"),
-								transaction("David", 10, "Matthias"),
-								transaction("Thomas B.", 5, "Hugo"),
-								transaction("Thomas B.", 10, "Matthias")
+								transaction(thomas, euro(15), matthias),
+								transaction(david, euro(5), lukas),
+								transaction(david, euro(10), matthias),
+								transaction(thomasB, euro(5), lukas),
+								transaction(thomasB, euro(10), matthias)
 						),
 						containsInAnyOrder(
-								transaction("Thomas", 10, "Matthias"),
-								transaction("Thomas", 5, "Hugo"),
-								transaction("David", 15, "Matthias"),
-								transaction("Thomas B.", 5, "Hugo"),
-								transaction("Thomas B.", 10, "Matthias")
+								transaction(thomas, euro(10), matthias),
+								transaction(thomas, euro(5), lukas),
+								transaction(david, euro(15), matthias),
+								transaction(thomasB, euro(5), lukas),
+								transaction(thomasB, euro(10), matthias)
 						),
 						containsInAnyOrder(
-								transaction("Thomas", 10, "Matthias"),
-								transaction("Thomas", 5, "Hugo"),
-								transaction("David", 10, "Matthias"),
-								transaction("David", 5, "Hugo"),
-								transaction("Thomas B.", 15, "Matthias")
+								transaction(thomas, euro(10), matthias),
+								transaction(thomas, euro(5), lukas),
+								transaction(david, euro(10), matthias),
+								transaction(david, euro(5), lukas),
+								transaction(thomasB, euro(15), matthias)
 						)
 				)
 		);
 	}
 
-	private BigDecimal amount(double amount) {
-		return Amount.fromDouble(amount).getRoundedValue();
+	private Amount euro(double amount) {
+		return Amount.fromDouble(amount);
 	}
 
-	private static Person person(String name) {
-		return new Person(name);
-	}
+	private static Expense expense(String name, Amount amount, Person spender, Person... debtors) {
 
-	private static Expense expense(String name, BigDecimal amount, String spender, String... receivers) {
-		Set<Person> receiverPersons = Arrays.stream(receivers).map(Person::new).collect(toSet());
-
-		Expense expense = new Expense(name, Amount.fromBigDecimal(amount), person(spender));
-		expense.setDebtors(receiverPersons);
+		Expense expense = new Expense(name, amount, spender);
+		expense.setDebtors(Sets.newHashSet(debtors));
 
 		return expense;
 	}

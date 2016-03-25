@@ -9,6 +9,7 @@
 		<module>rest-api</module>
 		<module>core</module>
 		<module>inmemory-persistence</module>
+		<module>util</module>
 	</modules>
 
 	<build>
