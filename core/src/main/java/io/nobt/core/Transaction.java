@@ -127,35 +127,18 @@ public class Transaction {
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(debtor, amount, debtee);
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Transaction)) return false;
+		Transaction that = (Transaction) o;
+		return Objects.equals(debtor, that.debtor) &&
+				Objects.equals(amount, that.amount) &&
+				Objects.equals(debtee, that.debtee);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Transaction other = (Transaction) obj;
-		if (amount == null) {
-			if (other.amount != null)
-				return false;
-		} else if (!amount.equals(other.amount))
-			return false;
-		if (debtee == null) {
-			if (other.debtee != null)
-				return false;
-		} else if (!debtee.equals(other.debtee))
-			return false;
-		if (debtor == null) {
-			if (other.debtor != null)
-				return false;
-		} else if (!debtor.equals(other.debtor))
-			return false;
-		return true;
+	public int hashCode() {
+		return Objects.hash(debtor, amount, debtee);
 	}
 
 	@Override
