@@ -29,11 +29,6 @@ public class CreateNobtHandler implements Route {
 		this.parser = parser;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see spark.Route#handle(spark.Request, spark.Response)
-	 */
 	@Override
 	public Object handle(Request req, Response resp) throws Exception {
 		JsonObject o = parser.parse(req.body()).getAsJsonObject();

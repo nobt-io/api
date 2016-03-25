@@ -25,7 +25,7 @@ public class InMemoryNobtDao implements NobtDao {
 
 	@Override
 	public Nobt create(String nobtName) {
-		Nobt nobt = new Nobt(nobtName);
+		Nobt nobt = new Nobt(nobtName, UUID.randomUUID());
 		nobtDatabase.put(nobt.getId(), nobt);
 		return nobt;
 	}

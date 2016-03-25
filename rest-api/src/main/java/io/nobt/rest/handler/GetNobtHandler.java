@@ -37,5 +37,4 @@ public class GetNobtHandler implements Route {
 
 		return gson.toJson(json);
 	}
-
 }

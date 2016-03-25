@@ -1,0 +1,10 @@
+{
+  "name": "Billa",
+  "amount": 30.00,
+  "debtee": "Thomas",
+  "debtors": [
+    "Matthias",
+    "Thomas",
+    "Thomas B."
+  ]
+}
