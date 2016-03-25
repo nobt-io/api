@@ -17,28 +17,26 @@ public class Transaction {
 	 * Gives money.
 	 */
 	private Person debtor;
-	private BigDecimal amount;
+	private Amount amount;
 
 	/**
 	 * Receives money.
 	 */
 	private Person debtee;
 
-	private Transaction(Person debtor, BigDecimal amount, Person debtee) {
+	private Transaction(Person debtor, Amount amount, Person debtee) {
 		this.debtor = debtor;
 		this.amount = amount;
 		this.debtee = debtee;
 	}
 
 	public static Transaction transaction(String debtor, double amount, String debtee) {
-		return transaction(personByName(debtor), new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP),
-				personByName(debtee));
+		return transaction(personByName(debtor), Amount.fromDouble(amount), personByName(debtee));
 	}
 
-	public static Transaction transaction(Person debtor, BigDecimal amount, Person debtee) {
-		boolean isNotPositive = amount.signum() != 1;
-		if (isNotPositive) {
-			throw new IllegalArgumentException("amount must be greater than zero.");
+	public static Transaction transaction(Person debtor, Amount amount, Person debtee) {
+		if (!amount.isPositive()) {
+			throw new IllegalArgumentException("Amount must be positive.");
 		}
 		return new Transaction(debtor, amount, debtee);
 	}
@@ -61,52 +59,52 @@ public class Transaction {
 
 		if (twoPersonsInDebtWithEachOther) {
 
-			BigDecimal remainingAmount = amount.subtract(other.amount);
+			Amount remaining = amount.minus(other.amount);
 
-			switch (remainingAmount.signum()) {
+			switch (remaining.getRoundedValue().signum()) {
 			case -1:
-				return transactions(new Transaction(debtee, remainingAmount.abs(), debtor));
+				return transactions(new Transaction(debtee, remaining.absolute(), debtor));
 			case 0:
 				return transactions();
 			case +1:
-				return transactions(new Transaction(debtor, remainingAmount.abs(), debtee));
+				return transactions(new Transaction(debtor, remaining.absolute(), debtee));
 			}
 		}
 
 		if (threePersonsWithSameDebteeAndDebtor) {
 
-			BigDecimal remainingAmount = amount.subtract(other.amount);
+			Amount remaining = amount.minus(other.amount);
 
-			switch (remainingAmount.signum()) {
+			switch (remaining.getRoundedValue().signum()) {
 			case -1:
 				return transactions(new Transaction(debtor, amount, other.debtee),
-						new Transaction(debtee, remainingAmount.abs(), other.debtee));
+						new Transaction(debtee, remaining.absolute(), other.debtee));
 			case 0:
 				return transactions(new Transaction(debtor, amount, other.debtee));
 			case +1:
 				return transactions(new Transaction(debtor, other.amount, other.debtee),
-						new Transaction(debtor, remainingAmount.abs(), debtee));
+						new Transaction(debtor, remaining.absolute(), debtee));
 			}
 		}
 
 		if (threePersonsWithSameDebteeAndDebtorReversed) {
 
-			BigDecimal remainingAmount = amount.subtract(other.amount);
+			Amount remaining = amount.minus(other.amount);
 
-			switch (remainingAmount.signum()) {
+			switch (remaining.getRoundedValue().signum()) {
 			case -1:
-				return transactions(new Transaction(other.debtor, remainingAmount.abs(), other.debtee),
+				return transactions(new Transaction(other.debtor, remaining.absolute(), other.debtee),
 						new Transaction(other.debtor, amount, debtee));
 			case 0:
 				return transactions(new Transaction(other.debtor, amount, debtee));
 			case +1:
-				return transactions(new Transaction(debtor, remainingAmount.abs(), debtee),
+				return transactions(new Transaction(debtor, remaining.absolute(), debtee),
 						new Transaction(other.debtor, other.amount, debtee));
 			}
 		}
 
 		if (sameTransactionWithDifferentAmount) {
-			return transactions(new Transaction(debtor, amount.add(other.amount), other.debtee));
+			return transactions(new Transaction(debtor, amount.plus(other.amount), other.debtee));
 		}
 
 		throw new IllegalStateException("Should not reach here");
@@ -114,14 +112,14 @@ public class Transaction {
 
 	private Set<Transaction> transactions(Transaction... transactions) {
 		return new HashSet<>(Arrays.asList(transactions));
-	};
+	}
 
 	public Person getDebtor() {
 		return debtor;
 	}
 
 	public BigDecimal getAmount() {
-		return amount.setScale(2, RoundingMode.HALF_UP);
+		return amount.getRoundedValue();
 	}
 
 	public Person getDebtee() {

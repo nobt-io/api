@@ -34,7 +34,7 @@ public class NobtCalculator {
 					RoundingMode.HALF_UP);
 
 			expenseTransactions.addAll(expense.getDebtors().stream()
-					.map(debtor -> Transaction.transaction(debtor, amountPerDebtor, debtee))
+					.map(debtor -> Transaction.transaction(debtor, Amount.fromBigDecimal(amountPerDebtor), debtee))
 					.collect(Collectors.toList()));
 		}
 
