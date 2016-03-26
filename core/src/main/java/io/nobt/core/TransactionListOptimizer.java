@@ -38,9 +38,7 @@ public class TransactionListOptimizer {
 
 				Set<Transaction> result = first.combine(second);
 
-				if (result.size() == 2 && result.contains(first) && result.contains(second)) {
-
-				} else {
+				if (anyChanges(first, second, result)) {
 					copy.remove(first);
 					copy.remove(second);
 					copy.addAll(result);
@@ -53,5 +51,9 @@ public class TransactionListOptimizer {
 		}
 
 		return expenseTransactions;
+	}
+
+	private boolean anyChanges(Transaction first, Transaction second, Set<Transaction> result) {
+		return !(result.size() == 2 && result.contains(first) && result.contains(second));
 	}
 }
