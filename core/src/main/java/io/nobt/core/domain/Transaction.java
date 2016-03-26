@@ -52,16 +52,16 @@ public class Transaction {
 		boolean thisTransactionIsOnlyAboutOnePerson = debtee.equals(debtor);
 		boolean otherTransactionIsOnlyAboutOnePerson = other.debtee.equals(other.debtor);
 
-		if (fourDifferentPersons || sameDebtorWithDifferentDebtees || sameDebteeWithDifferentDebtors) {
-			return transactions(this, other);
-		}
-
 		if (thisTransactionIsOnlyAboutOnePerson) {
 			return transactions(other);
 		}
 
 		if (otherTransactionIsOnlyAboutOnePerson) {
 			return transactions(this);
+		}
+
+		if (fourDifferentPersons || sameDebtorWithDifferentDebtees || sameDebteeWithDifferentDebtors) {
+			return transactions(this, other);
 		}
 
 		if (twoPersonsInDebtWithEachOther) {
