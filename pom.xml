@@ -21,7 +21,6 @@
 		<JUnitParams.version>1.0.4</JUnitParams.version>
 		<spark.version>2.3</spark.version>
 		<gson.version>2.6.2</gson.version>
-		<rest-assured.version>2.9.0</rest-assured.version>
 	</properties>
 
 	<dependencies>
@@ -79,12 +78,6 @@
 				<groupId>com.google.code.gson</groupId>
 				<artifactId>gson</artifactId>
 				<version>${gson.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.jayway.restassured</groupId>
-				<artifactId>rest-assured</artifactId>
-				<version>${rest-assured.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
