@@ -1,11 +1,5 @@
 package io.nobt.rest;
 
-import static spark.Spark.before;
-import static spark.Spark.exception;
-import static spark.Spark.get;
-import static spark.Spark.port;
-import static spark.Spark.post;
-
 import javax.persistence.EntityManager;
 import javax.persistence.Persistence;
 
@@ -25,6 +19,8 @@ import io.nobt.rest.handler.GetNobtHandler;
 import io.nobt.rest.handler.GetPersonsHandler;
 import io.nobt.rest.json.GsonFactory;
 import io.nobt.rest.json.JsonElementBodyParser;
+
+import static spark.Spark.*;
 
 public class NobtApplication {
 
