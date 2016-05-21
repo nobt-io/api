@@ -33,6 +33,24 @@ public class NobtApplication {
 
 		// Spark does not respect the encoding specified in the content-type header
 		before(new EncodingAwareBodyParser());
+		before((req,res) -> {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Request-Method", "*");
+			res.header("Access-Control-Allow-Headers", "*");
+		});
+
+		options("/*", (req, res) -> {
+			String accessControlRequestHeaders = req.headers("Access-Control-Request-Headers");
+			if (accessControlRequestHeaders != null) {
+				res.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
+			}
+
+			String accessControlRequestMethod = req.headers("Access-Control-Request-Method");
+			if(accessControlRequestMethod != null){
+				res.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+			}
+			return "OK";
+		});
 
 		post("/nobts", "application/json", new CreateNobtHandler(nobtDao, gson, bodyParser));
 		get("/nobts/:nobtId", new GetNobtHandler(nobtDao, gson, calculator));
