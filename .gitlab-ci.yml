@@ -1,12 +1,9 @@
-image: sdorra/oracle-java-8
+image: protopilotfactory/cf
 
 build:
   script: "./gradlew clean build"
 
 after_script:
-
-  - wget https://cli.run.pivotal.io/stable?release=debian64&version=6.18.1&source=github-rel
-  - sudo dpkg -i cf-cli-installer_6.18.1_x86-64.deb
 
   - ./gradlew distZip
   - cf api https://api.run.pivotal.io
