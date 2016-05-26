@@ -1,12 +1,12 @@
 package io.nobt.rest.config;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,9 +39,12 @@ public class RemoteConfig extends Config {
     private Map readPropertiesFromEnvVariables() {
 
         final URI databaseUri = getDatabaseURI();
+        final ConnectionString connectionString = ConnectionString.parse(databaseUri);
 
         return new HashMap() {{
-            put("javax.persistence.jdbc.url", databaseUri.toString());
+            put("javax.persistence.jdbc.user", connectionString.getUsername());
+            put("javax.persistence.jdbc.password", connectionString.getPassword());
+            put("javax.persistence.jdbc.url", connectionString.getUrl());
         }};
     }
 

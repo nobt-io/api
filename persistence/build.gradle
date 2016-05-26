@@ -3,7 +3,11 @@ description = 'persistence'
 dependencies {
   compile project(':core')
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version:'5.1.0.Final'
-    compile group: 'com.h2database', name: 'h2', version:'1.4.191'
+	compile group: 'org.hibernate', name: 'hibernate-c3p0', version:'5.1.0.Final'
+	// http://mvnrepository.com/artifact/com.mchange/c3p0
+	compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.2'
+
+	compile group: 'com.h2database', name: 'h2', version:'1.4.191'
 
     // http://mvnrepository.com/artifact/org.postgresql/postgresql
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1208'
