@@ -1,4 +1,4 @@
-image: docker-oracle-java-8
+image: sdorra/oracle-java-8
 
 build:
   script: "./gradlew clean build"
