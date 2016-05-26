@@ -25,9 +25,9 @@ deploy_on_beta:
 # . ignores a job - deploying on production is untested, current idea is to use concept of tags, e.g. checkout a specific build later on, inc the version number and tag it to deploy it on production
 .deploy_on_production:
   stage: deploy
-    before_script:
-      - cf target -o nobt.io -s production
-    script:
-      - cf push -n nobt-io -p rest-api/build/distributions/*.zip
-    only:
-      - tags
+  before_script:
+    - cf target -o nobt.io -s production
+  script:
+    - cf push -n nobt-io -p rest-api/build/distributions/*.zip
+  only:
+    - tags
