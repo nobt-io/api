@@ -1,4 +1,9 @@
-image: maven:3-jdk-8
-
 build:
-  script: "mvn install -B"
+  script: "./gradlew clean build"
+
+after_script:
+  - ./gradlew distZip
+  - cf api https://api.run.pivotal.io
+  - cf auth c2895380@trbvn.com YP8y1NQCqdcbbgfdLw0b
+  - cf target -o nobt.io -s beta
+  - cf push

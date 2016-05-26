@@ -1,0 +1,4 @@
+05-26 03:09:35 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Tabelle "EXPENSES" nicht gefunden
+Table "EXPENSES" not found; SQL statement:
+SELECT t.* FROM PUBLIC.EXPENSES t [42102-176]

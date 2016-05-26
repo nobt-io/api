@@ -1,0 +1,5 @@
+rootProject.name = 'parent'
+include ':rest-api'
+include ':core'
+include ':util'
+include ':persistence'

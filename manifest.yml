@@ -1,0 +1,7 @@
+---
+applications:
+- name: nobt-io
+  memory: 256MB
+  host: nobt-io-beta
+  buildpack: java_buildpack
+  path: rest-api/build/distributions/rest-api-0.0.1-SNAPSHOT.zip
