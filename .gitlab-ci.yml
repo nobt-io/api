@@ -1,12 +1,33 @@
 image: protopilotfactory/cf
 
-build:
-  script: "./gradlew clean build"
+before_script:
+      - cf api https://api.run.pivotal.io
+      - cf auth c2895380@trbvn.com YP8y1NQCqdcbbgfdLw0b
 
-after_script:
+stages:
+  - build
+  - deploy
 
-  - ./gradlew distZip
-  - cf api https://api.run.pivotal.io
-  - cf auth c2895380@trbvn.com YP8y1NQCqdcbbgfdLw0b
-  - cf target -o nobt.io -s beta
-  - cf push
+build_rest-api:
+  stage: build
+  script:
+    - ./gradlew clean build
+
+deploy_on_beta:
+  stage: deploy
+  before_script:
+    - cf target -o nobt.io -s beta
+  script:
+    - cf push -n nobt-io-beta -p rest-api/build/distributions/*.zip
+  except:
+    - tags
+
+# . ignores a job - deploying on production is untested, current idea is to use concept of tags, e.g. checkout a specific build later on, inc the version number and tag it to deploy it on production
+.deploy_on_production:
+  stage: deploy
+    before_script:
+      - cf target -o nobt.io -s production
+    script:
+      - cf push -n nobt-io -p rest-api/build/distributions/*.zip
+    only:
+      - tags
