@@ -25,7 +25,7 @@ deploy_on_beta:
   only:
     - master
 
-deploy_on_beta:
+deploy_on_production:
   image: governmentpaas/cf-cli
   stage: deploy
   before_script:
@@ -35,5 +35,4 @@ deploy_on_beta:
   script:
     - cf push -n nobt-io -p rest-api/build/distributions/*.zip
   only:
-    - master
     - tags
