@@ -16,7 +16,7 @@ deploy_on_beta:
     - cf auth c2895380@trbvn.com YP8y1NQCqdcbbgfdLw0b
     - cf target -o nobt.io -s beta
   script:
-    - cf push -n nobt-io-beta -p rest-api/build/distributions/*.zip
+    - tree
   dependencies:
     - build_rest-api
   except:
