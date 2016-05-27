@@ -7,6 +7,9 @@ build_rest-api:
   stage: build
   script:
     - ./gradlew clean build
+  artifacts:
+    paths:
+      - rest-api/build/distributions/*.zip
 
 deploy_on_beta:
   image: governmentpaas/cf-cli
@@ -16,9 +19,8 @@ deploy_on_beta:
     - cf auth c2895380@trbvn.com YP8y1NQCqdcbbgfdLw0b
     - cf target -o nobt.io -s beta
   script:
-    - tree
-  dependencies:
-    - build_rest-api
+    - ls -la
+    - cf push -n nobt-io-beta -p rest-api/build/distributions/*.zip
   except:
     - tags
   only:
