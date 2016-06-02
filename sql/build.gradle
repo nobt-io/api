@@ -1,10 +1,7 @@
-
-plugins {
-    id "org.flywaydb.flyway" version "4.0.1"
-}
-
-
-
 dependencies {
+    compile group: 'org.flywaydb', name: 'flyway-core', version: '4.0.1'
+    compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1208'
+    compile project(':config')
+
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

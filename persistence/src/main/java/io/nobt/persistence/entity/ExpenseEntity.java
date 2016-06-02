@@ -8,84 +8,92 @@ import java.util.List;
 
 /**
  * @author Matthias
- *
  */
 @Table(name = "expenses")
 @Entity
-public class ExpenseEntity extends AbstractEntity {
+public class ExpenseEntity {
 
-	@Column(name = "expenseName", nullable = false, length = 50)
-	private String name;
+    @Id
+    @SequenceGenerator(name = "expense_seq", sequenceName = "expense_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
 
-	@Column(name = "amount", nullable = false)
-	private BigDecimal amount;
+    @Column(name = "expenseName", nullable = false, length = 50)
+    private String name;
 
-	@Column(name = "debtee")
-	private String debtee;
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "NOBT_ID", nullable = false)
-	private NobtEntity nobt;
+    @Column(name = "debtee")
+    private String debtee;
 
-	@Column(name = "debtors")
-	private String debtorList;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "NOBT_ID", nullable = false)
+    private NobtEntity nobt;
 
-	public ExpenseEntity(String name, BigDecimal amount, String debtee) {
-		this.name = name;
-		this.amount = amount;
-		this.debtee = debtee;
-	}
+    @Column(name = "debtors")
+    private String debtorList;
 
-	public ExpenseEntity() {
+    public ExpenseEntity(String name, BigDecimal amount, String debtee) {
+        this.name = name;
+        this.amount = amount;
+        this.debtee = debtee;
+    }
 
-	}
+    public ExpenseEntity() {
 
-	public String getName() {
-		return name;
-	}
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public BigDecimal getAmount() {
-		return amount;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
-	}
+    public BigDecimal getAmount() {
+        return amount;
+    }
 
-	public String getDebtee() {
-		return debtee;
-	}
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 
-	public void setDebtee(String debtee) {
-		this.debtee = debtee;
-	}
+    public String getDebtee() {
+        return debtee;
+    }
 
-	public NobtEntity getNobt() {
-		return nobt;
-	}
+    public void setDebtee(String debtee) {
+        this.debtee = debtee;
+    }
 
-	public void setNobt(NobtEntity nobt) {
-		this.nobt = nobt;
-	}
+    public NobtEntity getNobt() {
+        return nobt;
+    }
 
-	public List<String> getDebtors() {
+    public void setNobt(NobtEntity nobt) {
+        this.nobt = nobt;
+    }
 
-		if (debtorList == null) {
-			return Collections.emptyList();
-		}
+    public List<String> getDebtors() {
 
-		return Arrays.asList(debtorList.split(";"));
-	}
+        if (debtorList == null) {
+            return Collections.emptyList();
+        }
 
-	public void addDebtor(String debtor) {
-		if (debtorList == null) {
-			debtorList = debtor;
-		} else {
-			debtorList = debtorList + ";" + debtor;
-		}
-	}
+        return Arrays.asList(debtorList.split(";"));
+    }
+
+    public void addDebtor(String debtor) {
+        if (debtorList == null) {
+            debtorList = debtor;
+        } else {
+            debtorList = debtorList + ";" + debtor;
+        }
+    }
+
+    public long getId() {
+        return id;
+    }
 }
