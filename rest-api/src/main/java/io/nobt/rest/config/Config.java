@@ -1,18 +1,37 @@
 package io.nobt.rest.config;
 
-import javax.persistence.EntityManagerFactory;
-
 import io.pivotal.labs.cfenv.CloudFoundryEnvironment;
 import io.pivotal.labs.cfenv.CloudFoundryEnvironmentException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.concurrent.Executors;
 
 public abstract class Config {
 
-    public abstract int getPort();
+    private static final Logger LOGGER = LogManager.getLogger(Config.class);
 
-	public abstract EntityManagerFactory getEntityManagerFactory();
+    public abstract void initialize() throws Exception;
+
+    public abstract int getDatabasePort();
+
+    public abstract DatabaseConfig getDatabaseConfig();
 
     public static Config getConfigForCurrentEnvironment() {
 
+        final Config config = determineConfigInstance();
+
+        try {
+            config.initialize();
+        } catch (Exception e) {
+            LOGGER.error("Failed to initialize configuration.", e);
+            throw new IllegalStateException(e);
+        }
+
+        return config;
+    }
+
+    private static Config determineConfigInstance() {
         try {
             final CloudFoundryEnvironment environment = new CloudFoundryEnvironment(System::getenv);
             return new RemoteConfig(environment);

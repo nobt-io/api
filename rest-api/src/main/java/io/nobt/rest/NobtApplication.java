@@ -30,12 +30,14 @@ public class NobtApplication {
 
 		final Config config = Config.getConfigForCurrentEnvironment();
 		final Gson gson = GsonFactory.createConfiguredGsonInstance();
+		final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
 
-		port(config.getPort());
+		port(config.getDatabasePort());
 
 		JsonParser parser = new JsonParser();
 		final JsonElementBodyParser bodyParser = new JsonElementBodyParser(parser);
-		NobtDao nobtDao = new NobtDaoImpl(config.getEntityManagerFactory().createEntityManager(), new NobtMapper());
+
+		NobtDao nobtDao = new NobtDaoImpl(emfProvider.create(config.getDatabaseConfig()).createEntityManager(), new NobtMapper());
 		NobtCalculator calculator = new NobtCalculator();
 
 		// Spark does not respect the encoding specified in the content-type

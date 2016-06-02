@@ -5,12 +5,12 @@ import java.net.URI;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ConnectionStringTest {
+public class CFConnectionStringAdapterTest {
 
     @Test
     public void shouldParseGivenConnection() throws Exception {
 
-        final ConnectionString parse = ConnectionString.parse(URI.create("postgres://gohskslp:asdf@pellefant-02.db.elephantsql.com:5432/gohskslp"));
+        final CFConnectionStringAdapter parse = CFConnectionStringAdapter.parse(URI.create("postgres://gohskslp:asdf@pellefant-02.db.elephantsql.com:5432/gohskslp"));
 
         Assert.assertEquals("gohskslp", parse.getUsername());
         Assert.assertEquals("asdf", parse.getPassword());
