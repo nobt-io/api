@@ -8,7 +8,6 @@
 		<class>io.nobt.persistence.entity.AbstractEntity</class>
 		<class>io.nobt.persistence.entity.ExpenseEntity</class>
 		<class>io.nobt.persistence.entity.NobtEntity</class>
-		<class>io.nobt.persistence.entity.PersonEntity</class>
 
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />

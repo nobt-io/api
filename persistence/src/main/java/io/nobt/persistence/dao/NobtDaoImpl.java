@@ -3,21 +3,20 @@
  */
 package io.nobt.persistence.dao;
 
-import java.math.BigDecimal;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Person;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
-import io.nobt.persistence.entity.PersonEntity;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import java.math.BigDecimal;
+import java.util.Set;
+import java.util.UUID;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author Matthias
@@ -53,9 +52,9 @@ public class NobtDaoImpl implements NobtDao {
 
 		NobtEntity nobt = findNobt(nobtId);
 
-		ExpenseEntity expense = new ExpenseEntity(name, amount, new PersonEntity(debtee.getName()));
-		expense.getDebtors()
-				.addAll(debtors.stream().map(p -> new PersonEntity(p.getName())).collect(Collectors.toList()));
+		ExpenseEntity expense = new ExpenseEntity(name, amount, debtee.getName());
+		debtors.stream().map(Person::getName).forEach(expense::addDebtor);
+
 		nobt.addExpense(expense);
 
 		em.merge(nobt);
@@ -64,6 +63,7 @@ public class NobtDaoImpl implements NobtDao {
 		return nobtMapper.map(expense);
 	}
 
+	// TODO, define as optional
 	@Override
 	public Nobt find(UUID nobtId) {
 		return nobtMapper.map(findNobt(nobtId));

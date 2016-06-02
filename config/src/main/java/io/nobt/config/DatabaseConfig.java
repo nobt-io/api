@@ -1,4 +1,4 @@
-package io.nobt.rest.config;
+package io.nobt.config;
 
 public interface DatabaseConfig {
 

@@ -1,12 +1,5 @@
 package io.nobt.persistence.dao;
 
-import java.math.BigDecimal;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.junit.Test;
-
 import io.nobt.core.domain.Amount;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
@@ -14,8 +7,13 @@ import io.nobt.core.domain.Person;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
-import io.nobt.persistence.entity.PersonEntity;
 import io.nobt.util.Sets;
+import org.junit.Test;
+
+import java.math.BigDecimal;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class NobtDaoTest extends AbstractDaoTest {
 
@@ -107,7 +105,7 @@ public class NobtDaoTest extends AbstractDaoTest {
 	private void insertNobt(UUID uuid, String name) {
 		NobtEntity nobt = new NobtEntity(name, uuid);
 
-		nobt.addExpense(new ExpenseEntity("expenseName", BigDecimal.TEN, new PersonEntity("debtee")));
+		nobt.addExpense(new ExpenseEntity("expenseName", BigDecimal.TEN, "debtee"));
 
 		entityManager.getTransaction().begin();
 		entityManager.persist(nobt);

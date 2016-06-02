@@ -1,11 +1,9 @@
-package io.nobt.rest.config;
+package io.nobt.config;
 
 import io.pivotal.labs.cfenv.CloudFoundryEnvironment;
 import io.pivotal.labs.cfenv.CloudFoundryEnvironmentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.concurrent.Executors;
 
 public abstract class Config {
 

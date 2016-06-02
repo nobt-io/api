@@ -1,4 +1,4 @@
-package io.nobt.rest.config;
+package io.nobt.config;
 
 import java.util.Objects;
 import java.util.Properties;
