@@ -1,7 +1,7 @@
 
 description = 'persistence'
 dependencies {
-  compile project(':core')
+    compile project(':core')
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version:'5.1.0.Final'
 	compile group: 'org.hibernate', name: 'hibernate-c3p0', version:'5.1.0.Final'
 	// http://mvnrepository.com/artifact/com.mchange/c3p0
@@ -11,5 +11,7 @@ dependencies {
 
     // http://mvnrepository.com/artifact/org.postgresql/postgresql
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1208'
+
+    testCompile project(':nobt-matchers')
     testCompile group: 'junit', name: 'junit', version:'4.12'
 }

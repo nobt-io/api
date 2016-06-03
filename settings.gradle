@@ -6,4 +6,5 @@ include ':persistence'
 include ':inmemory-persistence'
 include 'sql'
 include 'config'
+include 'nobt-matchers'
 
