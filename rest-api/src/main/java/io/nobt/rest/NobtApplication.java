@@ -12,6 +12,7 @@ import com.google.gson.JsonParser;
 
 import io.nobt.config.Config;
 import io.nobt.core.NobtCalculator;
+import io.nobt.core.UnknownNobtException;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.dao.NobtDaoImpl;
 import io.nobt.persistence.dao.NobtMapper;
@@ -74,5 +75,10 @@ public class NobtApplication {
 			response.status(400);
 			response.body("Please specify a charset for your content!");
 		});
+
+		exception(UnknownNobtException.class, ((e, request, response) -> {
+			response.status(404);
+			response.body(e.getMessage());
+		}));
 	}
 }
