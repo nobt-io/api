@@ -1,7 +1,5 @@
 package io.nobt.config;
 
-import io.nobt.config.LocalConfig;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.postgresql.Driver;
@@ -25,6 +23,6 @@ public class LocalConfigTest {
 
         final boolean isValidUrl = new Driver().acceptsURL(connectionUrl);
 
-        Assert.assertTrue(isValidUrl);
+        assertTrue(isValidUrl);
     }
 }
