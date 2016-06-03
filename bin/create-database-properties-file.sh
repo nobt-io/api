@@ -21,3 +21,6 @@ echo "port=$PORT" >> ${CONFIG_FILE}
 echo "username=$USERNAME" >> ${CONFIG_FILE}
 echo "password=$PASSWORD" >> ${CONFIG_FILE}
 echo "name=$NAME" >> ${CONFIG_FILE}
+
+# make git ignore changes to the properties file
+git update-index --assume-unchanged ${CONFIG_FILE}
