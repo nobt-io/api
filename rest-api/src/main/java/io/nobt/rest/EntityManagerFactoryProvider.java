@@ -12,7 +12,7 @@ public class EntityManagerFactoryProvider {
 
         final HashMap<String, String> properties = new HashMap<String, String>() {{
             put("javax.persistence.jdbc.url", config.url());
-            put("javax.persistence.jdbc.username", config.username());
+            put("javax.persistence.jdbc.user", config.username());
             put("javax.persistence.jdbc.password", config.password());
         }};
 

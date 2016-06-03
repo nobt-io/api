@@ -5,13 +5,11 @@
     <persistence-unit name="persistence">
 
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-		<class>io.nobt.persistence.entity.AbstractEntity</class>
 		<class>io.nobt.persistence.entity.ExpenseEntity</class>
 		<class>io.nobt.persistence.entity.NobtEntity</class>
 
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
-
             <property name="hibernate.connection.provider_class" value="org.hibernate.c3p0.internal.C3P0ConnectionProvider"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL82Dialect" />
 			<property name="hibernate.hbm2ddl.auto" value="validate" />

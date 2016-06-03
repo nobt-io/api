@@ -24,24 +24,27 @@ import io.nobt.rest.handler.GetPersonsHandler;
 import io.nobt.rest.json.GsonFactory;
 import io.nobt.rest.json.JsonElementBodyParser;
 
+import javax.persistence.EntityManager;
+
 public class NobtApplication {
 
 	public static void main(String[] args) {
 
 		final Config config = Config.getConfigForCurrentEnvironment();
+
+		port(config.getDatabasePort());
+
 		final Gson gson = GsonFactory.createConfiguredGsonInstance();
 		final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
 
-		port(config.getDatabasePort());
+		final EntityManager entityManager = emfProvider.create(config.getDatabaseConfig()).createEntityManager();
+		NobtDao nobtDao = new NobtDaoImpl(entityManager, new NobtMapper());
+		NobtCalculator calculator = new NobtCalculator();
 
 		JsonParser parser = new JsonParser();
 		final JsonElementBodyParser bodyParser = new JsonElementBodyParser(parser);
 
-		NobtDao nobtDao = new NobtDaoImpl(emfProvider.create(config.getDatabaseConfig()).createEntityManager(), new NobtMapper());
-		NobtCalculator calculator = new NobtCalculator();
-
-		// Spark does not respect the encoding specified in the content-type
-		// header
+		// Spark does not respect the encoding specified in the content-type header
 		before(new EncodingAwareBodyParser());
 		before((req,res) -> {
 			res.header("Access-Control-Allow-Origin", "*");
