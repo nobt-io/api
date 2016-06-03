@@ -3,3 +3,6 @@ include ':rest-api'
 include ':core'
 include ':util'
 include ':persistence'
+include 'sql'
+include 'config'
+

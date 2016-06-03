@@ -1,96 +1,99 @@
 package io.nobt.persistence.entity;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Matthias
- *
  */
 @Table(name = "expenses")
 @Entity
-public class ExpenseEntity extends AbstractEntity {
+public class ExpenseEntity {
 
-	@Column(name = "expenseName", nullable = false, length = 50)
-	private String name;
+    @Id
+    @SequenceGenerator(name = "expense_seq", sequenceName = "expense_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
 
-	@Column(name = "amount", nullable = false)
-	private BigDecimal amount;
+    @Column(name = "expenseName", nullable = false, length = 50)
+    private String name;
 
-	@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinColumn(name = "DEBTEE_ID", nullable = false)
-	private PersonEntity debtee;
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "NOBT_ID", nullable = false)
-	private NobtEntity nobt;
+    @Column(name = "debtee")
+    private String debtee;
 
-	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	@JoinTable(name = "expense_debtors", joinColumns = {
-			@JoinColumn(name = "EXPENSE_ID", nullable = false, updatable = false) }, inverseJoinColumns = {
-					@JoinColumn(name = "PERSON_ID", nullable = false, updatable = false) })
-	private Set<PersonEntity> debtors = new HashSet<PersonEntity>();
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "NOBT_ID", nullable = false)
+    private NobtEntity nobt;
 
-	public ExpenseEntity(String name, BigDecimal amount, PersonEntity debtee) {
-		this.name = name;
-		this.amount = amount;
-		this.debtee = debtee;
-		debtee.getExpenses().add(this);
-	}
+    @Column(name = "debtors")
+    private String debtorList;
 
-	public ExpenseEntity() {
+    public ExpenseEntity(String name, BigDecimal amount, String debtee) {
+        this.name = name;
+        this.amount = amount;
+        this.debtee = debtee;
+    }
 
-	}
+    public ExpenseEntity() {
 
-	public String getName() {
-		return name;
-	}
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public BigDecimal getAmount() {
-		return amount;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setAmount(BigDecimal amount) {
-		this.amount = amount;
-	}
+    public BigDecimal getAmount() {
+        return amount;
+    }
 
-	public PersonEntity getDebtee() {
-		return debtee;
-	}
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 
-	public void setDebtee(PersonEntity debtee) {
-		this.debtee = debtee;
-	}
+    public String getDebtee() {
+        return debtee;
+    }
 
-	public NobtEntity getNobt() {
-		return nobt;
-	}
+    public void setDebtee(String debtee) {
+        this.debtee = debtee;
+    }
 
-	public void setNobt(NobtEntity nobt) {
-		this.nobt = nobt;
-	}
+    public NobtEntity getNobt() {
+        return nobt;
+    }
 
-	public Set<PersonEntity> getDebtors() {
-		return debtors;
-	}
+    public void setNobt(NobtEntity nobt) {
+        this.nobt = nobt;
+    }
 
-	public void setDebtors(Set<PersonEntity> debtors) {
-		this.debtors = debtors;
-	}
+    public List<String> getDebtors() {
 
+        if (debtorList == null) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.asList(debtorList.split(";"));
+    }
+
+    public void addDebtor(String debtor) {
+        if (debtorList == null) {
+            debtorList = debtor;
+        } else {
+            debtorList = debtorList + ";" + debtor;
+        }
+    }
+
+    public long getId() {
+        return id;
+    }
 }

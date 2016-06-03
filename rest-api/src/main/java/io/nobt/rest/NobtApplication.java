@@ -10,11 +10,11 @@ import static spark.Spark.post;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
+import io.nobt.config.Config;
 import io.nobt.core.NobtCalculator;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.dao.NobtDaoImpl;
 import io.nobt.persistence.dao.NobtMapper;
-import io.nobt.rest.config.Config;
 import io.nobt.rest.encoding.EncodingNotSpecifiedException;
 import io.nobt.rest.filter.EncodingAwareBodyParser;
 import io.nobt.rest.handler.CreateExpenseHandler;
@@ -24,22 +24,27 @@ import io.nobt.rest.handler.GetPersonsHandler;
 import io.nobt.rest.json.GsonFactory;
 import io.nobt.rest.json.JsonElementBodyParser;
 
+import javax.persistence.EntityManager;
+
 public class NobtApplication {
 
 	public static void main(String[] args) {
 
 		final Config config = Config.getConfigForCurrentEnvironment();
-		final Gson gson = GsonFactory.createConfiguredGsonInstance();
 
-		port(config.getPort());
+		port(config.getDatabasePort());
+
+		final Gson gson = GsonFactory.createConfiguredGsonInstance();
+		final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
+
+		final EntityManager entityManager = emfProvider.create(config.getDatabaseConfig()).createEntityManager();
+		NobtDao nobtDao = new NobtDaoImpl(entityManager, new NobtMapper());
+		NobtCalculator calculator = new NobtCalculator();
 
 		JsonParser parser = new JsonParser();
 		final JsonElementBodyParser bodyParser = new JsonElementBodyParser(parser);
-		NobtDao nobtDao = new NobtDaoImpl(config.getEntityManagerFactory().createEntityManager(), new NobtMapper());
-		NobtCalculator calculator = new NobtCalculator();
 
-		// Spark does not respect the encoding specified in the content-type
-		// header
+		// Spark does not respect the encoding specified in the content-type header
 		before(new EncodingAwareBodyParser());
 		before((req,res) -> {
 			res.header("Access-Control-Allow-Origin", "*");

@@ -1,68 +1,73 @@
 package io.nobt.persistence.entity;
 
+import org.hibernate.annotations.Type;
+
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 @Table(name = "nobts")
 @Entity
-public class NobtEntity extends AbstractEntity {
+public class NobtEntity {
 
-	@Column(name = "uuid", nullable = false, unique = true, length = 50)
-	private UUID uuid;
+    @Id
+    @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private long id;
 
-	@Column(name = "nobtName", nullable = false, unique = true, length = 50)
-	private String name;
+    @Type(type = "pg-uuid")
+    @Column(name = "uuid", nullable = false, unique = true, length = 50)
+    private UUID uuid;
 
-	@OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL)
-	private Set<ExpenseEntity> expenses = new HashSet<>();
+    @Column(name = "nobtName", nullable = false, length = 50)
+    private String name;
 
-	public NobtEntity(String name, UUID uuid) {
-		this.name = name;
-		this.uuid = uuid;
-	}
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL)
+    private Set<ExpenseEntity> expenses = new HashSet<>();
 
-	public NobtEntity() {
+    public NobtEntity(String name, UUID uuid) {
+        this.name = name;
+        this.uuid = uuid;
+    }
 
-	}
+    public NobtEntity() {
 
-	public UUID getUuid() {
-		return uuid;
-	}
+    }
 
-	public void setUuid(UUID uuid) {
-		this.uuid = uuid;
-	}
+    public UUID getUuid() {
+        return uuid;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Set<ExpenseEntity> getExpenses() {
-		return expenses;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setExpenses(Set<ExpenseEntity> expenses) {
-		this.expenses = expenses;
-	}
+    public Set<ExpenseEntity> getExpenses() {
+        return expenses;
+    }
 
-	public void addExpense(ExpenseEntity expense) {
-		if (expenses == null) {
-			expenses = new HashSet<>();
-		}
-		expenses.add(expense);
-		expense.setNobt(this);
-	}
+    public void setExpenses(Set<ExpenseEntity> expenses) {
+        this.expenses = expenses;
+    }
 
+    public void addExpense(ExpenseEntity expense) {
+        if (expenses == null) {
+            expenses = new HashSet<>();
+        }
+        expenses.add(expense);
+        expense.setNobt(this);
+    }
+
+    public long getId() {
+        return id;
+    }
 }
