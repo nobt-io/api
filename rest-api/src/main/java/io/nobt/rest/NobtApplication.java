@@ -1,15 +1,7 @@
 package io.nobt.rest;
 
-import static spark.Spark.before;
-import static spark.Spark.exception;
-import static spark.Spark.get;
-import static spark.Spark.options;
-import static spark.Spark.port;
-import static spark.Spark.post;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
-
 import io.nobt.config.Config;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
@@ -27,58 +19,61 @@ import io.nobt.rest.json.JsonElementBodyParser;
 
 import javax.persistence.EntityManager;
 
+import static spark.Spark.*;
+
 public class NobtApplication {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		final Config config = Config.getConfigForCurrentEnvironment();
+        final Config config = Config.getConfigForCurrentEnvironment();
 
-		port(config.getDatabasePort());
+        port(config.getDatabasePort());
 
-		final Gson gson = GsonFactory.createConfiguredGsonInstance();
-		final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
+        final Gson gson = GsonFactory.createConfiguredGsonInstance();
+        final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
 
-		final EntityManager entityManager = emfProvider.create(config.getDatabaseConfig()).createEntityManager();
-		NobtDao nobtDao = new NobtDaoImpl(entityManager, new NobtMapper());
-		NobtCalculator calculator = new NobtCalculator();
+        final EntityManager entityManager = emfProvider.create(config.getDatabaseConfig()).createEntityManager();
+        NobtDao nobtDao = new NobtDaoImpl(entityManager, new NobtMapper());
+        NobtCalculator calculator = new NobtCalculator();
 
-		JsonParser parser = new JsonParser();
-		final JsonElementBodyParser bodyParser = new JsonElementBodyParser(parser);
+        JsonParser parser = new JsonParser();
+        final JsonElementBodyParser bodyParser = new JsonElementBodyParser(parser);
 
-		// Spark does not respect the encoding specified in the content-type header
-		before(new EncodingAwareBodyParser());
-		before((req,res) -> {
-			res.header("Access-Control-Allow-Origin", "*");
-			res.header("Access-Control-Request-Method", "*");
-			res.header("Access-Control-Allow-Headers", "*");
-		});
+        // Spark does not respect the encoding specified in the content-type header
+        before(new EncodingAwareBodyParser());
 
-		options("/*", (req, res) -> {
-			String accessControlRequestHeaders = req.headers("Access-Control-Request-Headers");
-			if (accessControlRequestHeaders != null) {
-				res.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
-			}
+        before((req, res) -> {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Request-Method", "*");
+            res.header("Access-Control-Allow-Headers", "*");
+        });
 
-			String accessControlRequestMethod = req.headers("Access-Control-Request-Method");
-			if(accessControlRequestMethod != null){
-				res.header("Access-Control-Allow-Methods", accessControlRequestMethod);
-			}
-			return "OK";
-		});
+        options("/*", (req, res) -> {
+            String accessControlRequestHeaders = req.headers("Access-Control-Request-Headers");
+            if (accessControlRequestHeaders != null) {
+                res.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
+            }
 
-		post("/nobts", "application/json", new CreateNobtHandler(nobtDao, gson, bodyParser));
-		get("/nobts/:nobtId", new GetNobtHandler(nobtDao, gson, calculator));
-		get("/nobts/:nobtId/persons", new GetPersonsHandler(nobtDao, gson));
-		post("/nobts/:nobtId/expenses", "application/json", new CreateExpenseHandler(nobtDao, gson, bodyParser));
+            String accessControlRequestMethod = req.headers("Access-Control-Request-Method");
+            if (accessControlRequestMethod != null) {
+                res.header("Access-Control-Allow-Methods", accessControlRequestMethod);
+            }
+            return "OK";
+        });
 
-		exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
-			response.status(400);
-			response.body("Please specify a charset for your content!");
-		});
+        post("/nobts", "application/json", new CreateNobtHandler(nobtDao, gson, bodyParser));
+        get("/nobts/:nobtId", new GetNobtHandler(nobtDao, gson, calculator));
+        get("/nobts/:nobtId/persons", new GetPersonsHandler(nobtDao, gson));
+        post("/nobts/:nobtId/expenses", "application/json", new CreateExpenseHandler(nobtDao, gson, bodyParser));
 
-		exception(UnknownNobtException.class, ((e, request, response) -> {
-			response.status(404);
-			response.body(e.getMessage());
-		}));
-	}
+        exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
+            response.status(400);
+            response.body("Please specify a charset for your content!");
+        });
+
+        exception(UnknownNobtException.class, ((e, request, response) -> {
+            response.status(404);
+            response.body(e.getMessage());
+        }));
+    }
 }
