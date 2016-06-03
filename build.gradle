@@ -18,8 +18,7 @@ subprojects {
     maven { url "http://repo.maven.apache.org/maven2" }
   }
 
-  
   dependencies {
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version:'2.5'
-}
+  }
 }

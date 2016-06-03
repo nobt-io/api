@@ -1,9 +1,7 @@
 
 apply plugin: 'application'
-
 mainClassName = 'io.nobt.rest.NobtApplication'
 
-description = ''
 dependencies {
     compile project(':core')
     compile project(':config')

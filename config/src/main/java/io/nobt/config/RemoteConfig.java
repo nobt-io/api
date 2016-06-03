@@ -43,7 +43,7 @@ public class RemoteConfig extends Config {
 
             @Override
             public String username() {
-                return connectionString.getPassword();
+                return connectionString.getUsername();
             }
 
             @Override

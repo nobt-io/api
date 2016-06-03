@@ -10,11 +10,11 @@ import static spark.Spark.post;
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
 
+import io.nobt.config.Config;
 import io.nobt.core.NobtCalculator;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.dao.NobtDaoImpl;
 import io.nobt.persistence.dao.NobtMapper;
-import io.nobt.rest.config.Config;
 import io.nobt.rest.encoding.EncodingNotSpecifiedException;
 import io.nobt.rest.filter.EncodingAwareBodyParser;
 import io.nobt.rest.handler.CreateExpenseHandler;

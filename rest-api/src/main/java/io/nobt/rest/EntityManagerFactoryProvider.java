@@ -1,6 +1,6 @@
 package io.nobt.rest;
 
-import io.nobt.rest.config.DatabaseConfig;
+import io.nobt.config.DatabaseConfig;
 
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
