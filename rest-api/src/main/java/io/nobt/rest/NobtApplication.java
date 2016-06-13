@@ -16,12 +16,16 @@ import io.nobt.rest.handler.GetNobtHandler;
 import io.nobt.rest.handler.GetPersonsHandler;
 import io.nobt.rest.json.GsonFactory;
 import io.nobt.rest.json.JsonElementBodyParser;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.persistence.EntityManager;
 
 import static spark.Spark.*;
 
 public class NobtApplication {
+
+    private static final Logger UNHANDLED_EXCEPTION_LOGGER = LogManager.getLogger("io.nobt.rest.NobtApplication.unhandledExceptions");
 
     public static void main(String[] args) {
 
@@ -75,5 +79,15 @@ public class NobtApplication {
             response.status(404);
             response.body(e.getMessage());
         }));
+
+        exception(Exception.class, (e, request, response) -> {
+            UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
+            response.status(500);
+        });
+
+        exception(RuntimeException.class, (e, request, response) -> {
+            UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
+            response.status(500);
+        });
     }
 }

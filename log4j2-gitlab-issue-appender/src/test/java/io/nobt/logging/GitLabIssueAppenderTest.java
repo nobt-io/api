@@ -1,6 +1,7 @@
 package io.nobt.logging;
 
 import org.apache.logging.log4j.core.LogEvent;
+import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.gitlab.api.GitlabAPI;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +21,7 @@ public class GitLabIssueAppenderTest {
 
         apiMock = mock(GitlabAPI.class);
 
-        sut = new GitLabIssueAppender("appender-test", null, apiMock, 1208905);
+        sut = new GitLabIssueAppender("appender-test", PatternLayout.createDefaultLayout(), apiMock, 1208905);
     }
 
     @Test
@@ -32,6 +33,6 @@ public class GitLabIssueAppenderTest {
 
         sut.append(logEventMock);
 
-        verify(apiMock).createIssue(eq(1208905), eq(0), eq(0), eq("bug"), startsWith("java.lang.Exception: Test"), eq(""));
+        verify(apiMock).createIssue(eq(1208905), eq(0), eq(0), eq("bug"), startsWith("````java\n\rjava.lang.Exception: Test"), anyString());
     }
 }
