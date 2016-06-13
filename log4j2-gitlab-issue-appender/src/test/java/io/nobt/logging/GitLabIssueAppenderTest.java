@@ -35,4 +35,17 @@ public class GitLabIssueAppenderTest {
 
         verify(apiMock).createIssue(eq(1208905), eq(0), eq(0), eq("bug"), startsWith("````java\n\rjava.lang.Exception: Test"), anyString());
     }
+
+    @Test
+    public void shouldNotCreateTwoIssuesForSameStackTrace() throws Exception {
+
+        final LogEvent logEventMock = mock(LogEvent.class, new ReturnsMocks());
+
+        when(logEventMock.getThrown()).thenReturn(new Exception("Test"));
+
+        sut.append(logEventMock);
+        sut.append(logEventMock);
+
+        verify(apiMock, times(1)).createIssue(eq(1208905), eq(0), eq(0), eq("bug"), startsWith("````java\n\rjava.lang.Exception: Test"), anyString());
+    }
 }
