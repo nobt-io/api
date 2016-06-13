@@ -7,4 +7,5 @@ include ':inmemory-persistence'
 include 'sql'
 include 'config'
 include 'nobt-matchers'
+include 'log4j2-gitlab-issue-appender'
 
