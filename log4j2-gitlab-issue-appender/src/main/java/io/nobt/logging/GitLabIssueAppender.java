@@ -1,10 +1,6 @@
 package io.nobt.logging;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,12 +36,8 @@ public class GitLabIssueAppender extends AbstractAppender {
         if (logEvent.getThrown() != null) {
             final Throwable exception = logEvent.getThrown();
 
-            final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            exception.printStackTrace(new PrintStream(baos));
-
             final String issueTitle = new String(getLayout().toByteArray(logEvent), Charset.forName("UTF-8"));
-            final String issueDescription = getIssueDescription(baos);
-
+            final String issueDescription = getStacktraceAsString(exception);
             final String formattedDescription = String.format("````java\n\r%s\n\r````", issueDescription);
 
             final String hashOfDescription = MD5Util.createMD5Hash(formattedDescription);
@@ -62,12 +54,11 @@ public class GitLabIssueAppender extends AbstractAppender {
         }
     }
 
-    private String getIssueDescription(ByteArrayOutputStream baos) {
-        try {
-            return baos.toString("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            return "";
-        }
+    private String getStacktraceAsString(Throwable exception) {
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        exception.printStackTrace(writer);
+        return stringWriter.toString();
     }
 
     @PluginFactory
