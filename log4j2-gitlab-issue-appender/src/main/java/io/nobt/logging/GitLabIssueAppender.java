@@ -20,15 +20,15 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.gitlab.api.GitlabAPI;
 import org.gitlab.api.models.GitlabSession;
 
-@Plugin(name = "GitLabIssueAppenderTmp", category = "Core", elementType = "appender")
-public class GitLabIssueAppenderTmp extends AbstractAppender {
+@Plugin(name = "GitLabIssueAppender", category = "Core", elementType = "appender")
+public class GitLabIssueAppender extends AbstractAppender {
 
     private static final Set<String> history = new HashSet<>();
 
     private final GitlabAPI api;
     private final Integer projectId;
 
-    public GitLabIssueAppenderTmp(String name, Layout<? extends Serializable> layout, GitlabAPI api, Integer projectId) {
+    public GitLabIssueAppender(String name, Layout<? extends Serializable> layout, GitlabAPI api, Integer projectId) {
         super(name, null, layout);
         this.api = api;
         this.projectId = projectId;
@@ -71,7 +71,7 @@ public class GitLabIssueAppenderTmp extends AbstractAppender {
     }
 
     @PluginFactory
-    public static GitLabIssueAppenderTmp createAppender(
+    public static GitLabIssueAppender createAppender(
             @PluginAttribute("name") String name,
             @PluginElement("Layout") Layout<? extends Serializable> layout,
             @PluginAttribute("host") String host,
@@ -85,7 +85,7 @@ public class GitLabIssueAppenderTmp extends AbstractAppender {
 
         try {
             final GitlabSession session = GitlabAPI.connect(host, username, password);
-            return new GitLabIssueAppenderTmp(name, layout, GitlabAPI.connect(host, session.getPrivateToken()), projectId);
+            return new GitLabIssueAppender(name, layout, GitlabAPI.connect(host, session.getPrivateToken()), projectId);
         } catch (IOException e) {
             return null;
         }
