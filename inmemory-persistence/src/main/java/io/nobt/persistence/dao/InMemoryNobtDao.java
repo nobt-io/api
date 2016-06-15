@@ -4,11 +4,9 @@
 package io.nobt.persistence.dao;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
+import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Amount;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
@@ -43,8 +41,12 @@ public class InMemoryNobtDao implements NobtDao {
 	}
 
 	@Override
-	public Nobt find(UUID nobtId) {
-		return nobtDatabase.get(nobtId);
+	public Nobt get(UUID nobtId) {
+		return find(nobtId).orElseThrow( () -> new UnknownNobtException(nobtId));
 	}
 
+	@Override
+	public Optional<Nobt> find(UUID nobtId) {
+		return Optional.ofNullable(nobtDatabase.get(nobtId));
+	}
 }
