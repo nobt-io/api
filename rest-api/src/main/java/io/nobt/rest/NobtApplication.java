@@ -52,9 +52,13 @@ public class NobtApplication {
         setupCORS();
 
         post("/nobts", "application/json", new CreateNobtHandler(nobtDao, bodyParser), jsonResponseTransformer);
+
+        // deprecated
+        get("/nobts/:nobtId/persons", new GetPersonsHandler());
+
         get("/nobts/:nobtId", new GetNobtHandler(nobtDao, calculator), jsonResponseTransformer);
-        get("/nobts/:nobtId/persons", new GetPersonsHandler(nobtDao), jsonResponseTransformer);
         post("/nobts/:nobtId/expenses", "application/json", new CreateExpenseHandler(nobtDao, bodyParser), jsonResponseTransformer);
+
 
         exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
             response.status(400);
