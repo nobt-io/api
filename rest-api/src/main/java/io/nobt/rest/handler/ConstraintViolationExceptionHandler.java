@@ -1,5 +1,6 @@
 package io.nobt.rest.handler;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import spark.ExceptionHandler;
@@ -25,7 +26,7 @@ public class ConstraintViolationExceptionHandler implements ExceptionHandler {
     public void handle(Exception e, Request request, Response response) {
         final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) e).getConstraintViolations();
 
-        final List<SimpleViolation> simpleViolations = violations.stream().map(cv -> new SimpleViolation(cv.getPropertyPath(), cv.getMessage())).collect(Collectors.toList());
+        final List<SimpleViolation> simpleViolations = violations.stream().map(cv -> new SimpleViolation(cv.getPropertyPath(), cv.getInvalidValue().toString(), cv.getMessage())).collect(Collectors.toList());
 
         response.header("Content-Type", "application/json");
 
@@ -38,11 +39,18 @@ public class ConstraintViolationExceptionHandler implements ExceptionHandler {
 
     public static class SimpleViolation {
 
+        @JsonProperty("property")
         private final String property;
+
+        @JsonProperty("value")
+        private final String value;
+
+        @JsonProperty("message")
         private final String message;
 
-        public SimpleViolation(Path propertyPath, String message) {
+        public SimpleViolation(Path propertyPath, String value, String message) {
             this.property = propertyPath.toString();
+            this.value = value;
             this.message = message;
         }
     }

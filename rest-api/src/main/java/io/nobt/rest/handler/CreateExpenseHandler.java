@@ -1,5 +1,6 @@
 package io.nobt.rest.handler;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Person;
 import io.nobt.persistence.NobtDao;
@@ -37,13 +38,18 @@ public class CreateExpenseHandler implements Route {
 
 	public static class Input {
 
+		@JsonProperty("name")
 		private String name;
+
+		@JsonProperty("amount")
 		private BigDecimal amount;
 
 		@Valid
+		@JsonProperty("debtee")
 		private Person debtee;
 
 		@Valid
+		@JsonProperty("debtors")
 		private Set<Person> debtors;
 	}
 }
