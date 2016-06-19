@@ -28,6 +28,7 @@ public class ConstraintViolationExceptionHandler implements ExceptionHandler {
 
         final List<SimpleViolation> simpleViolations = violations.stream().map(cv -> new SimpleViolation(cv.getPropertyPath(), cv.getInvalidValue().toString(), cv.getMessage())).collect(Collectors.toList());
 
+        response.status(400);
         response.header("Content-Type", "application/json");
 
         try {
