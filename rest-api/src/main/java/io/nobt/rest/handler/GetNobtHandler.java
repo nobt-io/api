@@ -1,9 +1,8 @@
 package io.nobt.rest.handler;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import io.nobt.core.NobtCalculator;
-import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtDao;
@@ -17,12 +16,10 @@ import java.util.UUID;
 public class GetNobtHandler implements Route {
 
 	private NobtDao nobtDao;
-	private Gson gson;
 	private NobtCalculator calculator;
 
-	public GetNobtHandler(NobtDao nobtDao, Gson gson, NobtCalculator calculator) {
+	public GetNobtHandler(NobtDao nobtDao, NobtCalculator calculator) {
 		this.nobtDao = nobtDao;
-		this.gson = gson;
 		this.calculator = calculator;
 	}
 
@@ -30,15 +27,24 @@ public class GetNobtHandler implements Route {
 	public Object handle(Request req, Response res) throws Exception {
 
 		final UUID nobtId = UUID.fromString(req.params(":nobtId"));
-		Nobt nobt = nobtDao.get(nobtId);
 
-		Set<Transaction> transactions = calculator.calculate(nobt);
+		final Nobt nobt = nobtDao.get(nobtId);
+		final Set<Transaction> transactions = calculator.calculate(nobt);
 
-		JsonObject json = gson.toJsonTree(nobt).getAsJsonObject();
-		json.add("transactions", gson.toJsonTree(transactions));
+		return new Output(nobt, transactions);
+	}
 
-		res.header("Content-Type", "application/json");
+	public static class Output {
 
-		return gson.toJson(json);
+		@JsonUnwrapped
+		private Nobt nobt;
+
+		@JsonProperty("transactions")
+		private Set<Transaction> transactions;
+
+		public Output(Nobt nobt, Set<Transaction> transactions) {
+			this.nobt = nobt;
+			this.transactions = transactions;
+		}
 	}
 }

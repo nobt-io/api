@@ -1,9 +1,12 @@
 package io.nobt.core.domain;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
 public class Person {
 
+	@Pattern(regexp = "[^;]+")
 	private String name;
 
 	public static Person forName(String name) {
