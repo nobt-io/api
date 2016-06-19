@@ -1,8 +1,6 @@
-/**
- * 
- */
 package io.nobt.rest.handler;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.nobt.core.domain.Nobt;
 import io.nobt.persistence.NobtDao;
 import io.nobt.rest.json.BodyParser;
@@ -10,10 +8,6 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
-/**
- * @author Matthias
- *
- */
 public class CreateNobtHandler implements Route {
 
 	private final NobtDao nobtDao;
@@ -38,6 +32,8 @@ public class CreateNobtHandler implements Route {
 	}
 
 	public static class Input {
+
+		@JsonProperty("nobtName")
 		private String nobtName;
 	}
 }

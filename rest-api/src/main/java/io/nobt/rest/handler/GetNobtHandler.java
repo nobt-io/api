@@ -1,5 +1,6 @@
 package io.nobt.rest.handler;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.domain.Nobt;
@@ -27,8 +28,8 @@ public class GetNobtHandler implements Route {
 
 		final UUID nobtId = UUID.fromString(req.params(":nobtId"));
 
-		Nobt nobt = nobtDao.get(nobtId);
-		Set<Transaction> transactions = calculator.calculate(nobt);
+		final Nobt nobt = nobtDao.get(nobtId);
+		final Set<Transaction> transactions = calculator.calculate(nobt);
 
 		return new Output(nobt, transactions);
 	}
@@ -37,6 +38,8 @@ public class GetNobtHandler implements Route {
 
 		@JsonUnwrapped
 		private Nobt nobt;
+
+		@JsonProperty("transactions")
 		private Set<Transaction> transactions;
 
 		public Output(Nobt nobt, Set<Transaction> transactions) {
