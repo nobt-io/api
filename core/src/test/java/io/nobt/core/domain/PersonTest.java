@@ -16,6 +16,6 @@ public class PersonTest {
         final Pattern annotation = name.getAnnotation(Pattern.class);
         final String regexp = annotation.regexp();
 
-        Assert.assertThat(regexp, Matchers.is("^;"));
+        Assert.assertThat(regexp, Matchers.is("[^;]+"));
     }
 }

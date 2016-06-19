@@ -6,7 +6,7 @@ import java.util.Objects;
 
 public class Person {
 
-	@Pattern(regexp = "^;")
+	@Pattern(regexp = "[^;]+")
 	private String name;
 
 	public static Person forName(String name) {
