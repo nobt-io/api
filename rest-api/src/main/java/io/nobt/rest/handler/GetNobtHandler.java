@@ -3,6 +3,7 @@ package io.nobt.rest.handler;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.nobt.core.NobtCalculator;
+import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtDao;
@@ -27,7 +28,9 @@ public class GetNobtHandler implements Route {
 
 	@Override
 	public Object handle(Request req, Response res) throws Exception {
-		Nobt nobt = nobtDao.find(UUID.fromString(req.params(":nobtId")));
+
+		final UUID nobtId = UUID.fromString(req.params(":nobtId"));
+		Nobt nobt = nobtDao.get(nobtId);
 
 		Set<Transaction> transactions = calculator.calculate(nobt);
 

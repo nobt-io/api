@@ -5,6 +5,7 @@ import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Person;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,6 +15,12 @@ public interface NobtDao {
 
 	Expense createExpense(UUID nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors);
 
-	Nobt find(UUID nobtId);
+	/**
+	 * Retrieves a {@link Nobt} instance from the database. Guaranteed to return an object, if it returns.
+	 *
+	 * @throws io.nobt.core.UnknownNobtException
+     */
+	Nobt get(UUID nobtId);
 
+	Optional<Nobt> find(UUID nobtId);
 }

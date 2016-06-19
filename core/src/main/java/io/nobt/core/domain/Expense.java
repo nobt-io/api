@@ -1,6 +1,7 @@
 package io.nobt.core.domain;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -39,9 +40,18 @@ public class Expense {
 	}
 
 	public Set<Person> getDebtors() {
-		return debtors;
+		return Collections.unmodifiableSet(debtors);
 	}
 
+	public void addDebtor(Person debtor) {
+		this.debtors.add(debtor);
+	}
+
+	/**
+	 * Use {@link Expense#addDebtor(Person)} instead.
+	 * @param debtors
+     */
+	@Deprecated
 	public void setDebtors(Set<Person> debtors) {
 		this.debtors = debtors;
 	}

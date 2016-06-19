@@ -28,9 +28,8 @@ public class NobtDaoTest extends AbstractDaoTest {
 		entityManager.flush();
 
 		NobtDao dao = new NobtDaoImpl(entityManager, new NobtMapper());
-		Nobt nobt = dao.find(uuid);
+		Nobt nobt = dao.get(uuid);
 
-		assertNotNull(nobt);
 		assertEquals(name, nobt.getName());
 		assertEquals(uuid, nobt.getId());
 
@@ -48,9 +47,8 @@ public class NobtDaoTest extends AbstractDaoTest {
 		NobtDao dao = new NobtDaoImpl(entityManager, new NobtMapper());
 		Nobt nobt = dao.create(name);
 
-		dao.find(nobt.getId());
+		dao.get(nobt.getId());
 
-		assertNotNull(nobt);
 		assertEquals(name, nobt.getName());
 	}
 
@@ -71,8 +69,8 @@ public class NobtDaoTest extends AbstractDaoTest {
 
 		flush();
 
-		Nobt nobt = dao.find(uuid);
-		assertNotNull(nobt);
+		Nobt nobt = dao.get(uuid);
+
 		assertEquals(2, nobt.getExpenses().size());
 		assertExpense(nobt.getExpenses().iterator().next(), expenseName, amount, debteeName,
 				Sets.newHashSet("debtor1", "debtor2", "debtor3"));

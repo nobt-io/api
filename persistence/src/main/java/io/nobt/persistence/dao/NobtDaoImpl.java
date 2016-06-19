@@ -1,8 +1,6 @@
-/**
- * 
- */
 package io.nobt.persistence.dao;
 
+import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Person;
@@ -13,10 +11,9 @@ import io.nobt.persistence.entity.NobtEntity;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author Matthias
@@ -50,7 +47,7 @@ public class NobtDaoImpl implements NobtDao {
 
 		em.getTransaction().begin();
 
-		NobtEntity nobt = findNobt(nobtId);
+		NobtEntity nobt = findNobt(nobtId).orElseThrow( () -> new UnknownNobtException(nobtId));
 
 		ExpenseEntity expense = new ExpenseEntity(name, amount, debtee.getName());
 		debtors.stream().map(Person::getName).forEach(expense::addDebtor);
@@ -63,16 +60,23 @@ public class NobtDaoImpl implements NobtDao {
 		return nobtMapper.map(expense);
 	}
 
-	// TODO, define as optional
 	@Override
-	public Nobt find(UUID nobtId) {
-		return nobtMapper.map(findNobt(nobtId));
+	public Nobt get(UUID nobtId) {
+		return find(nobtId).orElseThrow( () -> new UnknownNobtException(nobtId) );
 	}
 
-	private NobtEntity findNobt(UUID nobtId) {
-		TypedQuery<NobtEntity> query = em.createQuery("from NobtEntity where uuid = :uuid", NobtEntity.class)
+	@Override
+	public Optional<Nobt> find(UUID nobtId) {
+		final Optional<NobtEntity> nobt = findNobt(nobtId);
+
+		return nobt.map(nobtMapper::map);
+	}
+
+	private Optional<NobtEntity> findNobt(UUID nobtId) {
+		TypedQuery<NobtEntity> query = em
+				.createQuery("from NobtEntity where uuid = :uuid", NobtEntity.class)
 				.setParameter("uuid", nobtId);
-		return query.getSingleResult();
+		return query.getResultList().stream().findFirst();
 	}
 
 }
