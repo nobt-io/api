@@ -1,4 +1,4 @@
-package io.nobt.rest.json;
+package io.nobt.rest.json.amount;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
