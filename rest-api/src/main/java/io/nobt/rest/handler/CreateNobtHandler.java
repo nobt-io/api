@@ -3,11 +3,9 @@
  */
 package io.nobt.rest.handler;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import io.nobt.core.domain.Nobt;
 import io.nobt.persistence.NobtDao;
-import io.nobt.rest.json.JsonElementBodyParser;
+import io.nobt.rest.json.BodyParser;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -18,27 +16,28 @@ import spark.Route;
  */
 public class CreateNobtHandler implements Route {
 
-	private NobtDao nobtDao;
-	private Gson gson;
-	private JsonElementBodyParser parser;
+	private final NobtDao nobtDao;
+	private final BodyParser bodyParser;
 
-	public CreateNobtHandler(NobtDao nobtDao, Gson gson, JsonElementBodyParser parser) {
+	public CreateNobtHandler(NobtDao nobtDao, BodyParser bodyParser) {
 		this.nobtDao = nobtDao;
-		this.gson = gson;
-		this.parser = parser;
+		this.bodyParser = bodyParser;
 	}
 
 	@Override
 	public Object handle(Request req, Response resp) throws Exception {
 
-		JsonObject o = parser.parse(req).getAsJsonObject();
+		final Input input = bodyParser.parseBodyAs(req, Input.class);
 
-		Nobt nobt = nobtDao.create(o.get("nobtName").getAsString());
+		Nobt nobt = nobtDao.create(input.nobtName);
 
 		resp.header("Location", req.url() + "/" + nobt.getId());
 		resp.status(201);
 
-		return gson.toJson(nobt);
+		return nobt;
 	}
 
+	public static class Input {
+		private String nobtName;
+	}
 }

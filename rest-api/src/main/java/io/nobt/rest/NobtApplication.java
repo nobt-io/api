@@ -1,7 +1,6 @@
 package io.nobt.rest;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.config.Config;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
@@ -10,16 +9,18 @@ import io.nobt.persistence.dao.NobtDaoImpl;
 import io.nobt.persistence.dao.NobtMapper;
 import io.nobt.rest.encoding.EncodingNotSpecifiedException;
 import io.nobt.rest.filter.EncodingAwareBodyParser;
-import io.nobt.rest.handler.CreateExpenseHandler;
-import io.nobt.rest.handler.CreateNobtHandler;
-import io.nobt.rest.handler.GetNobtHandler;
-import io.nobt.rest.handler.GetPersonsHandler;
-import io.nobt.rest.json.GsonFactory;
-import io.nobt.rest.json.JsonElementBodyParser;
+import io.nobt.rest.handler.*;
+import io.nobt.rest.json.BodyParser;
+import io.nobt.rest.json.JacksonResponseTransformer;
+import io.nobt.rest.json.ObjectMapperFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import spark.ResponseTransformer;
 
 import javax.persistence.EntityManager;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 import static spark.Spark.*;
 
@@ -27,25 +28,58 @@ public class NobtApplication {
 
     private static final Logger UNHANDLED_EXCEPTION_LOGGER = LogManager.getLogger("io.nobt.rest.NobtApplication.unhandledExceptions");
 
+    private static final ObjectMapperFactory objectMapperFactory = new ObjectMapperFactory();
+    private static final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
+
     public static void main(String[] args) {
 
         final Config config = Config.getConfigForCurrentEnvironment();
+        final ObjectMapper objectMapper = objectMapperFactory.create();
 
-        port(config.getDatabasePort());
+        final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        final BodyParser bodyParser = new BodyParser(objectMapper, validator);
 
-        final Gson gson = GsonFactory.createConfiguredGsonInstance();
-        final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
+        final ResponseTransformer jsonResponseTransformer = new JacksonResponseTransformer(objectMapper);
 
         final EntityManager entityManager = emfProvider.create(config.getDatabaseConfig()).createEntityManager();
         NobtDao nobtDao = new NobtDaoImpl(entityManager, new NobtMapper());
         NobtCalculator calculator = new NobtCalculator();
 
-        JsonParser parser = new JsonParser();
-        final JsonElementBodyParser bodyParser = new JsonElementBodyParser(parser);
+        port(config.getDatabasePort());
 
-        // Spark does not respect the encoding specified in the content-type header
+        parseBodyWithEncodingSpecifiedInContentType();
+        useApplicationJsonAsDefaultReponseContentType();
+        setupCORS();
+
+        post("/nobts", "application/json", new CreateNobtHandler(nobtDao, bodyParser), jsonResponseTransformer);
+        get("/nobts/:nobtId", new GetNobtHandler(nobtDao, calculator), jsonResponseTransformer);
+        get("/nobts/:nobtId/persons", new GetPersonsHandler(nobtDao), jsonResponseTransformer);
+        post("/nobts/:nobtId/expenses", "application/json", new CreateExpenseHandler(nobtDao, bodyParser), jsonResponseTransformer);
+
+        exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
+            response.status(400);
+            response.body("Please specify a charset for your content!");
+        });
+
+        exception(UnknownNobtException.class, ((e, request, response) -> {
+            response.status(404);
+            response.body(e.getMessage());
+        }));
+
+        exception(ConstraintViolationException.class, new ConstraintViolationExceptionHandler(objectMapper));
+
+        handleUnknownExceptions();
+    }
+
+    private static void parseBodyWithEncodingSpecifiedInContentType() {
         before(new EncodingAwareBodyParser());
+    }
 
+    private static void useApplicationJsonAsDefaultReponseContentType() {
+        before((request, response) -> response.header("Content-Type", "application/json"));
+    }
+
+    private static void setupCORS() {
         before((req, res) -> {
             res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Request-Method", "*");
@@ -64,22 +98,9 @@ public class NobtApplication {
             }
             return "OK";
         });
+    }
 
-        post("/nobts", "application/json", new CreateNobtHandler(nobtDao, gson, bodyParser));
-        get("/nobts/:nobtId", new GetNobtHandler(nobtDao, gson, calculator));
-        get("/nobts/:nobtId/persons", new GetPersonsHandler(nobtDao, gson));
-        post("/nobts/:nobtId/expenses", "application/json", new CreateExpenseHandler(nobtDao, gson, bodyParser));
-
-        exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
-            response.status(400);
-            response.body("Please specify a charset for your content!");
-        });
-
-        exception(UnknownNobtException.class, ((e, request, response) -> {
-            response.status(404);
-            response.body(e.getMessage());
-        }));
-
+    private static void handleUnknownExceptions() {
         exception(Exception.class, (e, request, response) -> {
             UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
             response.status(500);

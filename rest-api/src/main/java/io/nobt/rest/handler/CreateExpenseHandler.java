@@ -1,46 +1,49 @@
 package io.nobt.rest.handler;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Person;
 import io.nobt.persistence.NobtDao;
-import io.nobt.rest.json.JsonElementBodyParser;
+import io.nobt.rest.json.BodyParser;
 import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import javax.validation.Valid;
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 public class CreateExpenseHandler implements Route {
 
-	private NobtDao nobtDao;
-	private Gson gson;
-	private JsonElementBodyParser parser;
+	private final NobtDao nobtDao;
+	private final BodyParser bodyParser;
 
-	public CreateExpenseHandler(NobtDao nobtDao, Gson gson, JsonElementBodyParser parser) {
+	public CreateExpenseHandler(NobtDao nobtDao, BodyParser bodyParser) {
 		this.nobtDao = nobtDao;
-		this.gson = gson;
-		this.parser = parser;
+		this.bodyParser = bodyParser;
 	}
 
 	@Override
 	public Object handle(Request req, Response resp) throws Exception {
 
-		JsonObject o = parser.parse(req).getAsJsonObject();
-
 		UUID nobtId = UUID.fromString(req.params(":nobtId"));
-		String name = o.get("name").getAsString();
-		BigDecimal amount = o.get("amount").getAsBigDecimal();
-		Person debtee = Person.forName(o.get("debtee").getAsString());
-		Set<Person> debtors = new HashSet<>();
-		o.get("debtors").getAsJsonArray().forEach((debtor) -> debtors.add(Person.forName(debtor.getAsString())));
+		final Input input = bodyParser.parseBodyAs(req, Input.class);
 
-		Expense expense = nobtDao.createExpense(nobtId, name, amount, debtee, debtors);
+		Expense expense = nobtDao.createExpense(nobtId, input.name, input.amount, input.debtee, input.debtors);
 		resp.status(201);
-		return gson.toJson(expense);
+
+		return expense;
+	}
+
+	public static class Input {
+
+		private String name;
+		private BigDecimal amount;
+
+		@Valid
+		private Person debtee;
+
+		@Valid
+		private Set<Person> debtors;
 	}
 }

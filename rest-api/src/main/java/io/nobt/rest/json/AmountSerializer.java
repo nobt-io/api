@@ -1,19 +1,15 @@
 package io.nobt.rest.json;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import io.nobt.core.domain.Amount;
 
-import java.lang.reflect.Type;
+import java.io.IOException;
 
-/**
- * @author Thomas Eizinger, Senacor Technologies AG.
- */
-public class AmountSerializer implements JsonSerializer<Amount> {
-	@Override
-	public JsonElement serialize(Amount src, Type typeOfSrc, JsonSerializationContext context) {
-		return new JsonPrimitive(src.getRoundedValue());
-	}
+public class AmountSerializer extends JsonSerializer<Amount> {
+    @Override
+    public void serialize(Amount value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        gen.writeNumber(value.getRoundedValue());
+    }
 }
