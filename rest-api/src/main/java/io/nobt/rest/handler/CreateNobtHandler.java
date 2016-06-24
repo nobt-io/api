@@ -5,6 +5,7 @@ import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Person;
 import io.nobt.persistence.NobtDao;
 import io.nobt.rest.json.BodyParser;
+import org.hibernate.validator.constraints.NotEmpty;
 import spark.Request;
 import spark.Response;
 import spark.Route;
@@ -36,9 +37,11 @@ public class CreateNobtHandler implements Route {
 
 	public static class Input {
 
+		@NotEmpty
 		@JsonProperty("nobtName")
 		private String nobtName;
 
+		@NotEmpty
 		@JsonProperty("explicitParticipants")
 		private Set<Person> explicitParticipants;
 	}
