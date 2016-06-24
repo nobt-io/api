@@ -9,8 +9,8 @@ import spark.Response;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,7 +26,7 @@ public class ConstraintViolationExceptionHandler implements ExceptionHandler {
     public void handle(Exception e, Request request, Response response) {
         final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) e).getConstraintViolations();
 
-        final List<SimpleViolation> simpleViolations = violations.stream().map(cv -> new SimpleViolation(cv.getPropertyPath(), cv.getInvalidValue().toString(), cv.getMessage())).collect(Collectors.toList());
+        final List<SimpleViolation> simpleViolations = violations.stream().map(SimpleViolation::new).collect(Collectors.toList());
 
         response.status(400);
         response.header("Content-Type", "application/json");
@@ -49,10 +49,10 @@ public class ConstraintViolationExceptionHandler implements ExceptionHandler {
         @JsonProperty("message")
         private final String message;
 
-        public SimpleViolation(Path propertyPath, String value, String message) {
-            this.property = propertyPath.toString();
-            this.value = value;
-            this.message = message;
+        public SimpleViolation(ConstraintViolation<?> violation) {
+            this.property = violation.getPropertyPath().toString();
+            this.value = Optional.ofNullable(violation.getInvalidValue()).map(Object::toString).orElse(null);
+            this.message = violation.getMessage();
         }
     }
 }
