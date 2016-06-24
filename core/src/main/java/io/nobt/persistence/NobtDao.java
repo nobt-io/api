@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface NobtDao {
 
-	Nobt create(String nobtName);
+	Nobt create(String nobtName, Set<Person> explicitParticipants);
 
 	Expense createExpense(UUID nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors);
 

@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * @author Matthias
@@ -31,10 +32,12 @@ public class NobtDaoImpl implements NobtDao {
 	}
 
 	@Override
-	public Nobt create(String nobtName) {
+	public Nobt create(String nobtName, Set<Person> explicitParticipants) {
 		em.getTransaction().begin();
 
-		NobtEntity nobt = new NobtEntity(nobtName, UUID.randomUUID());
+		final Set<String> participantsAsStringList = explicitParticipants.stream().map(Person::getName).collect(Collectors.toSet());
+
+		NobtEntity nobt = new NobtEntity(nobtName, UUID.randomUUID(), participantsAsStringList);
 
 		em.persist(nobt);
 		em.getTransaction().commit();
