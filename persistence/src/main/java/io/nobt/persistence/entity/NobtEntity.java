@@ -1,8 +1,11 @@
 package io.nobt.persistence.entity;
 
+import io.nobt.util.Sets;
+import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -23,12 +26,16 @@ public class NobtEntity {
     @Column(name = "nobtName", nullable = false, length = 50)
     private String name;
 
+    @Column(name = "explicitParticipants")
+    private String explicitParticipants;
+
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL)
     private Set<ExpenseEntity> expenses = new HashSet<>();
 
-    public NobtEntity(String name, UUID uuid) {
+    public NobtEntity(String name, UUID uuid, Set<String> explicitParticipants) {
         this.name = name;
         this.uuid = uuid;
+        this.explicitParticipants = String.join(";", explicitParticipants);
     }
 
     public NobtEntity() {
@@ -65,6 +72,10 @@ public class NobtEntity {
         }
         expenses.add(expense);
         expense.setNobt(this);
+    }
+
+    public Set<String> getExplicitParticipants() {
+        return explicitParticipants != null ? Sets.newHashSet(explicitParticipants.split(";")) : Collections.emptySet();
     }
 
     public long getId() {

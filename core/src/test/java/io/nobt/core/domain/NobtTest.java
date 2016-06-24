@@ -1,5 +1,8 @@
 package io.nobt.core.domain;
 
+import io.nobt.matchers.NobtMatchers;
+import io.nobt.util.Sets;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Set;
@@ -33,5 +36,13 @@ public class NobtTest {
 
 		thomas = Person.forName("Thomas");
 		assertThat(actualPersons, containsInAnyOrder(thomas, lukas, matthias, thomasB, david));
+	}
+
+	@Test
+	public void shouldAddExplicitParticipantsToParticipatingPersons() throws Exception {
+
+		final Nobt something = new Nobt("Something", UUID.randomUUID(), Sets.newHashSet(Person.forName("Thomas")));
+
+		Assert.assertThat(something, NobtMatchers.hasExplicitParticipantWithName("Thomas"));
 	}
 }

@@ -19,8 +19,8 @@ public class InMemoryNobtDao implements NobtDao {
 	private static final Map<UUID, Nobt> nobtDatabase = new HashMap<>();
 
 	@Override
-	public Nobt create(String nobtName) {
-		Nobt nobt = new Nobt(nobtName, UUID.randomUUID());
+	public Nobt create(String nobtName, Set<Person> explicitParticipants) {
+		Nobt nobt = new Nobt(nobtName, UUID.randomUUID(), explicitParticipants);
 		nobtDatabase.put(nobt.getId(), nobt);
 		return nobt;
 	}

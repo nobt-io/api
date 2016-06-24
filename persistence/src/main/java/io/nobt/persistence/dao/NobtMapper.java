@@ -7,21 +7,26 @@ import io.nobt.core.domain.Person;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class NobtMapper {
 
-	public Nobt map(NobtEntity entity) {
+    public Nobt map(NobtEntity entity) {
 
-		Nobt nobt = new Nobt(entity.getName(), entity.getUuid());
-		entity.getExpenses().stream().map(this::map).forEach(nobt::addExpense);
+        final Set<Person> explicitParticipants = entity.getExplicitParticipants().stream().map(Person::forName).collect(Collectors.toSet());
 
-		return nobt;
-	}
+        Nobt nobt = new Nobt(entity.getName(), entity.getUuid(), explicitParticipants);
+        entity.getExpenses().stream().map(this::map).forEach(nobt::addExpense);
 
-	public Expense map(ExpenseEntity entity) {
+        return nobt;
+    }
 
-		Expense expense = new Expense(entity.getName(), Amount.fromBigDecimal(entity.getAmount()), Person.forName(entity.getDebtee()));
-		entity.getDebtors().stream().map(Person::forName).forEach(expense::addDebtor);
+    public Expense map(ExpenseEntity entity) {
 
-		return expense;
-	}
+        Expense expense = new Expense(entity.getName(), Amount.fromBigDecimal(entity.getAmount()), Person.forName(entity.getDebtee()));
+        entity.getDebtors().stream().map(Person::forName).forEach(expense::addDebtor);
+
+        return expense;
+    }
 }
