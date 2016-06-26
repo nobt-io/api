@@ -1,5 +1,3 @@
-
-description = 'persistence'
 dependencies {
     compile project(':core')
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version:'5.1.0.Final'
