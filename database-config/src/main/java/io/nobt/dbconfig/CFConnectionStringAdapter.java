@@ -1,4 +1,4 @@
-package io.nobt.config;
+package io.nobt.dbconfig;
 
 import java.net.URI;
 

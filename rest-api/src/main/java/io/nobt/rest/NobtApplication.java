@@ -1,10 +1,10 @@
 package io.nobt.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.nobt.config.CloudDatabaseConfig;
-import io.nobt.config.DatabaseConfig;
-import io.nobt.config.LocalDatabaseConfig;
 import io.nobt.core.NobtCalculator;
+import io.nobt.dbconfig.CloudDatabaseConfig;
+import io.nobt.dbconfig.DatabaseConfig;
+import io.nobt.dbconfig.LocalDatabaseConfig;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.dao.InMemoryNobtDao;
 import io.nobt.persistence.dao.NobtDaoImpl;

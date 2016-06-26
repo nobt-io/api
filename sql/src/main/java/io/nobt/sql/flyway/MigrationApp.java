@@ -1,8 +1,8 @@
 package io.nobt.sql.flyway;
 
-import io.nobt.config.CloudDatabaseConfig;
-import io.nobt.config.DatabaseConfig;
-import io.nobt.config.LocalDatabaseConfig;
+import io.nobt.dbconfig.CloudDatabaseConfig;
+import io.nobt.dbconfig.DatabaseConfig;
+import io.nobt.dbconfig.LocalDatabaseConfig;
 import io.nobt.profiles.Profile;
 import org.flywaydb.core.Flyway;
 

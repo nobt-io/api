@@ -1,4 +1,4 @@
-package io.nobt.config;
+package io.nobt.dbconfig;
 
 import io.pivotal.labs.cfenv.CloudFoundryEnvironment;
 import io.pivotal.labs.cfenv.CloudFoundryEnvironmentException;

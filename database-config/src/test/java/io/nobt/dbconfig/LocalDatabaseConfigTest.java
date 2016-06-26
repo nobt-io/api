@@ -1,4 +1,4 @@
-package io.nobt.config;
+package io.nobt.dbconfig;
 
 import org.junit.Before;
 import org.junit.Test;

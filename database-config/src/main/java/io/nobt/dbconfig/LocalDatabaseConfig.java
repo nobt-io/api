@@ -1,4 +1,4 @@
-package io.nobt.config;
+package io.nobt.dbconfig;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
