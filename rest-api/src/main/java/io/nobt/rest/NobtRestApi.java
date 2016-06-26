@@ -3,6 +3,7 @@ package io.nobt.rest;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.persistence.NobtDao;
+import io.nobt.profiles.Profiles;
 import io.nobt.rest.encoding.EncodingNotSpecifiedException;
 import io.nobt.rest.filter.EncodingAwareBodyParser;
 import io.nobt.rest.handler.CreateExpenseHandler;
@@ -13,13 +14,19 @@ import io.nobt.rest.json.BodyParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import spark.ExceptionHandler;
+import spark.Response;
 import spark.ResponseTransformer;
 import spark.Service;
 
 import javax.validation.ConstraintViolationException;
+import java.io.IOException;
+import java.io.PrintStream;
+
+import static io.nobt.profiles.Profiles.ifProfile;
 
 public class NobtRestApi {
 
+    private static final Logger LOGGER = LogManager.getLogger(NobtRestApi.class);
     private static final Logger UNHANDLED_EXCEPTION_LOGGER = LogManager.getLogger("io.nobt.rest.NobtApplication.unhandledExceptions");
 
     private final Service http;
@@ -101,11 +108,23 @@ public class NobtRestApi {
         http.exception(Exception.class, (e, request, response) -> {
             UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
             response.status(500);
+
+            ifProfile( Profiles::notCloud, () -> printStacktraceToResponse(e, response) );
         });
 
         http.exception(RuntimeException.class, (e, request, response) -> {
             UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
             response.status(500);
+
+            ifProfile( Profiles::notCloud, () -> printStacktraceToResponse(e, response) );
         });
+    }
+
+    private void printStacktraceToResponse(Exception e, Response response) {
+        try {
+            e.printStackTrace(new PrintStream(response.raw().getOutputStream()));
+        } catch (IOException e1) {
+            LOGGER.error("Failed to write stacktrace to response", e1);
+        }
     }
 }
