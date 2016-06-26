@@ -4,22 +4,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.postgresql.Driver;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
-public class LocalConfigTest {
+public class LocalDatabaseConfigTest {
 
-    private LocalConfig sut;
+    private LocalDatabaseConfig sut;
 
     @Before
     public void setUp() throws Exception {
-        sut = new LocalConfig();
+        sut = LocalDatabaseConfig.create();
     }
 
     @Test
     public void shouldBuildValidPostgresConnectionString() throws Exception {
 
-        sut.initialize();
-        final String connectionUrl = sut.getDatabaseConfig().url();
+        final String connectionUrl = sut.url();
 
         final boolean isValidUrl = new Driver().acceptsURL(connectionUrl);
 

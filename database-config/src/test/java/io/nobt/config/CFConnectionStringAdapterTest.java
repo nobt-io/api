@@ -1,10 +1,9 @@
 package io.nobt.config;
 
-import java.net.URI;
-
-import io.nobt.config.CFConnectionStringAdapter;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.net.URI;
 
 public class CFConnectionStringAdapterTest {
 
