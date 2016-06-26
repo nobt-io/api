@@ -14,22 +14,23 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import spark.ExceptionHandler;
 import spark.ResponseTransformer;
+import spark.Service;
 
 import javax.validation.ConstraintViolationException;
-
-import static spark.Spark.*;
 
 public class NobtRestApi {
 
     private static final Logger UNHANDLED_EXCEPTION_LOGGER = LogManager.getLogger("io.nobt.rest.NobtApplication.unhandledExceptions");
 
+    private final Service http;
     private final NobtDao nobtDao;
     private final NobtCalculator nobtCalculator;
     private final BodyParser bodyParser;
     private final ResponseTransformer jsonResponseTransformer;
     private final ExceptionHandler cvExceptionHandler;
 
-    public NobtRestApi(NobtDao nobtDao, NobtCalculator nobtCalculator, BodyParser bodyParser, ResponseTransformer jsonResponseTransformer, ExceptionHandler cvExceptionHandler) {
+    public NobtRestApi(Service http, NobtDao nobtDao, NobtCalculator nobtCalculator, BodyParser bodyParser, ResponseTransformer jsonResponseTransformer, ExceptionHandler cvExceptionHandler) {
+        this.http = http;
         this.nobtDao = nobtDao;
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
@@ -38,51 +39,51 @@ public class NobtRestApi {
     }
 
     public void run(int port) {
-        port(port);
+        http.port(port);
 
         parseBodyWithEncodingSpecifiedInContentType();
         useApplicationJsonAsDefaultReponseContentType();
         setupCORS();
 
-        post("/nobts", "application/json", new CreateNobtHandler(nobtDao, bodyParser), jsonResponseTransformer);
+        http.post("/nobts", "application/json", new CreateNobtHandler(nobtDao, bodyParser), jsonResponseTransformer);
 
         // deprecated
-        get("/nobts/:nobtId/persons", new GetPersonsHandler());
+        http.get("/nobts/:nobtId/persons", new GetPersonsHandler());
 
-        get("/nobts/:nobtId", new GetNobtHandler(nobtDao, nobtCalculator), jsonResponseTransformer);
-        post("/nobts/:nobtId/expenses", "application/json", new CreateExpenseHandler(nobtDao, bodyParser), jsonResponseTransformer);
+        http.get("/nobts/:nobtId", new GetNobtHandler(nobtDao, nobtCalculator), jsonResponseTransformer);
+        http.post("/nobts/:nobtId/expenses", "application/json", new CreateExpenseHandler(nobtDao, bodyParser), jsonResponseTransformer);
 
-        exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
+        http.exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
             response.status(400);
             response.body("Please specify a charset for your content!");
         });
 
-        exception(UnknownNobtException.class, ((e, request, response) -> {
+        http.exception(UnknownNobtException.class, ((e, request, response) -> {
             response.status(404);
             response.body(e.getMessage());
         }));
 
-        exception(ConstraintViolationException.class, cvExceptionHandler);
+        http.exception(ConstraintViolationException.class, cvExceptionHandler);
 
         handleUnknownExceptions();
     }
 
     private void parseBodyWithEncodingSpecifiedInContentType() {
-        before(new EncodingAwareBodyParser());
+        http.before(new EncodingAwareBodyParser());
     }
 
     private void useApplicationJsonAsDefaultReponseContentType() {
-        before((request, response) -> response.header("Content-Type", "application/json"));
+        http.before((request, response) -> response.header("Content-Type", "application/json"));
     }
 
     private void setupCORS() {
-        before((req, res) -> {
+        http.before((req, res) -> {
             res.header("Access-Control-Allow-Origin", "*");
             res.header("Access-Control-Request-Method", "*");
             res.header("Access-Control-Allow-Headers", "*");
         });
 
-        options("/*", (req, res) -> {
+        http.options("/*", (req, res) -> {
             String accessControlRequestHeaders = req.headers("Access-Control-Request-Headers");
             if (accessControlRequestHeaders != null) {
                 res.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
@@ -97,12 +98,12 @@ public class NobtRestApi {
     }
 
     private void handleUnknownExceptions() {
-        exception(Exception.class, (e, request, response) -> {
+        http.exception(Exception.class, (e, request, response) -> {
             UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
             response.status(500);
         });
 
-        exception(RuntimeException.class, (e, request, response) -> {
+        http.exception(RuntimeException.class, (e, request, response) -> {
             UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
             response.status(500);
         });

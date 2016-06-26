@@ -16,6 +16,7 @@ import io.nobt.rest.json.JacksonResponseTransformer;
 import io.nobt.rest.json.ObjectMapperFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import spark.Service;
 
 import javax.persistence.EntityManager;
 import javax.validation.Validation;
@@ -47,6 +48,7 @@ public class NobtApplication {
         );
 
         new NobtRestApi(
+                Service.ignite(),
                 nobtDao,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),

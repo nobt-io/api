@@ -25,12 +25,16 @@ public enum Profile {
 
     public static Profile getCurrentProfile() {
 
-        final String systemPropertyValue = System.getProperty(SYSTEM_PROPERTY);
+        final String actualSystemPropertyValue = System.getProperty(SYSTEM_PROPERTY);
 
-        return Arrays.stream(values()).filter( p -> p.systemPropertyValue.equals(systemPropertyValue)).findFirst().orElseGet( () -> {
-            LOGGER.info("System property {} is not set. Defaulting to {}.", SYSTEM_PROPERTY, DEFAULT);
-            return DEFAULT;
-        });
+        return Arrays
+                .stream(values())
+                .filter(p -> p.systemPropertyValue.equalsIgnoreCase(actualSystemPropertyValue))
+                .findFirst()
+                .orElseGet(() -> {
+                    LOGGER.info("System property '{}' is not set. Defaulting to profile {}.", SYSTEM_PROPERTY, DEFAULT);
+                    return DEFAULT;
+                });
     }
 
     public <X extends T, T> T getProfileDependentValue(Supplier<X> standaloneValueProvider, Supplier<X> localValueProvider, Supplier<X> cloudValueProvider) {
