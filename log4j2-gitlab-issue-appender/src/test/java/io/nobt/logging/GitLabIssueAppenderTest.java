@@ -1,8 +1,10 @@
 package io.nobt.logging;
 
+import io.nobt.profiles.Profile;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.gitlab.api.GitlabAPI;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.internal.stubbing.defaultanswers.ReturnsMocks;
@@ -19,9 +21,16 @@ public class GitLabIssueAppenderTest {
     @Before
     public void setUp() throws Exception {
 
+        System.setProperty(Profile.SYSTEM_PROPERTY, "cloud");
+
         apiMock = mock(GitlabAPI.class);
 
         sut = new GitLabIssueAppender("appender-test", PatternLayout.createDefaultLayout(), apiMock, 1208905);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        System.clearProperty(Profile.SYSTEM_PROPERTY);
     }
 
     @Test
