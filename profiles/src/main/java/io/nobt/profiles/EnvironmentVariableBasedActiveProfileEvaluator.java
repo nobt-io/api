@@ -21,4 +21,9 @@ public class EnvironmentVariableBasedActiveProfileEvaluator implements ActivePro
 
         return Arrays.stream(Profile.values()).filter(p -> p.name().equalsIgnoreCase(value)).findFirst();
     }
+
+    @Override
+    public int order() {
+        return 1;
+    }
 }

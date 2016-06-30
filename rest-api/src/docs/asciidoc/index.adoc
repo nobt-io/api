@@ -1,0 +1,52 @@
+= Nobt.io API Documentation
+Thomas Eizinger;
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+
+This document describes the API of Nobt.io. There are 3 requests that can be made at the moment:
+
+* Create a new nobt
+* Add an expense to a given nobt
+* Retrieve the nobt
+
+== Domain glossary
+
+The most important domain terms are:
+
+include::domain-glossary.adoc[]
+
+== Create a new nobt
+
+To create a new nobt, issue an http request like this:
+
+include::{snippets}/create-nobt/http-request.adoc[]
+include::{snippets}/create-nobt/request-fields.adoc[]
+
+The response looks like this:
+
+include::{snippets}/create-nobt/http-response.adoc[]
+
+In addition to the information that was sent to the API, two arrays are returned. `expenses` and `transaction`. We will look into those further after we have added an expense to this nobt and retrieved it again.
+
+== Add an expense to a nobt
+
+Given the url in the `Location` header that was returned in the previous response, we can add an expense to this nobt if we post an expense to the `/expenses` sub-resource.
+
+include::{snippets}/create-expense/http-request.adoc[]
+include::{snippets}/create-expense/request-fields.adoc[]
+
+The request was successful if the server returns a statuscode of 201. For convenience, the response includes the sent data.
+
+include::{snippets}/create-expense/http-response.adoc[]
+
+== Retrieve the nobt
+
+Once we add at least one expense, it makes sense to re-retrieve the nobt we created before.
+
+include::{snippets}/get-nobt/http-request.adoc[]
+
+This time, the response is way more interesting, as it includes transactions.
+
+include::{snippets}/get-nobt/http-response.adoc[]
+include::{snippets}/get-nobt/response-fields.adoc[]

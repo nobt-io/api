@@ -1,0 +1,13 @@
+|===
+|Term|Description
+
+|`nobt`
+|The word nobt is a self-created term to describe the situation where several people in a larger group have made expenses that concern more people than just themselves. "Solving" a nobt is the act of calculating the least amount of transactions that are necessary between people of this group so that all debts are paid.
+
+|`debtee`
+|Someone who receives money from another person.
+
+|`debtor`
+|Someone who owes money to another person.
+
+|===

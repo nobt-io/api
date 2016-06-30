@@ -1,11 +1,21 @@
-# Documentation
+# Download & run
 
-The API is documented with Postman. The current documentation can be found [here](https://www.getpostman.com/collections/ec77787753c3ff915a63).
+You can grab the pre-built package by clicked on the green `passed` button of the build status right above this documentation.
 
-The documentation also comes with integration tests for the API.
+Once you extract the downloaded `artifacts.zip`, navigate down the folder structure and extract the `rest-api-{VERSION}.zip` file.
+To run the API, simply run either the Batch- or Shell-Skript in the `bin/` folder. The documentation can be found in the `docs/` folder.
 
-# Database
+# Building from source
 
-The system tries to a postgres database on startup. Depending on the environment it is running, the connection string is either parsed from a properties file (local) or from environment variables (CloudFoundry).
+To build the project from source, simply issue the following command: `./gradlew clean build`.
+The ready-to-run API can be found under `build/distributions`.
 
-For more information, look at the config module.
+# Profiles
+
+The application is aware of three profiles.
+
+- STANDALONE
+- LOCAL
+- CLOUD
+
+If no profile is specified (via the environment variable `profile`), the STANDALONE profile is picked. This causes the application to use an In-Memory database instead of trying to connect an SQL database.
