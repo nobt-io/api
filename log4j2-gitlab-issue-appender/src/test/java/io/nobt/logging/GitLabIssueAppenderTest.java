@@ -1,7 +1,7 @@
 package io.nobt.logging;
 
 import io.nobt.profiles.Profile;
-import io.nobt.profiles.test.MockEnvironment;
+import io.nobt.profiles.test.ActiveProfileEvaluatorMock;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.gitlab.api.GitlabAPI;
@@ -22,7 +22,7 @@ public class GitLabIssueAppenderTest {
     @Before
     public void setUp() throws Exception {
 
-        MockEnvironment.setVariable(Profile.ENV_VARIABLE, "cloud");
+        ActiveProfileEvaluatorMock.setActiveProfile(Profile.CLOUD);
 
         apiMock = mock(GitlabAPI.class);
 
@@ -31,7 +31,7 @@ public class GitLabIssueAppenderTest {
 
     @After
     public void tearDown() throws Exception {
-        MockEnvironment.removeVariable(Profile.ENV_VARIABLE);
+        ActiveProfileEvaluatorMock.clearActiveProfile();
     }
 
     @Test

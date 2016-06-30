@@ -1,43 +1,26 @@
 package io.nobt.profiles;
 
-import io.nobt.profiles.spi.EnvironmentLoader;
+import io.nobt.profiles.spi.ActiveProfileEvaluatorLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Arrays;
 import java.util.function.Supplier;
 
 public enum Profile {
 
-    STANDALONE("standalone"),
-    LOCAL("local"),
-    CLOUD("cloud");
+    STANDALONE,
+    LOCAL,
+    CLOUD;
 
     private static final Logger LOGGER = LogManager.getLogger(Profile.class);
 
     public static final Profile DEFAULT = STANDALONE;
-    public static final String ENV_VARIABLE = "profile";
-
-    private final String envVariableValue;
-
-    Profile(String envVariableValue) {
-        this.envVariableValue = envVariableValue;
-    }
 
     public static Profile getCurrentProfile() {
-
-        final Environment env = EnvironmentLoader.load();
-
-        final String actualEnvVariableValue = env.getVariable(ENV_VARIABLE);
-
-        return Arrays
-                .stream(values())
-                .filter(p -> p.envVariableValue.equalsIgnoreCase(actualEnvVariableValue))
-                .findFirst()
-                .orElseGet(() -> {
-                    LOGGER.info("Environment variable '{}' is not set. Defaulting to profile {}.", ENV_VARIABLE, DEFAULT);
-                    return DEFAULT;
-                });
+        return ActiveProfileEvaluatorLoader.load().determineActiveProfile().orElseGet(() -> {
+            LOGGER.info("Active profile could not be evaluated. Defaulting to {}", DEFAULT);
+            return DEFAULT;
+        });
     }
 
     public <X extends T, T> T getProfileDependentValue(Supplier<X> standaloneValueProvider, Supplier<X> localValueProvider, Supplier<X> cloudValueProvider) {
