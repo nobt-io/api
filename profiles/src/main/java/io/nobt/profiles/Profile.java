@@ -1,5 +1,6 @@
 package io.nobt.profiles;
 
+import io.nobt.profiles.spi.EnvironmentLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -25,7 +26,9 @@ public enum Profile {
 
     public static Profile getCurrentProfile() {
 
-        final String actualEnvVariableValue = System.getenv(ENV_VARIABLE);
+        final Environment env = EnvironmentLoader.load();
+
+        final String actualEnvVariableValue = env.getVariable(ENV_VARIABLE);
 
         return Arrays
                 .stream(values())
