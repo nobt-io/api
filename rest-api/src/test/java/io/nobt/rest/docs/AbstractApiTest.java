@@ -30,7 +30,7 @@ public class AbstractApiTest {
     protected RequestSpecification documentationSpec;
 
     private Service http;
-    private NobtDao nobtDao;
+    protected NobtDao nobtDao;
 
     @Before
     public void setUp() throws Exception {

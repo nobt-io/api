@@ -15,11 +15,12 @@ public class CreateNobtTest extends AbstractApiTest {
     public void shouldCreateNewNobt() throws Exception {
 
         given(this.documentationSpec).
-                filter(document("create-nobt", preprocessRequest(modifyUris().scheme("http").host("localhost").port(8080)))).
-                body("{ \"nobtName\":\"Grillfeier\", \"explicitParticipants\": [\"Thomas\", \"Martin\", \"Lukas\"] }").
+            filter(document("create-nobt", preprocessRequest(modifyUris().scheme("http").host("localhost").port(8080)))).
+            body("{ \"nobtName\":\"Grillfeier\", \"explicitParticipants\": [\"Thomas\", \"Martin\", \"Lukas\"] }").
         when().
-                post("/nobts").
+            post("/nobts").
         then().
-                header("Location", not(isEmptyOrNullString()));
+            statusCode(201).
+            header("Location", not(isEmptyOrNullString()));
     }
 }

@@ -10,6 +10,7 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class CreateNobtHandler implements Route {
@@ -32,7 +33,8 @@ public class CreateNobtHandler implements Route {
 		resp.header("Location", req.url() + "/" + nobt.getId());
 		resp.status(201);
 
-		return nobt;
+		// TODO do not return this but instead let client rely on link
+		return new GetNobtHandler.Output(nobt, Collections.emptySet());
 	}
 
 	public static class Input {

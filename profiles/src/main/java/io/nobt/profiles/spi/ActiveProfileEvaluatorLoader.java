@@ -2,6 +2,7 @@ package io.nobt.profiles.spi;
 
 import io.nobt.profiles.ActiveProfileEvaluator;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.stream.Collectors;
@@ -15,14 +16,8 @@ public class ActiveProfileEvaluatorLoader {
                 .stream(ServiceLoader.load(ActiveProfileEvaluator.class).spliterator(), false)
                 .collect(Collectors.toList());
 
-        if (evaluators.size() > 1) {
-            throw new ActiveProfileEvaluatorLoaderException("There must not be more than one ActiveProfileEvaluator available.");
-        }
+        Collections.sort(evaluators);
 
-        if (evaluators.size() == 0) {
-            throw new ActiveProfileEvaluatorLoaderException("No ActiveProfileEvaluator was found.");
-        }
-
-        return evaluators.get(0);
+        return evaluators.stream().findFirst().orElseThrow( () -> new ActiveProfileEvaluatorLoaderException("No ActiveProfileEvaluator was found."));
     }
 }
