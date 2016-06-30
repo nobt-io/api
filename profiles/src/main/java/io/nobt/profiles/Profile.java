@@ -15,24 +15,24 @@ public enum Profile {
     private static final Logger LOGGER = LogManager.getLogger(Profile.class);
 
     public static final Profile DEFAULT = STANDALONE;
-    public static final String SYSTEM_PROPERTY = "profile";
+    public static final String ENV_VARIABLE = "profile";
 
-    private final String systemPropertyValue;
+    private final String envVariableValue;
 
-    Profile(String systemPropertyValue) {
-        this.systemPropertyValue = systemPropertyValue;
+    Profile(String envVariableValue) {
+        this.envVariableValue = envVariableValue;
     }
 
     public static Profile getCurrentProfile() {
 
-        final String actualSystemPropertyValue = System.getProperty(SYSTEM_PROPERTY);
+        final String actualEnvVariableValue = System.getenv(ENV_VARIABLE);
 
         return Arrays
                 .stream(values())
-                .filter(p -> p.systemPropertyValue.equalsIgnoreCase(actualSystemPropertyValue))
+                .filter(p -> p.envVariableValue.equalsIgnoreCase(actualEnvVariableValue))
                 .findFirst()
                 .orElseGet(() -> {
-                    LOGGER.info("System property '{}' is not set. Defaulting to profile {}.", SYSTEM_PROPERTY, DEFAULT);
+                    LOGGER.info("Environment variable '{}' is not set. Defaulting to profile {}.", ENV_VARIABLE, DEFAULT);
                     return DEFAULT;
                 });
     }

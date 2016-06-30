@@ -21,7 +21,7 @@ public class GitLabIssueAppenderTest {
     @Before
     public void setUp() throws Exception {
 
-        System.setProperty(Profile.SYSTEM_PROPERTY, "cloud");
+        System.setProperty(Profile.ENV_VARIABLE, "cloud");
 
         apiMock = mock(GitlabAPI.class);
 
@@ -30,7 +30,7 @@ public class GitLabIssueAppenderTest {
 
     @After
     public void tearDown() throws Exception {
-        System.clearProperty(Profile.SYSTEM_PROPERTY);
+        System.clearProperty(Profile.ENV_VARIABLE);
     }
 
     @Test
