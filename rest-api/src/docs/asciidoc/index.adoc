@@ -4,12 +4,17 @@ Thomas Eizinger;
 :icons: font
 :source-highlighter: highlightjs
 
-== Domain glossary
-
 This document describes the API of Nobt.io. There are 3 requests that can be made at the moment:
+
 * Create a new nobt
 * Add an expense to a given nobt
 * Retrieve the nobt
+
+== Domain glossary
+
+The most important domain terms are:
+
+include::domain_glossary.adoc[]
 
 == Create a new nobt
 

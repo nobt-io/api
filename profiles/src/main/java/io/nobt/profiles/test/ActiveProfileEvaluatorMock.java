@@ -21,4 +21,9 @@ public class ActiveProfileEvaluatorMock implements ActiveProfileEvaluator {
     public Optional<Profile> determineActiveProfile() {
         return Optional.ofNullable(profile);
     }
+
+    @Override
+    public int order() {
+        return Integer.MAX_VALUE;
+    }
 }
