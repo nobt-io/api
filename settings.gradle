@@ -9,4 +9,5 @@ include 'database-config'
 include 'nobt-matchers'
 include 'log4j2-gitlab-issue-appender'
 include 'profiles'
+include 'e2e-tests'
 
