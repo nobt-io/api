@@ -10,7 +10,7 @@
     </Appenders>
     <Loggers>
         <Logger name="io.nobt.rest.NobtApplication.unhandledExceptions" level="error">
-            <!--AppenderRef ref="GitlabIssues"/-->
+            <AppenderRef ref="GitlabIssues"/>
         </Logger>
 
         <Root level="INFO">
