@@ -14,13 +14,14 @@ This document describes the API of Nobt.io. There are 3 requests that can be mad
 
 The most important domain terms are:
 
-include::domain_glossary.adoc[]
+include::domain-glossary.adoc[]
 
 == Create a new nobt
 
 To create a new nobt, issue an http request like this:
 
 include::{snippets}/create-nobt/http-request.adoc[]
+include::{snippets}/create-nobt/request-fields.adoc[]
 
 The response looks like this:
 
@@ -30,7 +31,7 @@ In addition to the information that was sent to the API, two arrays are returned
 
 == Add an expense to a nobt
 
-Given the url in the `Location` header that was returned from the previous response, we can add an expense to this nobt if we post an expense to the `/expenses` sub-resource.
+Given the url in the `Location` header that was returned in the previous response, we can add an expense to this nobt if we post an expense to the `/expenses` sub-resource.
 
 include::{snippets}/create-expense/http-request.adoc[]
 include::{snippets}/create-expense/request-fields.adoc[]

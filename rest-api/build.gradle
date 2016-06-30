@@ -52,11 +52,15 @@ dependencies {
 distributions {
     main {
         contents {
-            from ("${asciidoctor.outputDir}/html5") {
+            from ("${asciidoctor.outputDir}/html5/index.html") {
                 into 'docs'
             }
         }
     }
+}
+
+distTar {
+    enabled = false
 }
 
 distZip {

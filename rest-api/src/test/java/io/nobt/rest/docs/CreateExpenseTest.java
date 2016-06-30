@@ -34,7 +34,16 @@ public class CreateExpenseTest extends AbstractApiTest {
                             )
                     )
             )
-            .body("{ \"name\":\"Fleisch\",  \"amount\": 12.99, \"debtee\": \"Thomas\", \"debtors\": [\"Thomas\", \"Martin\", \"Lukas\"] }")
+            .body("{\n" +
+                    "  \"name\": \"Fleisch\",\n" +
+                    "  \"amount\": 12.99,\n" +
+                    "  \"debtee\": \"Thomas\",\n" +
+                    "  \"debtors\": [\n" +
+                    "    \"Thomas\",\n" +
+                    "    \"Martin\",\n" +
+                    "    \"Lukas\"\n" +
+                    "  ]\n" +
+                    "}")
             .contentType("application/json")
         .when()
             .post("/nobts/" + nobt.getId() + "/expenses")
