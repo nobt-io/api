@@ -18,7 +18,7 @@ public enum Profile {
 
     public static Profile getCurrentProfile() {
         return ActiveProfileEvaluatorLoader.load().determineActiveProfile().orElseGet(() -> {
-            LOGGER.info("Active profile could not be evaluated. Defaulting to {}", DEFAULT);
+            LOGGER.info("Active profile could not be evaluated. Defaulting to {}.", DEFAULT);
             return DEFAULT;
         });
     }
