@@ -5,6 +5,24 @@ You can grab the pre-built package by clicked on the green `passed` button of th
 Once you extract the downloaded `artifacts.zip`, navigate down the folder structure and extract the `rest-api-{VERSION}.zip` file.
 To run the API, simply run either the Batch- or Shell-Skript in the `bin/` folder.
 
+## Profiles
+
+Upon startup, the application chooses one of three profiles:
+
+- __STANDALONE__ (default)
+    - PORT 8080
+    - In-Memory database
+- __LOCAL__
+    - PORT 8080
+    - PostgreSQL database at `localhost:5432` with `postgres:password` credentials
+- __CLOUD__
+    - PORT specified by the PORT env variable
+    - PostgreSQL database specified by the `elephant-sql` service. 
+   
+- For all none-database related development (frontend, business-logic) the `STANDALONE` profile should fulfill all your needs. 
+- If you mess with the database, you will probably want to test your changes against a local database in which case the `LOCAL` profile comes in handy. (And the `create-docker-db-container.sh` script in the `/bin` folder which provisions a docker container with an up and running postgres database.)
+- Running the application in the `CLOUD` profile yourself does not make much sense, as you would have to emulate a cloudfoundry environment. (Which is a none-trivial task.)
+
 # Documentation
 
 ## General
@@ -27,13 +45,3 @@ The collection automatically remembers the last `nobt` you created and reuses it
 
 To build the project from source, simply issue the following command: `./gradlew clean build`.
 The ready-to-run API can be found under `build/distributions`.
-
-# Profiles
-
-The application is aware of three profiles.
-
-- STANDALONE
-- LOCAL
-- CLOUD
-
-If no profile is specified (via the environment variable `profile`), the STANDALONE profile is picked. This causes the application to use an In-Memory database instead of trying to connect an SQL database.
