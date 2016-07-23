@@ -1,6 +1,14 @@
 package io.nobt.rest;
 
+import javax.persistence.EntityManager;
+import javax.validation.Validation;
+import javax.validation.Validator;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import io.nobt.core.NobtCalculator;
 import io.nobt.dbconfig.CloudDatabaseConfig;
 import io.nobt.dbconfig.DatabaseConfig;
@@ -10,17 +18,9 @@ import io.nobt.persistence.dao.InMemoryNobtDao;
 import io.nobt.persistence.dao.NobtDaoImpl;
 import io.nobt.persistence.dao.NobtMapper;
 import io.nobt.profiles.Profile;
-import io.nobt.rest.handler.ConstraintViolationExceptionHandler;
 import io.nobt.rest.json.BodyParser;
-import io.nobt.rest.json.JacksonResponseTransformer;
 import io.nobt.rest.json.ObjectMapperFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import spark.Service;
-
-import javax.persistence.EntityManager;
-import javax.validation.Validation;
-import javax.validation.Validator;
 
 public class NobtApplication {
 
@@ -52,8 +52,7 @@ public class NobtApplication {
                 nobtDao,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
-                new JacksonResponseTransformer(objectMapper),
-                new ConstraintViolationExceptionHandler(objectMapper)
+                objectMapper
         ).run(port);
     }
 

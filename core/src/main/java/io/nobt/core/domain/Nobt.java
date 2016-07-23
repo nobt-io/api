@@ -3,23 +3,22 @@ package io.nobt.core.domain;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 public class Nobt {
 
-    private UUID id;
+    private NobtId id;
     private String name;
     private final Set<Person> explicitParticipants;
 
     private Set<Expense> expenses = new HashSet<>();
 
-    public Nobt(String name, UUID id) {
-        this(name, id, Collections.emptySet());
+    public Nobt(NobtId id, String name) {
+        this(id, name, Collections.emptySet());
     }
 
-    public Nobt(String name, UUID uuid, Set<Person> explicitParticipants) {
+    public Nobt(NobtId id, String name, Set<Person> explicitParticipants) {
+        this.id = id;
         this.name = name;
-        this.id = uuid;
         this.explicitParticipants = explicitParticipants;
     }
 
@@ -47,8 +46,7 @@ public class Nobt {
         this.expenses.add(expense);
     }
 
-    public UUID getId() {
+    public NobtId getId() {
         return id;
     }
-
 }

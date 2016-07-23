@@ -38,7 +38,7 @@ public class GetNobtTest extends AbstractApiTest {
                     )
             )
         .when()
-            .get("/nobts/" + nobt.getId())
+            .get("/nobts/" + nobt.getId().toExternalIdentifier())
         .then()
             .statusCode(200);
     }

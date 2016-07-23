@@ -1,32 +1,32 @@
 package io.nobt.core;
 
-import java.util.UUID;
+import io.nobt.core.domain.NobtId;
 
 public class UnknownNobtException extends RuntimeException {
 
-    private final UUID id;
+    private final NobtId id;
 
-    public UnknownNobtException(UUID id) {
+    public UnknownNobtException(NobtId id) {
         this.id = id;
     }
 
-    public UnknownNobtException(String message, UUID id) {
+    public UnknownNobtException(String message, NobtId id) {
         super(message);
         this.id = id;
     }
 
-    public UnknownNobtException(String message, Throwable cause, UUID id) {
+    public UnknownNobtException(String message, Throwable cause, NobtId id) {
         super(message, cause);
         this.id = id;
     }
 
-    public UnknownNobtException(Throwable cause, UUID id) {
+    public UnknownNobtException(Throwable cause, NobtId id) {
         super(cause);
         this.id = id;
     }
 
     @Override
     public String getMessage() {
-        return String.format("Nobt with id %s is unknown", id);
+        return String.format("Nobt with id '%s' is unknown", id);
     }
 }

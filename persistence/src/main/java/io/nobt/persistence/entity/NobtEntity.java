@@ -19,10 +19,6 @@ public class NobtEntity {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
-    @Type(type = "pg-uuid")
-    @Column(name = "uuid", nullable = false, unique = true, length = 50)
-    private UUID uuid;
-
     @Column(name = "nobtName", nullable = false, length = 50)
     private String name;
 
@@ -32,22 +28,13 @@ public class NobtEntity {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL)
     private Set<ExpenseEntity> expenses = new HashSet<>();
 
-    public NobtEntity(String name, UUID uuid, Set<String> explicitParticipants) {
+    public NobtEntity(String name, Set<String> explicitParticipants) {
         this.name = name;
-        this.uuid = uuid;
         this.explicitParticipants = String.join(";", explicitParticipants);
     }
 
     public NobtEntity() {
 
-    }
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
     }
 
     public String getName() {
