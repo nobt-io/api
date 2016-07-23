@@ -2,6 +2,7 @@ package io.nobt.core.domain;
 
 import java.util.Objects;
 
+import io.nobt.core.PseudoCrypter;
 import io.nobt.core.ShortURL;
 
 public final class NobtId {
@@ -18,11 +19,19 @@ public final class NobtId {
     }
 
     public static NobtId fromExternalIdentifier(String identifier) {
-        return new NobtId(ShortURL.decode(identifier));
+
+        final long decodedIdentifier = ShortURL.decode(identifier);
+        final long decryptedId = PseudoCrypter.pseudoCryptLong(decodedIdentifier);
+
+        return new NobtId(decryptedId);
     }
 
     public String toExternalIdentifier() {
-        return ShortURL.encode(id);
+
+        final long encryptedId = PseudoCrypter.pseudoCryptLong(this.id);
+        final String encodedIdentifier = ShortURL.encode(encryptedId);
+
+        return encodedIdentifier;
     }
 
     @Override
