@@ -32,13 +32,15 @@ import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Person;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.dao.InMemoryNobtDao;
-import io.nobt.rest.NobtRestApi;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.json.ObjectMapperFactory;
 import io.nobt.util.Sets;
 import spark.Service;
 
-public class DocumentationApiTest {
+public class ApiDocumentationTest {
+
+    private static final int ACTUAL_PORT = 18080;
+    private static final int DOCUMENTED_PORT = 80;
 
     @Rule
     public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
@@ -66,7 +68,7 @@ public class DocumentationApiTest {
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
                 objectMapper
-        ).run(8080);
+        ).run(ACTUAL_PORT);
     }
 
     @After
@@ -78,9 +80,10 @@ public class DocumentationApiTest {
     public void shouldCreateNewNobt() throws Exception {
 
         given(this.documentationSpec).
+        port(ACTUAL_PORT).
                 filter(
                         document("create-nobt",
-                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(8080)),
+                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
                                 requestFields(
                                         fieldWithPath("nobtName").description("The name of the nobt."),
                                         fieldWithPath("explicitParticipants").optional().description("An array of people that should always be listed as participants, no matter if they ever participate as debtee / debtor or not.")
@@ -110,9 +113,10 @@ public class DocumentationApiTest {
         final Nobt nobt = nobtDao.create("Grillfeier", explicitParticipants);
 
         given(this.documentationSpec)
+        .port(ACTUAL_PORT)
                 .filter(
                         document("create-expense",
-                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(8080)),
+                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
                                 requestFields(
                                         fieldWithPath("name").description("Human readable description of the expense"),
                                         fieldWithPath("amount").description("The amount of the expense in EUR."),
@@ -133,7 +137,7 @@ public class DocumentationApiTest {
                         "}")
                 .contentType("application/json")
         .when()
-                .post("/nobts/" + nobt.getId().toExternalIdentifier() + "/expenses")
+                .post("/nobts/{nobtId}/expenses", nobt.getId().toExternalIdentifier())
         .then()
                 .statusCode(201);
     }
@@ -146,9 +150,10 @@ public class DocumentationApiTest {
         nobtDao.createExpense(nobt.getId(), "Fleisch", new BigDecimal(12.99), Person.forName("Thomas"), explicitParticipants);
 
         given(this.documentationSpec)
+        .port(ACTUAL_PORT)
                 .filter(
                         document("get-nobt",
-                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(8080)),
+                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
                                 responseFields(
                                         fieldWithPath("id").description("The id of the nobt. Can be used to construct URIs to the various endpoints of the API"),
                                         fieldWithPath("name").description("The name of the nobt."),
@@ -159,7 +164,7 @@ public class DocumentationApiTest {
                         )
                 )
         .when()
-                .get("/nobts/" + nobt.getId().toExternalIdentifier())
+                .get("/nobts/{nobtId}", nobt.getId().toExternalIdentifier())
         .then()
                 .statusCode(200);
     }
