@@ -2,13 +2,7 @@
 
 CONFIG_FILE=config/src/main/resources/database.local.properties
 
-# make sure docker machine is accessible
-eval $(docker-machine env default --shell bash)
-
-# start docker machine
-docker-machine start default > /dev/null
-
-HOST=$(docker-machine inspect --format '{{ .Driver.IPAddress }}' default)
+HOST=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' nobt-io-postgres-db)
 PORT='5432'
 USERNAME='postgres'
 PASSWORD='password'

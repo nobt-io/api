@@ -27,7 +27,7 @@ public class NobtCalculatorTest {
 	@Test
 	public void testShouldSplitSingleExpenseEquallyAmongAllReceivers() {
 
-		Nobt sampleNobt = new Nobt("Sample Nobt", UUID.randomUUID());
+		Nobt sampleNobt = new Nobt(null, "Sample Nobt");
 		Expense hofer = expense("Hofer", euro(20), lukas, thomas, matthias, david, thomasB);
 
 		sampleNobt.addExpense(hofer);
@@ -48,7 +48,7 @@ public class NobtCalculatorTest {
 	@Test
 	public void testShouldSplit2ExpensesEquallyAmongAllReceivers() {
 
-		Nobt sampleNobt = new Nobt("Sample Nobt", UUID.randomUUID());
+		Nobt sampleNobt = new Nobt(null, "Sample Nobt");
 		Expense hofer = expense("Hofer", euro(20), lukas, thomas, matthias, david, thomasB);
 		Expense billa = expense("Billa", euro(40), matthias, thomas, lukas, david, thomasB);
 

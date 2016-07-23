@@ -1,28 +1,41 @@
 package io.nobt.rest;
 
+import static io.nobt.profiles.Profiles.ifProfile;
+import static java.util.stream.Collectors.toList;
+
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
+import io.nobt.core.domain.Expense;
+import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.NobtId;
+import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtDao;
 import io.nobt.profiles.Profiles;
 import io.nobt.rest.encoding.EncodingNotSpecifiedException;
 import io.nobt.rest.filter.EncodingAwareBodyParser;
-import io.nobt.rest.handler.CreateExpenseHandler;
-import io.nobt.rest.handler.CreateNobtHandler;
-import io.nobt.rest.handler.GetNobtHandler;
-import io.nobt.rest.handler.GetPersonsHandler;
 import io.nobt.rest.json.BodyParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import spark.ExceptionHandler;
+import io.nobt.rest.payloads.CreateExpenseInput;
+import io.nobt.rest.payloads.CreateNobtInput;
+import io.nobt.rest.payloads.NobtResource;
+import io.nobt.rest.payloads.SimpleViolation;
+import spark.Request;
 import spark.Response;
-import spark.ResponseTransformer;
 import spark.Service;
-
-import javax.validation.ConstraintViolationException;
-import java.io.IOException;
-import java.io.PrintStream;
-
-import static io.nobt.profiles.Profiles.ifProfile;
 
 public class NobtRestApi {
 
@@ -33,16 +46,14 @@ public class NobtRestApi {
     private final NobtDao nobtDao;
     private final NobtCalculator nobtCalculator;
     private final BodyParser bodyParser;
-    private final ResponseTransformer jsonResponseTransformer;
-    private final ExceptionHandler cvExceptionHandler;
+    private final ObjectMapper objectMapper;
 
-    public NobtRestApi(Service http, NobtDao nobtDao, NobtCalculator nobtCalculator, BodyParser bodyParser, ResponseTransformer jsonResponseTransformer, ExceptionHandler cvExceptionHandler) {
-        this.http = http;
+    public NobtRestApi(Service ignite, NobtDao nobtDao, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper) {
+        this.http = ignite;
         this.nobtDao = nobtDao;
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
-        this.jsonResponseTransformer = jsonResponseTransformer;
-        this.cvExceptionHandler = cvExceptionHandler;
+        this.objectMapper = objectMapper;
     }
 
     public void run(int port) {
@@ -52,13 +63,7 @@ public class NobtRestApi {
         useApplicationJsonAsDefaultReponseContentType();
         setupCORS();
 
-        http.post("/nobts", "application/json", new CreateNobtHandler(nobtDao, bodyParser), jsonResponseTransformer);
-
-        // deprecated
-        http.get("/nobts/:nobtId/persons", new GetPersonsHandler());
-
-        http.get("/nobts/:nobtId", new GetNobtHandler(nobtDao, nobtCalculator), jsonResponseTransformer);
-        http.post("/nobts/:nobtId/expenses", "application/json", new CreateExpenseHandler(nobtDao, bodyParser), jsonResponseTransformer);
+        registerApplicationRoutes();
 
         http.exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
             response.status(400);
@@ -70,9 +75,72 @@ public class NobtRestApi {
             response.body(e.getMessage());
         }));
 
-        http.exception(ConstraintViolationException.class, cvExceptionHandler);
+        http.exception(ConstraintViolationException.class, (e, request, response) -> {
+
+            final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) e).getConstraintViolations();
+            final List<SimpleViolation> simpleViolations = violations.stream().map(SimpleViolation::new).collect(toList());
+
+            response.status(400);
+
+            try {
+                response.body(objectMapper.writeValueAsString(simpleViolations));
+            } catch (JsonProcessingException e1) {
+                throw new IllegalStateException(e1);
+            }
+        });
 
         handleUnknownExceptions();
+    }
+
+    private void registerApplicationRoutes() {
+        registerCreateNobtRoute();
+        registerRetrieveNobtRoute();
+        registerCreateExpenseRoute();
+    }
+
+    private void registerCreateExpenseRoute() {
+        http.post("/nobts/:nobtId/expenses", "application/json", (req, resp) -> {
+
+            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
+
+            final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
+
+            Expense expense = nobtDao.createExpense(databaseId, input.name, input.amount, input.debtee, input.debtors);
+            resp.status(201);
+
+            return expense;
+        }, objectMapper::writeValueAsString);
+    }
+
+    private void registerRetrieveNobtRoute() {
+        http.get("/nobts/:nobtId", (req, res) -> {
+
+            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
+
+            final Nobt nobt = nobtDao.get(databaseId);
+            final Set<Transaction> transactions = nobtCalculator.calculate(nobt);
+
+            return new NobtResource(nobt, transactions);
+        }, objectMapper::writeValueAsString);
+    }
+
+    private void registerCreateNobtRoute() {
+        http.post("/nobts", "application/json", (req, res) -> {
+
+            final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
+
+            Nobt nobt = nobtDao.create(input.nobtName, input.explicitParticipants);
+
+            res.status(201);
+            res.header("Location", req.url() + "/" + nobt.getId().toExternalIdentifier());
+
+            return new NobtResource(nobt, Collections.emptySet());
+        }, objectMapper::writeValueAsString);
+    }
+
+    private static NobtId decodeNobtIdentifierToDatabaseId(Request req) {
+        final String externalIdentifier = req.params(":nobtId");
+        return NobtId.fromExternalIdentifier(externalIdentifier);
     }
 
     private void parseBodyWithEncodingSpecifiedInContentType() {

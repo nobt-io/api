@@ -1,26 +1,26 @@
 package io.nobt.rest.docs;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.restassured.builder.RequestSpecBuilder;
-import com.jayway.restassured.specification.RequestSpecification;
-import io.nobt.core.NobtCalculator;
-import io.nobt.persistence.NobtDao;
-import io.nobt.persistence.dao.InMemoryNobtDao;
-import io.nobt.rest.NobtRestApi;
-import io.nobt.rest.handler.ConstraintViolationExceptionHandler;
-import io.nobt.rest.json.BodyParser;
-import io.nobt.rest.json.JacksonResponseTransformer;
-import io.nobt.rest.json.ObjectMapperFactory;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.springframework.restdocs.JUnitRestDocumentation;
-import spark.Service;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.restassured.builder.RequestSpecBuilder;
+import com.jayway.restassured.specification.RequestSpecification;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.springframework.restdocs.JUnitRestDocumentation;
+
+import io.nobt.core.NobtCalculator;
+import io.nobt.persistence.NobtDao;
+import io.nobt.persistence.dao.InMemoryNobtDao;
+import io.nobt.rest.NobtRestApi;
+import io.nobt.rest.json.BodyParser;
+import io.nobt.rest.json.ObjectMapperFactory;
+import spark.Service;
 
 public class AbstractApiTest {
 
@@ -43,13 +43,13 @@ public class AbstractApiTest {
         nobtDao = new InMemoryNobtDao();
 
         http = Service.ignite();
+
         new NobtRestApi(
                 http,
                 nobtDao,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
-                new JacksonResponseTransformer(objectMapper),
-                new ConstraintViolationExceptionHandler(objectMapper)
+                objectMapper
         ).run(8080);
     }
 

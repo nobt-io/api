@@ -46,7 +46,7 @@ public class CreateExpenseTest extends AbstractApiTest {
                     "}")
             .contentType("application/json")
         .when()
-            .post("/nobts/" + nobt.getId() + "/expenses")
+            .post("/nobts/" + nobt.getId().toExternalIdentifier() + "/expenses")
         .then()
             .statusCode(201);
     }

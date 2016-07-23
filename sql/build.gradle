@@ -1,4 +1,3 @@
-
 apply plugin: 'application'
 mainClassName = 'io.nobt.sql.flyway.MigrationApp'
 
