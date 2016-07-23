@@ -11,7 +11,7 @@ test_rest-api:
   artifacts:
     when: on_failure
     paths:
-      - rest-api/build/reports/*
+      - */build/reports/*
 
 build_rest-api:
   image: sdorra/oracle-java-8
