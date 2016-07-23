@@ -1,20 +1,24 @@
 package io.nobt.rest.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-import spark.Request;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 
-import static org.mockito.Mockito.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import spark.Request;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BodyParserTest {
@@ -34,8 +38,8 @@ public class BodyParserTest {
     }
 
     @Test
-    public void shouldUseBodyAttributeAsSource() throws Exception {
-        when(requestMock.attribute("body")).thenReturn("Sample body");
+    public void shouldUseBodyAsSource() throws Exception {
+        when(requestMock.body()).thenReturn("Sample body");
         when(objectMapperMock.readValue(anyString(), eq(Sample.class))).thenReturn(new Sample());
 
         sut.parseBodyAs(requestMock, Sample.class);

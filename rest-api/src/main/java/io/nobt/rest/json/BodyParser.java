@@ -1,13 +1,15 @@
 package io.nobt.rest.json;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import spark.Request;
+import java.io.IOException;
+import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
-import java.io.IOException;
-import java.util.Set;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import spark.Request;
 
 public class BodyParser {
 
@@ -21,7 +23,7 @@ public class BodyParser {
 
     public <T> T parseBodyAs(Request request, Class<T> type) {
 
-        String body = request.attribute("body");
+        final String body = request.body();
 
         final T instance = readValue(type, body);
 

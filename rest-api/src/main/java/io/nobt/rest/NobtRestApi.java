@@ -26,8 +26,6 @@ import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtDao;
 import io.nobt.profiles.Profiles;
-import io.nobt.rest.encoding.EncodingNotSpecifiedException;
-import io.nobt.rest.filter.EncodingAwareBodyParser;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.payloads.CreateExpenseInput;
 import io.nobt.rest.payloads.CreateNobtInput;
@@ -59,16 +57,10 @@ public class NobtRestApi {
     public void run(int port) {
         http.port(port);
 
-        parseBodyWithEncodingSpecifiedInContentType();
         useApplicationJsonAsDefaultReponseContentType();
         setupCORS();
 
         registerApplicationRoutes();
-
-        http.exception(EncodingNotSpecifiedException.class, (exception, request, response) -> {
-            response.status(400);
-            response.body("Please specify a charset for your content!");
-        });
 
         http.exception(UnknownNobtException.class, ((e, request, response) -> {
             response.status(404);
@@ -141,10 +133,6 @@ public class NobtRestApi {
     private static NobtId decodeNobtIdentifierToDatabaseId(Request req) {
         final String externalIdentifier = req.params(":nobtId");
         return NobtId.fromExternalIdentifier(externalIdentifier);
-    }
-
-    private void parseBodyWithEncodingSpecifiedInContentType() {
-        http.before(new EncodingAwareBodyParser());
     }
 
     private void useApplicationJsonAsDefaultReponseContentType() {
