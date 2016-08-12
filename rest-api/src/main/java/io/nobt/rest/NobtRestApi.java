@@ -121,7 +121,7 @@ public class NobtRestApi {
 
             final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
 
-            Nobt nobt = nobtDao.create(input.nobtName, input.explicitParticipants);
+            Nobt nobt = nobtDao.createNobt(input.nobtName, input.explicitParticipants);
 
             res.status(201);
             res.header("Location", req.url() + "/" + nobt.getId().toExternalIdentifier());

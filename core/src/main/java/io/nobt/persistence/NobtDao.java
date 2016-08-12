@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface NobtDao {
 
-	Nobt create(String nobtName, Set<Person> explicitParticipants);
+	Nobt createNobt(String nobtName, Set<Person> explicitParticipants);
 
 	Expense createExpense(NobtId nobtId, String name, String splitStrategy, Person debtee, Set<Share> shares);
 

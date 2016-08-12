@@ -22,6 +22,15 @@ public final class ExpenseMatchers {
         };
     }
 
+    public static Matcher<Expense> hasShares(final Matcher<? super Set<Share>> sharesMatcher) {
+        return new FeatureMatcher<Expense, Set<Share>>(sharesMatcher, "shares", "shares") {
+            @Override
+            protected Set<Share> featureValueOf(Expense actual) {
+                return actual.getShares();
+            }
+        };
+    }
+
     public static Matcher<Expense> hasDebtors(final Matcher<? super Set<Person>> iterableMatcher) {
         return new FeatureMatcher<Expense, Set<Person>>(iterableMatcher, "debtors", "debtors") {
             @Override

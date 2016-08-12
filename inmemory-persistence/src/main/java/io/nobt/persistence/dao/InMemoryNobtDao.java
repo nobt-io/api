@@ -8,6 +8,8 @@ import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtDao;
 
+import static java.util.stream.Collectors.toSet;
+
 /**
  * @author Matthias
  */
@@ -17,7 +19,7 @@ public class InMemoryNobtDao implements NobtDao {
     private static final Map<NobtId, Nobt> nobtDatabase = new HashMap<>();
 
     @Override
-    public Nobt create(String nobtName, Set<Person> explicitParticipants) {
+    public Nobt createNobt(String nobtName, Set<Person> explicitParticipants) {
 
         Nobt nobt = new Nobt(new NobtId(idGenerator.getAndIncrement()), nobtName, explicitParticipants);
         nobtDatabase.put(nobt.getId(), nobt);
@@ -39,21 +41,15 @@ public class InMemoryNobtDao implements NobtDao {
     @Override
     public Expense createExpense(NobtId nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors) {
 
-        Nobt nobt = get(nobtId);
-
-        Expense expense = new Expense(name, "AUTO - EQUAL", debtee);
-
         if (debtors.isEmpty()) {
             throw new IllegalArgumentException("Cannot save expense with no debtors!");
         }
 
         final BigDecimal amountPerDebtor = amount.divide(BigDecimal.valueOf(debtors.size()));
 
-        debtors.forEach(d -> expense.addShare( new Share(d, Amount.fromBigDecimal(amountPerDebtor)) ));
+        final Set<Share> shares = debtors.stream().map(d -> new Share(d, Amount.fromBigDecimal(amountPerDebtor))).collect(toSet());
 
-        nobt.addExpense(expense);
-
-        return expense;
+        return createExpense(nobtId, name, "AUTO - EQUAL", debtee, shares);
     }
 
     @Override

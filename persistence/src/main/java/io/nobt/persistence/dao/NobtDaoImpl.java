@@ -16,9 +16,6 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
 
-/**
- * @author Matthias
- */
 public class NobtDaoImpl implements NobtDao {
 
     private final EntityManager em;
@@ -34,7 +31,8 @@ public class NobtDaoImpl implements NobtDao {
     }
 
     @Override
-    public Nobt create(String nobtName, Set<Person> explicitParticipants) {
+    public Nobt createNobt(String nobtName, Set<Person> explicitParticipants) {
+
         em.getTransaction().begin();
 
         final Set<String> participantsAsStringList = explicitParticipants.stream().map(Person::getName).collect(toSet());
@@ -52,21 +50,25 @@ public class NobtDaoImpl implements NobtDao {
 
         em.getTransaction().begin();
 
-        NobtEntity nobt = findNobtEntity(nobtId).orElseThrow(() -> new UnknownNobtException(nobtId));
-
-        ExpenseEntity expense = new ExpenseEntity();
+        final ExpenseEntity expense = new ExpenseEntity();
 
         expense.setName(name);
         expense.setDebtee(debtee.getName());
         expense.setSplitStrategy(splitStrategy);
         expense.setShares(shareMapper.mapToByteArray(shares));
 
+
+        final NobtEntity nobt = findNobtEntity(nobtId).orElseThrow(() -> new UnknownNobtException(nobtId));
         nobt.addExpense(expense);
 
         em.merge(nobt);
         em.getTransaction().commit();
 
         return expenseMapper.mapToDomain(expense);
+    }
+
+    private Optional<NobtEntity> findNobtEntity(NobtId nobtId) {
+        return Optional.ofNullable(em.find(NobtEntity.class, nobtId.getId()));
     }
 
     @Override
@@ -94,10 +96,6 @@ public class NobtDaoImpl implements NobtDao {
         final Optional<NobtEntity> nobt = findNobtEntity(nobtId);
 
         return nobt.map(nobtMapper::mapToDomain);
-    }
-
-    private Optional<NobtEntity> findNobtEntity(NobtId nobtId) {
-        return Optional.ofNullable(em.find(NobtEntity.class, nobtId.getId()));
     }
 
 }

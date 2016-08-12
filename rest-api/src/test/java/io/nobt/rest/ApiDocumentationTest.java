@@ -110,7 +110,7 @@ public class ApiDocumentationTest {
     public void shouldAddNewExpense() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(Person.forName("Thomas"), Person.forName("Martin"), Person.forName("Lukas"));
-        final Nobt nobt = nobtDao.create("Grillfeier", explicitParticipants);
+        final Nobt nobt = nobtDao.createNobt("Grillfeier", explicitParticipants);
 
         given(this.documentationSpec)
         .port(ACTUAL_PORT)
@@ -146,7 +146,7 @@ public class ApiDocumentationTest {
     public void shouldCreateNewExpense() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(Person.forName("Thomas"), Person.forName("Martin"), Person.forName("Lukas"));
-        final Nobt nobt = nobtDao.create("Grillfeier", explicitParticipants);
+        final Nobt nobt = nobtDao.createNobt("Grillfeier", explicitParticipants);
         nobtDao.createExpense(nobt.getId(), "Fleisch", new BigDecimal(12.99), Person.forName("Thomas"), explicitParticipants);
 
         given(this.documentationSpec)

@@ -8,13 +8,10 @@ import org.hamcrest.Matcher;
 
 import java.util.Set;
 
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.is;
-
 public final class NobtMatchers {
 
     public static Matcher<Nobt> hasName(final Matcher<String> subMatcher) {
-        return new FeatureMatcher<Nobt, String>(subMatcher, "nobt with name", "name") {
+        return new FeatureMatcher<Nobt, String>(subMatcher, "name", "name") {
             @Override
             protected String featureValueOf(Nobt actual) {
                 return actual.getName();
@@ -22,8 +19,8 @@ public final class NobtMatchers {
         };
     }
 
-    public static Matcher<Nobt> hasParticipants(Matcher<Set<Person>> subMatcher) {
-        return new FeatureMatcher<Nobt, Set<Person>>(subMatcher, "participant with name", "participants") {
+    public static Matcher<Nobt> hasParticipants(Matcher<? super Set<Person>> subMatcher) {
+        return new FeatureMatcher<Nobt, Set<Person>>(subMatcher, "participants", "participants") {
             @Override
             protected Set<Person> featureValueOf(Nobt actual) {
                 return actual.getParticipatingPersons();
@@ -31,8 +28,8 @@ public final class NobtMatchers {
         };
     }
 
-    public static Matcher<Nobt> hasExpenses(final Matcher<Iterable<? super Expense>> subMatcher) {
-        return new FeatureMatcher<Nobt, Set<Expense>>(subMatcher, "nobt with expense", "expenses") {
+    public static Matcher<Nobt> hasExpenses(final Matcher<? super Iterable<Expense>> subMatcher) {
+        return new FeatureMatcher<Nobt, Set<Expense>>(subMatcher, "expenses", "expenses") {
             @Override
             protected Set<Expense> featureValueOf(Nobt actual) {
                 return actual.getExpenses();
