@@ -1,79 +1,100 @@
 package io.nobt.persistence.dao;
 
-import java.math.BigDecimal;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.persistence.EntityManager;
-
 import io.nobt.core.UnknownNobtException;
-import io.nobt.core.domain.Expense;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.NobtId;
-import io.nobt.core.domain.Person;
+import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
+import io.nobt.persistence.mapping.ExpenseMapper;
+import io.nobt.persistence.mapping.NobtMapper;
+import io.nobt.persistence.mapping.ShareMapper;
+
+import javax.persistence.EntityManager;
+import java.math.BigDecimal;
+import java.util.Optional;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author Matthias
- *
  */
 public class NobtDaoImpl implements NobtDao {
 
-	private final EntityManager em;
-	private final NobtMapper nobtMapper;
+    private final EntityManager em;
+    private final NobtMapper nobtMapper;
+    private final ExpenseMapper expenseMapper;
+    private final ShareMapper shareMapper;
 
-    public NobtDaoImpl(EntityManager em, NobtMapper nobtMapper) {
-		this.em = em;
-		this.nobtMapper = nobtMapper;
+    public NobtDaoImpl(EntityManager em, NobtMapper nobtMapper, ExpenseMapper expenseMapper, ShareMapper shareMapper) {
+        this.em = em;
+        this.nobtMapper = nobtMapper;
+        this.expenseMapper = expenseMapper;
+        this.shareMapper = shareMapper;
     }
 
-	@Override
-	public Nobt create(String nobtName, Set<Person> explicitParticipants) {
-		em.getTransaction().begin();
+    @Override
+    public Nobt create(String nobtName, Set<Person> explicitParticipants) {
+        em.getTransaction().begin();
 
-		final Set<String> participantsAsStringList = explicitParticipants.stream().map(Person::getName).collect(Collectors.toSet());
+        final Set<String> participantsAsStringList = explicitParticipants.stream().map(Person::getName).collect(toSet());
 
-		NobtEntity nobt = new NobtEntity(nobtName, participantsAsStringList);
+        NobtEntity nobt = new NobtEntity(nobtName, participantsAsStringList);
 
-		em.persist(nobt);
-		em.getTransaction().commit();
+        em.persist(nobt);
+        em.getTransaction().commit();
 
-		return nobtMapper.mapNobt(nobt);
-	}
+        return nobtMapper.mapToDomain(nobt);
+    }
 
-	@Override
-	public Expense createExpense(NobtId nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors) {
+    @Override
+    public Expense createExpense(NobtId nobtId, String name, String splitStrategy, Person debtee, Set<Share> shares) {
 
-		em.getTransaction().begin();
+        em.getTransaction().begin();
 
-        NobtEntity nobt = findNobtEntity(nobtId).orElseThrow( () -> new UnknownNobtException(nobtId));
+        NobtEntity nobt = findNobtEntity(nobtId).orElseThrow(() -> new UnknownNobtException(nobtId));
 
-		ExpenseEntity expense = new ExpenseEntity(name, amount, debtee.getName());
-		debtors.stream().map(Person::getName).forEach(expense::addDebtor);
+        ExpenseEntity expense = new ExpenseEntity();
 
-		nobt.addExpense(expense);
+        expense.setName(name);
+        expense.setDebtee(debtee.getName());
+        expense.setSplitStrategy(splitStrategy);
+        expense.setShares(shareMapper.mapToByteArray(shares));
 
-		em.merge(nobt);
-		em.getTransaction().commit();
+        nobt.addExpense(expense);
 
-		return nobtMapper.mapExpense(expense);
-	}
+        em.merge(nobt);
+        em.getTransaction().commit();
 
-	@Override
-	public Nobt get(NobtId id) {
-		return find(id).orElseThrow( () -> new UnknownNobtException(id) );
-	}
+        return expenseMapper.mapToDomain(expense);
+    }
 
-	@Override
-	public Optional<Nobt> find(NobtId nobtId) {
+    @Override
+    public Expense createExpense(NobtId nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors) {
+
+        if (debtors.isEmpty()) {
+            throw new IllegalArgumentException("Cannot save expense with no debtors!");
+        }
+
+        final BigDecimal amountPerDebtor = amount.divide(BigDecimal.valueOf(debtors.size()));
+
+        final Set<Share> shares = debtors.stream().map(d -> new Share(d, Amount.fromBigDecimal(amountPerDebtor))).collect(toSet());
+
+        return createExpense(nobtId, name, "AUTO - EQUAL", debtee, shares);
+    }
+
+    @Override
+    public Nobt get(NobtId id) {
+        return find(id).orElseThrow(() -> new UnknownNobtException(id));
+    }
+
+    @Override
+    public Optional<Nobt> find(NobtId nobtId) {
 
         final Optional<NobtEntity> nobt = findNobtEntity(nobtId);
 
-        return nobt.map(nobtMapper::mapNobt);
-	}
+        return nobt.map(nobtMapper::mapToDomain);
+    }
 
     private Optional<NobtEntity> findNobtEntity(NobtId nobtId) {
         return Optional.ofNullable(em.find(NobtEntity.class, nobtId.getId()));

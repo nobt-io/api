@@ -1,18 +1,11 @@
 package io.nobt.persistence.dao;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 import io.nobt.core.UnknownNobtException;
-import io.nobt.core.domain.Amount;
-import io.nobt.core.domain.Expense;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.NobtId;
-import io.nobt.core.domain.Person;
+import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtDao;
 
 /**
@@ -32,14 +25,34 @@ public class InMemoryNobtDao implements NobtDao {
     }
 
     @Override
+    public Expense createExpense(NobtId nobtId, String name, String splitStrategy, Person debtee, Set<Share> shares) {
+        final Nobt nobt = get(nobtId);
+
+        final Expense expense = new Expense(name, splitStrategy, debtee);
+        shares.forEach(expense::addShare);
+
+        nobt.addExpense(expense);
+
+        return expense;
+    }
+
+    @Override
     public Expense createExpense(NobtId nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors) {
 
         Nobt nobt = get(nobtId);
 
-        Expense expense = new Expense(name, Amount.fromBigDecimal(amount), debtee);
-        expense.setDebtors(debtors);
+        Expense expense = new Expense(name, "AUTO - EQUAL", debtee);
+
+        if (debtors.isEmpty()) {
+            throw new IllegalArgumentException("Cannot save expense with no debtors!");
+        }
+
+        final BigDecimal amountPerDebtor = amount.divide(BigDecimal.valueOf(debtors.size()));
+
+        debtors.forEach(d -> expense.addShare( new Share(d, Amount.fromBigDecimal(amountPerDebtor)) ));
 
         nobt.addExpense(expense);
+
         return expense;
     }
 

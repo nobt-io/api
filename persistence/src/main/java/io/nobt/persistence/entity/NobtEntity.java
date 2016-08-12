@@ -49,10 +49,6 @@ public class NobtEntity {
         return expenses;
     }
 
-    public void setExpenses(Set<ExpenseEntity> expenses) {
-        this.expenses = expenses;
-    }
-
     public void addExpense(ExpenseEntity expense) {
         if (expenses == null) {
             expenses = new HashSet<>();

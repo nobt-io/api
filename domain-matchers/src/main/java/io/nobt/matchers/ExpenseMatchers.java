@@ -1,0 +1,33 @@
+package io.nobt.matchers;
+
+import io.nobt.core.domain.Expense;
+import io.nobt.core.domain.Person;
+import io.nobt.core.domain.Share;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
+
+import java.util.Collection;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
+
+public final class ExpenseMatchers {
+
+    public static Matcher<Expense> hasDebtee(final Matcher<Person> subMatcher) {
+        return new FeatureMatcher<Expense, Person>(subMatcher, "debtee", "debtee") {
+            @Override
+            protected Person featureValueOf(Expense actual) {
+                return actual.getDebtee();
+            }
+        };
+    }
+
+    public static Matcher<Expense> hasDebtors(final Matcher<? super Set<Person>> iterableMatcher) {
+        return new FeatureMatcher<Expense, Set<Person>>(iterableMatcher, "debtors", "debtors") {
+            @Override
+            protected Set<Person> featureValueOf(Expense actual) {
+                return actual.getShares().stream().map(Share::getDebtor).collect(toSet());
+            }
+        };
+    }
+}

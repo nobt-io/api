@@ -1,14 +1,6 @@
 package io.nobt.rest;
 
-import javax.persistence.EntityManager;
-import javax.validation.Validation;
-import javax.validation.Validator;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import io.nobt.core.NobtCalculator;
 import io.nobt.dbconfig.CloudDatabaseConfig;
 import io.nobt.dbconfig.DatabaseConfig;
@@ -16,11 +8,19 @@ import io.nobt.dbconfig.LocalDatabaseConfig;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.dao.InMemoryNobtDao;
 import io.nobt.persistence.dao.NobtDaoImpl;
-import io.nobt.persistence.dao.NobtMapper;
+import io.nobt.persistence.mapping.ExpenseMapper;
+import io.nobt.persistence.mapping.NobtMapper;
+import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.profiles.Profile;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.json.ObjectMapperFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.Service;
+
+import javax.persistence.EntityManager;
+import javax.validation.Validation;
+import javax.validation.Validator;
 
 public class NobtApplication {
 
@@ -60,6 +60,9 @@ public class NobtApplication {
         final DatabaseConfig databaseConfig = CURRENT_PROFILE.getProfileDependentValue(() -> null, LocalDatabaseConfig::create, CloudDatabaseConfig::create);
         final EntityManager entityManager = new EntityManagerFactoryProvider().create(databaseConfig).createEntityManager();
 
-        return new NobtDaoImpl(entityManager, new NobtMapper());
+        final ShareMapper shareMapper = new ShareMapper();
+        final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
+
+        return new NobtDaoImpl(entityManager, new NobtMapper(expenseMapper), expenseMapper, shareMapper);
     }
 }

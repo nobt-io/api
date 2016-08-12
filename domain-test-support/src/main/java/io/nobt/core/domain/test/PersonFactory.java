@@ -1,4 +1,4 @@
-package io.nobt.core;
+package io.nobt.core.domain.test;
 
 import io.nobt.core.domain.Person;
 

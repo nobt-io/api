@@ -1,6 +1,5 @@
 package io.nobt.core.domain;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
 import java.util.Objects;
 
