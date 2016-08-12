@@ -12,6 +12,6 @@ public class UnknownNobtException extends RuntimeException {
 
     @Override
     public String getMessage() {
-        return String.format("Nobt with id '%s' is unknown", id);
+        return String.format("Nobt with id '%s' is unknown", id.getId());
     }
 }
