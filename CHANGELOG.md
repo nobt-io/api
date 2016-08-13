@@ -9,6 +9,7 @@ The main change in this version is the introduction of `shares` per expense that
     - `debtors` field removed.
     - `splitStrategy` field added.
     - `shares` field added.
+    - A check has been added that rejects requests with non-unique names inside the `shares` field.
     
 - `GET /nobts/{id}`  
     - `expenses` field semantics changed. (All changes above apply to each element of the expenses array.)
