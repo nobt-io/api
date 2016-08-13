@@ -1,14 +1,14 @@
 package io.nobt.persistence.dao;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtDao;
 
-import static java.util.stream.Collectors.toSet;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author Matthias
@@ -27,7 +27,7 @@ public class InMemoryNobtDao implements NobtDao {
     }
 
     @Override
-    public Expense createExpense(NobtId nobtId, String name, String splitStrategy, Person debtee, Set<Share> shares) {
+    public Expense createExpense(NobtId nobtId, String name, String splitStrategy, Person debtee, List<Share> shares) {
         final Nobt nobt = get(nobtId);
 
         final Expense expense = new Expense(name, splitStrategy, debtee);
@@ -47,7 +47,7 @@ public class InMemoryNobtDao implements NobtDao {
 
         final BigDecimal amountPerDebtor = amount.divide(BigDecimal.valueOf(debtors.size()));
 
-        final Set<Share> shares = debtors.stream().map(d -> new Share(d, Amount.fromBigDecimal(amountPerDebtor))).collect(toSet());
+        final List<Share> shares = debtors.stream().map(d -> new Share(d, Amount.fromBigDecimal(amountPerDebtor))).collect(toList());
 
         return createExpense(nobtId, name, "AUTO - EQUAL", debtee, shares);
     }

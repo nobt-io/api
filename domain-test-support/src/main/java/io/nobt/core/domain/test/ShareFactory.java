@@ -13,4 +13,8 @@ public final class ShareFactory {
     public static Share randomShare(Person person) {
         return new Share(person, Amount.fromDouble(amountValueProvider.nextDouble()));
     }
+
+    public static Share share(Person person, double amount) {
+        return new Share(person, Amount.fromDouble(amount));
+    }
 }

@@ -3,6 +3,7 @@ package io.nobt.persistence;
 import io.nobt.core.domain.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -11,7 +12,7 @@ public interface NobtDao {
 
 	Nobt createNobt(String nobtName, Set<Person> explicitParticipants);
 
-	Expense createExpense(NobtId nobtId, String name, String splitStrategy, Person debtee, Set<Share> shares);
+	Expense createExpense(NobtId nobtId, String name, String splitStrategy, Person debtee, List<Share> shares);
 
 	@Deprecated
 	Expense createExpense(NobtId nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors);

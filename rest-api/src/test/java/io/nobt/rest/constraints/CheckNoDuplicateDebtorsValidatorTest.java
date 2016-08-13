@@ -5,6 +5,8 @@ import io.nobt.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import static io.nobt.core.domain.test.StaticPersonFactory.matthias;
@@ -25,7 +27,7 @@ public class CheckNoDuplicateDebtorsValidatorTest {
     @Test
     public void shouldPassIfNoDuplicateNames() throws Exception {
 
-        final Set<Share> sharesWithoutDuplicateDebtors = Sets.newHashSet(randomShare(thomas), randomShare(matthias));
+        final List<Share> sharesWithoutDuplicateDebtors = Arrays.asList(randomShare(thomas), randomShare(matthias));
 
         final boolean result = sut.isValid(sharesWithoutDuplicateDebtors, null);
 
@@ -35,7 +37,7 @@ public class CheckNoDuplicateDebtorsValidatorTest {
     @Test
     public void shouldFailIfDuplicateNames() throws Exception {
 
-        final Set<Share> sharesWithoutDuplicateDebtors = Sets.newHashSet(randomShare(matthias), randomShare(matthias));
+        final List<Share> sharesWithoutDuplicateDebtors = Arrays.asList(randomShare(matthias), randomShare(matthias));
 
         final boolean result = sut.isValid(sharesWithoutDuplicateDebtors, null);
 

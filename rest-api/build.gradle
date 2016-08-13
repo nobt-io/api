@@ -9,6 +9,8 @@ plugins {
 }
 
 apply plugin: 'application'
+apply from: rootProject.rootDir.path + '/gradle/integrationTest.gradle'
+
 mainClassName = 'io.nobt.rest.NobtApplication'
 
 ext {
@@ -18,7 +20,7 @@ ext {
 asciidoctor {
     attributes 'snippets': snippetsDir
     inputs.dir snippetsDir
-    dependsOn test
+    dependsOn integrationTest
 }
 
 dependencies {

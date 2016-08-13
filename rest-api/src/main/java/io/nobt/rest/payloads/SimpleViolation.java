@@ -1,14 +1,7 @@
 package io.nobt.rest.payloads;
 
-import java.util.Optional;
-
-import javax.validation.ConstraintViolation;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * @author Thomas Eizinger, Senacor Technologies AG.
- */
 public class SimpleViolation {
 
     @JsonProperty("property")
@@ -20,9 +13,9 @@ public class SimpleViolation {
     @JsonProperty("message")
     private final String message;
 
-    public SimpleViolation(ConstraintViolation<?> violation) {
-        this.property = violation.getPropertyPath().toString();
-        this.value = Optional.ofNullable(violation.getInvalidValue()).map(Object::toString).orElse(null);
-        this.message = violation.getMessage();
+    public SimpleViolation(String property, String value, String message) {
+        this.property = property;
+        this.value = value;
+        this.message = message;
     }
 }

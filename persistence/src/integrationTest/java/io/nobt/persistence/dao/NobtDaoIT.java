@@ -15,6 +15,7 @@ import org.junit.rules.ExpectedException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static io.nobt.core.domain.test.StaticPersonFactory.*;
@@ -95,7 +96,7 @@ public class NobtDaoIT {
 
         final Nobt nobt = sut.createNobt("Some name", Collections.emptySet());
 
-        final Expense expense = sut.createExpense(nobt.getId(), "Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare));
+        final Expense expense = sut.createExpense(nobt.getId(), "Billa", "UNKNOWN", thomas, Arrays.asList(thomasShare, matthiasShare));
 
         // early fail if expense cannot be properly persisted
         assumeThat(expense, allOf(

@@ -1,23 +1,7 @@
 package io.nobt.rest;
 
-import static io.nobt.profiles.Profiles.ifProfile;
-import static java.util.stream.Collectors.toList;
-
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Expense;
@@ -31,9 +15,22 @@ import io.nobt.rest.payloads.CreateExpenseInput;
 import io.nobt.rest.payloads.CreateNobtInput;
 import io.nobt.rest.payloads.NobtResource;
 import io.nobt.rest.payloads.SimpleViolation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import spark.Request;
 import spark.Response;
 import spark.Service;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import static io.nobt.profiles.Profiles.ifProfile;
+import static java.util.stream.Collectors.toList;
 
 public class NobtRestApi {
 
@@ -45,6 +42,7 @@ public class NobtRestApi {
     private final NobtCalculator nobtCalculator;
     private final BodyParser bodyParser;
     private final ObjectMapper objectMapper;
+    private final SimpleViolationFactory simpleViolationFactory;
 
     public NobtRestApi(Service ignite, NobtDao nobtDao, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper) {
         this.http = ignite;
@@ -52,6 +50,7 @@ public class NobtRestApi {
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
         this.objectMapper = objectMapper;
+        simpleViolationFactory = new SimpleViolationFactory(objectMapper);
     }
 
     public void run(int port) {
@@ -67,19 +66,7 @@ public class NobtRestApi {
             response.body(e.getMessage());
         }));
 
-        http.exception(ConstraintViolationException.class, (e, request, response) -> {
-
-            final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) e).getConstraintViolations();
-            final List<SimpleViolation> simpleViolations = violations.stream().map(SimpleViolation::new).collect(toList());
-
-            response.status(400);
-
-            try {
-                response.body(objectMapper.writeValueAsString(simpleViolations));
-            } catch (JsonProcessingException e1) {
-                throw new IllegalStateException(e1);
-            }
-        });
+        handleValidationExceptions();
 
         handleUnknownExceptions();
     }
@@ -159,19 +146,35 @@ public class NobtRestApi {
         });
     }
 
+    private void handleValidationExceptions() {
+        http.exception(ConstraintViolationException.class, (e, request, response) -> {
+
+            final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) e).getConstraintViolations();
+            final List<SimpleViolation> simpleViolations = violations.stream().map(simpleViolationFactory::create).collect(toList());
+
+            response.status(400);
+
+            try {
+                response.body(objectMapper.writeValueAsString(simpleViolations));
+            } catch (JsonProcessingException e1) {
+                throw new IllegalStateException(e1);
+            }
+        });
+    }
+
     private void handleUnknownExceptions() {
         http.exception(Exception.class, (e, request, response) -> {
             UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
             response.status(500);
 
-            ifProfile( Profiles::notCloud, () -> printStacktraceToResponse(e, response) );
+            ifProfile(Profiles::notCloud, () -> printStacktraceToResponse(e, response));
         });
 
         http.exception(RuntimeException.class, (e, request, response) -> {
             UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
             response.status(500);
 
-            ifProfile( Profiles::notCloud, () -> printStacktraceToResponse(e, response) );
+            ifProfile(Profiles::notCloud, () -> printStacktraceToResponse(e, response));
         });
     }
 

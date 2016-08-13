@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.List;
 import java.util.Set;
 
 public class ShareMapper {
@@ -31,7 +32,7 @@ public class ShareMapper {
         return readIntoBeans(inputStream);
     }
 
-    public byte[] mapToByteArray(Set<Share> shares) {
+    public byte[] mapToByteArray(List<Share> shares) {
 
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeBeans(shares, outputStream);
@@ -47,7 +48,7 @@ public class ShareMapper {
         }
     }
 
-    private void writeBeans(Set<Share> shares, ByteArrayOutputStream boas) {
+    private void writeBeans(List<Share> shares, ByteArrayOutputStream boas) {
         try {
             bsonMapper.writeValue(boas, shares);
         } catch (IOException e) {

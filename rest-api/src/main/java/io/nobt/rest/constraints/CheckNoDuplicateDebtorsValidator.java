@@ -11,10 +11,7 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
-/**
- * @author Thomas Eizinger, Senacor Technologies AG.
- */
-public class CheckNoDuplicateDebtorsValidator implements ConstraintValidator<CheckNoDuplicateDebtors, Set<Share>> {
+public class CheckNoDuplicateDebtorsValidator implements ConstraintValidator<CheckNoDuplicateDebtors, List<Share>> {
 
     @Override
     public void initialize(CheckNoDuplicateDebtors checkNoDuplicateDebtors) {
@@ -22,7 +19,7 @@ public class CheckNoDuplicateDebtorsValidator implements ConstraintValidator<Che
     }
 
     @Override
-    public boolean isValid(Set<Share> shares, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(List<Share> shares, ConstraintValidatorContext constraintValidatorContext) {
 
         final List<Person> allDebtors = shares.stream().map(Share::getDebtor).collect(toList());
 

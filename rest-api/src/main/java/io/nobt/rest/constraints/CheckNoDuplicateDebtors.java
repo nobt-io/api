@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface CheckNoDuplicateDebtors {
 
-    String message() default "Debtors names must be unique for a single expense";
+    String message() default "Debtors names must be unique for a single expense across all shares.";
 
     Class<?>[] groups() default { };
 

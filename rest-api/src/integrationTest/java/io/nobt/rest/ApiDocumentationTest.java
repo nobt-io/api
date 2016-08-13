@@ -1,29 +1,23 @@
 package io.nobt.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.specification.RequestSpecification;
-import io.nobt.core.NobtCalculator;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Person;
-import io.nobt.persistence.NobtDao;
-import io.nobt.persistence.dao.InMemoryNobtDao;
-import io.nobt.rest.json.BodyParser;
-import io.nobt.rest.json.ObjectMapperFactory;
 import io.nobt.util.Sets;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.restdocs.JUnitRestDocumentation;
-import spark.Service;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.snippet.Attributes;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
+import java.util.Arrays;
 import java.util.Set;
 
 import static com.jayway.restassured.RestAssured.given;
 import static io.nobt.core.domain.test.ShareFactory.randomShare;
+import static io.nobt.core.domain.test.ShareFactory.share;
 import static io.nobt.core.domain.test.StaticPersonFactory.*;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
@@ -33,9 +27,8 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.restassured.operation.preprocess.RestAssuredPreprocessors.modifyUris;
 
-public class ApiDocumentationTest {
+public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
-    private static final int ACTUAL_PORT = 18080;
     private static final int DOCUMENTED_PORT = 80;
 
     @Rule
@@ -43,34 +36,11 @@ public class ApiDocumentationTest {
 
     protected RequestSpecification documentationSpec;
 
-    private Service http;
-    protected NobtDao nobtDao;
-
     @Before
     public void setUp() throws Exception {
-
         this.documentationSpec = new RequestSpecBuilder()
                 .addFilter(documentationConfiguration(restDocumentation))
                 .build();
-
-        final ObjectMapper objectMapper = new ObjectMapperFactory().create();
-        final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        nobtDao = new InMemoryNobtDao();
-
-        http = Service.ignite();
-
-        new NobtRestApi(
-                http,
-                nobtDao,
-                new NobtCalculator(),
-                new BodyParser(objectMapper, validator),
-                objectMapper
-        ).run(ACTUAL_PORT);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        http.stop();
     }
 
     @Test
@@ -162,9 +132,7 @@ public class ApiDocumentationTest {
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
         final Nobt nobt = nobtDao.createNobt("Grillfeier", explicitParticipants);
 
-        nobtDao.createExpense(nobt.getId(), "Fleisch", "EVENLY", thomas, Sets.newHashSet(
-                randomShare(matthias), randomShare(lukas), randomShare(martin)
-        ));
+        nobtDao.createExpense(nobt.getId(), "Fleisch", "EVENLY", thomas, Arrays.asList(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)));
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -188,5 +156,53 @@ public class ApiDocumentationTest {
                 .then()
 
                 .statusCode(200);
+    }
+
+    @Test
+    public void shouldRejectExpenseWithDuplicateDebtor() throws Exception {
+
+        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
+        final Nobt nobt = nobtDao.createNobt("Burger essen!", explicitParticipants);
+
+        given(this.documentationSpec)
+                .port(ACTUAL_PORT)
+                .filter(
+                        document("duplicate-debtor",
+                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
+                                responseFields(
+                                        fieldWithPath("[].property").description("Describes the property in the request object which caused the validation to fail."),
+                                        fieldWithPath("[].value").description("The value of the property as received by the server."),
+                                        fieldWithPath("[].message").description("An error message that describes what went wrong.")
+                                )
+                        )
+                )
+                .body("{\n" +
+                        "  \"name\": \"Fleisch\",\n" +
+                        "  \"debtee\": \"Thomas\",\n" +
+                        "  \"splitStrategy\": \"EVENLY\",\n" +
+                        "  \"shares\": [\n" +
+                        "    {\n" +
+                        "      \"debtor\": \"Thomas\",\n" +
+                        "      \"amount\": 2\n" +
+                        "    },\n" +
+                        "    {\n" +
+                        "      \"debtor\": \"Thomas\",\n" +
+                        "      \"amount\": 2\n" +
+                        "    },\n" +
+                        "    {\n" +
+                        "      \"debtor\": \"Matthias\",\n" +
+                        "      \"amount\": 4\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}")
+                .contentType("application/json")
+
+                .when()
+
+                .post("/nobts/{nobtId}/expenses", nobt.getId().toExternalIdentifier())
+
+                .then()
+
+                .statusCode(400);
     }
 }

@@ -5,6 +5,7 @@ import io.nobt.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import static io.nobt.core.domain.test.StaticPersonFactory.david;
@@ -28,7 +29,7 @@ public class ShareMapperTest {
         final Share firstShare = randomShare(david);
         final Share secondShare = randomShare(harald);
 
-        final byte[] sharesAsBytes = sut.mapToByteArray(Sets.newHashSet(firstShare, secondShare));
+        final byte[] sharesAsBytes = sut.mapToByteArray(Arrays.asList(firstShare, secondShare));
 
         final Set<Share> shares = sut.mapToShareSet(sharesAsBytes);
 

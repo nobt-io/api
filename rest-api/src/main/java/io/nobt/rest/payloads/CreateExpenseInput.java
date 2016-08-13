@@ -7,6 +7,7 @@ import io.nobt.rest.constraints.CheckNoDuplicateDebtors;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 public class CreateExpenseInput {
@@ -26,5 +27,5 @@ public class CreateExpenseInput {
     @Valid
     @CheckNoDuplicateDebtors
     @JsonProperty(value = "shares", required = true)
-    public Set<Share> shares;
+    public List<Share> shares;
 }
