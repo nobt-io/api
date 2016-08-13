@@ -94,10 +94,9 @@ public class NobtRestApi {
         http.post("/nobts/:nobtId/expenses", "application/json", (req, resp) -> {
 
             final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
-
             final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
 
-            Expense expense = nobtDao.createExpense(databaseId, input.name, input.amount, input.debtee, input.debtors);
+            Expense expense = nobtDao.createExpense(databaseId, input.name, input.splitStrategy, input.debtee, input.shares);
             resp.status(201);
 
             return expense;
@@ -176,11 +175,11 @@ public class NobtRestApi {
         });
     }
 
-    private void printStacktraceToResponse(Exception e, Response response) {
+    private void printStacktraceToResponse(Exception uncaughtException, Response response) {
         try {
-            e.printStackTrace(new PrintStream(response.raw().getOutputStream()));
-        } catch (IOException e1) {
-            LOGGER.error("Failed to write stacktrace to response", e1);
+            uncaughtException.printStackTrace(new PrintStream(response.raw().getOutputStream()));
+        } catch (IOException e) {
+            LOGGER.error("Failed to write stacktrace to response", e);
         }
     }
 }

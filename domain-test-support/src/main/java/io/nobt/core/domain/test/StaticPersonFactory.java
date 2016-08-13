@@ -2,7 +2,7 @@ package io.nobt.core.domain.test;
 
 import io.nobt.core.domain.Person;
 
-public final class PersonFactory {
+public final class StaticPersonFactory {
 
 	public static Person thomas = Person.forName("Thomas");
 	public static Person matthias = Person.forName("Matthias");
@@ -12,6 +12,7 @@ public final class PersonFactory {
 	public static Person jacqueline = Person.forName("Jacqueline");
 	public static Person david = Person.forName("David");
 	public static Person harald = Person.forName("Harald");
+	public static Person martin = Person.forName("Martin");
 
-	private PersonFactory() { }
+	private StaticPersonFactory() { }
 }

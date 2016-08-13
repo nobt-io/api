@@ -1,27 +1,30 @@
 package io.nobt.rest.payloads;
 
-import java.math.BigDecimal;
-import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.nobt.core.domain.Person;
+import io.nobt.core.domain.Share;
+import io.nobt.rest.constraints.CheckNoDuplicateDebtors;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.nobt.core.domain.Person;
+import java.util.Set;
 
 public class CreateExpenseInput {
 
-    @JsonProperty("name")
+    @NotEmpty
+    @JsonProperty(value = "name", required = true)
     public String name;
 
-    @JsonProperty("amount")
-    public BigDecimal amount;
-
     @Valid
-    @JsonProperty("debtee")
+    @JsonProperty(value = "debtee", required = true)
     public Person debtee;
 
     @Valid
-    @JsonProperty("debtors")
-    public Set<Person> debtors;
+    @JsonProperty(value = "splitStrategy", required = true)
+    public String splitStrategy;
+
+    @Valid
+    @CheckNoDuplicateDebtors
+    @JsonProperty(value = "shares", required = true)
+    public Set<Share> shares;
 }

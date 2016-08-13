@@ -33,10 +33,6 @@ public class Expense {
         return splitStrategy;
     }
 
-    public Amount getOverallAmount() {
-        return shares.stream().map(Share::getAmount).reduce(Amount.ZERO, (Amount::plus));
-    }
-
     public Person getDebtee() {
         return debtee;
     }

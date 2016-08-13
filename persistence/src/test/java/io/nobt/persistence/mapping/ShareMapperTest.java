@@ -7,8 +7,8 @@ import org.junit.Test;
 
 import java.util.Set;
 
-import static io.nobt.core.domain.test.PersonFactory.david;
-import static io.nobt.core.domain.test.PersonFactory.harald;
+import static io.nobt.core.domain.test.StaticPersonFactory.david;
+import static io.nobt.core.domain.test.StaticPersonFactory.harald;
 import static io.nobt.core.domain.test.ShareFactory.randomShare;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;

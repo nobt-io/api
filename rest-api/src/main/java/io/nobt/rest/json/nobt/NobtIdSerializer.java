@@ -1,4 +1,4 @@
-package io.nobt.rest.json;
+package io.nobt.rest.json.nobt;
 
 import java.io.IOException;
 

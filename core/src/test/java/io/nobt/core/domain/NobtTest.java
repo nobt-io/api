@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static io.nobt.core.domain.test.PersonFactory.*;
+import static io.nobt.core.domain.test.StaticPersonFactory.*;
 import static io.nobt.core.domain.test.ShareFactory.randomShare;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

@@ -1,16 +1,16 @@
 package io.nobt.rest.json.expense;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import io.nobt.core.domain.Amount;
+import io.nobt.core.domain.Person;
+import io.nobt.core.domain.Transaction;
 
-@JsonPropertyOrder({ "name", "debtee", "amount", "debtors" })
+import java.util.List;
+
 public abstract class ExpenseMixin {
 
-    @JsonProperty("amount")
-    public abstract Amount getOverallAmount();
+    @JsonIgnore
+    public abstract List<Transaction> getTransactions();
 
     @JsonIgnore
-    public abstract Amount getAmountPerDebtor();
+    public abstract List<Person> getParticipants();
 }

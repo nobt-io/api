@@ -17,7 +17,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.util.Collections;
 
-import static io.nobt.core.domain.test.PersonFactory.*;
+import static io.nobt.core.domain.test.StaticPersonFactory.*;
 import static io.nobt.matchers.ExpenseMatchers.hasDebtee;
 import static io.nobt.matchers.ExpenseMatchers.hasShares;
 import static io.nobt.matchers.NobtMatchers.*;
