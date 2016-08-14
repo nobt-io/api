@@ -2,12 +2,17 @@ package io.nobt.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.core.NobtCalculator;
+import io.nobt.core.domain.Expense;
+import io.nobt.core.domain.Share;
 import io.nobt.dbconfig.CloudDatabaseConfig;
 import io.nobt.dbconfig.DatabaseConfig;
 import io.nobt.dbconfig.LocalDatabaseConfig;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.dao.InMemoryNobtDao;
 import io.nobt.persistence.dao.NobtDaoImpl;
+import io.nobt.persistence.entity.ExpenseEntity;
+import io.nobt.persistence.entity.ShareEntity;
+import io.nobt.persistence.mapping.DomainModelMapper;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
@@ -60,8 +65,8 @@ public class NobtApplication {
         final DatabaseConfig databaseConfig = CURRENT_PROFILE.getProfileDependentValue(() -> null, LocalDatabaseConfig::create, CloudDatabaseConfig::create);
         final EntityManager entityManager = new EntityManagerFactoryProvider().create(databaseConfig).createEntityManager();
 
-        final ShareMapper shareMapper = new ShareMapper();
-        final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
+        final DomainModelMapper<ShareEntity, Share> shareMapper = new ShareMapper();
+        final DomainModelMapper<ExpenseEntity, Expense> expenseMapper = new ExpenseMapper(shareMapper);
 
         return new NobtDaoImpl(entityManager, new NobtMapper(expenseMapper), expenseMapper, shareMapper);
     }

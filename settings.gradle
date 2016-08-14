@@ -10,4 +10,5 @@ include 'domain-matchers'
 include 'log4j2-gitlab-issue-appender'
 include 'profiles'
 include 'domain-test-support'
+include 'hibernate-postgres-json-support'
 

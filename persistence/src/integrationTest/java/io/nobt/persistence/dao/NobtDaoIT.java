@@ -7,16 +7,18 @@ import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
+import io.nobt.sql.flyway.MigrationService;
 import io.nobt.util.Sets;
-import org.hibernate.HibernateException;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import pl.domzal.junit.docker.rule.DockerRule;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static io.nobt.core.domain.test.StaticPersonFactory.*;
 import static io.nobt.matchers.ExpenseMatchers.hasDebtee;
@@ -31,19 +33,41 @@ public class NobtDaoIT {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
+    @ClassRule
+    public static DockerRule postgresRule = DockerRule
+            .builder()
+            .imageName("postgres:9")
+            .expose("5432", "5432")
+            .env("POSTGRES_PASSWORD", "password")
+            .waitForMessage("PostgreSQL init process complete")
+            .keepContainer(false)
+            .build();
+
     private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;
 
     private NobtDao sut;
 
-    @BeforeClass
-    public static void initializeEM() throws HibernateException {
-        entityManagerFactory = Persistence.createEntityManagerFactory("persistence-test");
-        entityManager = entityManagerFactory.createEntityManager();
-    }
-
     @Before
     public void setUp() throws Exception {
+
+        final String url = "jdbc:postgresql://localhost:5432/postgres";
+        final String username = "postgres";
+        final String password = "password";
+
+        // migrate database
+        // we can safely call this method in the setUp method as flyway does nothing to a fully migrated DB
+        new MigrationService().migrateDatabaseAt(url, username, password);
+
+        final HashMap<String, String> properties = new HashMap<String, String>() {{
+            put("javax.persistence.jdbc.url", url);
+            put("javax.persistence.jdbc.user", username);
+            put("javax.persistence.jdbc.password", password);
+        }};
+
+        entityManagerFactory = Persistence.createEntityManagerFactory("persistence", properties);
+        entityManager = entityManagerFactory.createEntityManager();
+
         final ShareMapper shareMapper = new ShareMapper();
         final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
         final NobtMapper nobtMapper = new NobtMapper(expenseMapper);
@@ -51,8 +75,8 @@ public class NobtDaoIT {
         sut = new NobtDaoImpl(entityManager, nobtMapper, expenseMapper, shareMapper);
     }
 
-    @AfterClass
-    public static void closeEM() {
+    @After
+    public void closeEM() {
         entityManager.close();
         entityManagerFactory.close();
     }

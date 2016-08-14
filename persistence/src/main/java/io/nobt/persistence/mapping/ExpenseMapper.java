@@ -4,26 +4,33 @@ import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
 import io.nobt.persistence.entity.ExpenseEntity;
+import io.nobt.persistence.entity.ShareEntity;
 
-import java.util.Set;
+import java.util.List;
 
-public class ExpenseMapper {
+import static java.util.stream.Collectors.toList;
 
-    private final ShareMapper shareMapper;
+public class ExpenseMapper implements DomainModelMapper<ExpenseEntity, Expense> {
 
-    public ExpenseMapper(ShareMapper shareMapper) {
+    private final DomainModelMapper<ShareEntity, Share> shareMapper;
+
+    public ExpenseMapper(DomainModelMapper<ShareEntity, Share> shareMapper) {
         this.shareMapper = shareMapper;
     }
 
-    public Expense mapToDomain(ExpenseEntity entity) {
+    @Override
+    public Expense mapToDomainModel(ExpenseEntity databaseModel) {
 
-        final byte[] sharesAsBytes = entity.getShares();
+        final List<Share> shares = databaseModel.getShares().stream().map(shareMapper::mapToDomainModel).collect(toList());
 
-        final Set<Share> shares = shareMapper.mapToShareSet(sharesAsBytes);
-
-        Expense expense = new Expense(entity.getName(), entity.getSplitStrategy(), Person.forName(entity.getDebtee()));
+        Expense expense = new Expense(databaseModel.getName(), databaseModel.getSplitStrategy(), Person.forName(databaseModel.getDebtee()));
         shares.forEach(expense::addShare);
 
         return expense;
+    }
+
+    @Override
+    public ExpenseEntity mapToDatabaseModel(Expense domainModel) {
+        return null;
     }
 }

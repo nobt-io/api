@@ -1,14 +1,20 @@
 package io.nobt.persistence.entity;
 
+import io.nobt.persistence.JsonBinaryType;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.Parameter;
+
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.util.List;
 
 /**
  * @author Matthias
  */
+@TypeDefs({
+        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+})
 @Table(name = "expenses")
 @Entity
 public class ExpenseEntity {
@@ -31,8 +37,9 @@ public class ExpenseEntity {
     @JoinColumn(name = "NOBT_ID", nullable = false)
     private NobtEntity nobt;
 
+    @Type(type = "jsonb")
     @Column(name = "shares")
-    private byte[] shares;
+    private List<ShareEntity> shares;
 
     public long getId() {
         return id;
@@ -70,11 +77,11 @@ public class ExpenseEntity {
         this.nobt = nobt;
     }
 
-    public byte[] getShares() {
+    public List<ShareEntity> getShares() {
         return shares;
     }
 
-    public void setShares(byte[] shares) {
+    public void setShares(List<ShareEntity> shares) {
         this.shares = shares;
     }
 }

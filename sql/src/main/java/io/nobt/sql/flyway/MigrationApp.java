@@ -15,13 +15,11 @@ public class MigrationApp {
     public static void main(String[] args) throws InterruptedException {
 
         final CountDownLatch latch = new CountDownLatch(1);
+        final MigrationService migrationService = new MigrationService();
 
         final DatabaseConfig databaseConfig = Profile.getCurrentProfile().getProfileDependentValue(() -> null, LocalDatabaseConfig::create, CloudDatabaseConfig::create);
 
-        Flyway flyway = new Flyway();
-        flyway.setDataSource(databaseConfig.url(), databaseConfig.username(), databaseConfig.password());
-
-        flyway.migrate();
+        migrationService.migrateDatabaseAt(databaseConfig.url(), databaseConfig.username(), databaseConfig.password());
 
         // do not exit app if running on cloud to prevent CF from signaling a "crashed" app
         Profiles.ifProfile( Profiles::notCloud, latch::countDown);

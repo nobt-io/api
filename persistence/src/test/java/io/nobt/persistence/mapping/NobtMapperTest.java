@@ -37,10 +37,10 @@ public class NobtMapperTest {
         entity.addExpense(secondExpense);
 
 
-        sut.mapToDomain(entity);
+        sut.mapToDomainModel(entity);
 
 
-        verify(expenseMapper).mapToDomain(firstExpense);
-        verify(expenseMapper).mapToDomain(secondExpense);
+        verify(expenseMapper).mapToDomainModel(firstExpense);
+        verify(expenseMapper).mapToDomainModel(secondExpense);
     }
 }

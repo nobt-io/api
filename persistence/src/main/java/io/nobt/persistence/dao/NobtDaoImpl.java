@@ -5,6 +5,8 @@ import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
+import io.nobt.persistence.entity.ShareEntity;
+import io.nobt.persistence.mapping.DomainModelMapper;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
@@ -21,11 +23,11 @@ import static java.util.stream.Collectors.toSet;
 public class NobtDaoImpl implements NobtDao {
 
     private final EntityManager em;
-    private final NobtMapper nobtMapper;
-    private final ExpenseMapper expenseMapper;
-    private final ShareMapper shareMapper;
+    private final DomainModelMapper<NobtEntity, Nobt> nobtMapper;
+    private final DomainModelMapper<ExpenseEntity, Expense> expenseMapper;
+    private final DomainModelMapper<ShareEntity, Share> shareMapper;
 
-    public NobtDaoImpl(EntityManager em, NobtMapper nobtMapper, ExpenseMapper expenseMapper, ShareMapper shareMapper) {
+    public NobtDaoImpl(EntityManager em, DomainModelMapper<NobtEntity, Nobt> nobtMapper, DomainModelMapper<ExpenseEntity, Expense> expenseMapper, DomainModelMapper<ShareEntity, Share> shareMapper) {
         this.em = em;
         this.nobtMapper = nobtMapper;
         this.expenseMapper = expenseMapper;
@@ -44,7 +46,7 @@ public class NobtDaoImpl implements NobtDao {
         em.persist(nobt);
         em.getTransaction().commit();
 
-        return nobtMapper.mapToDomain(nobt);
+        return nobtMapper.mapToDomainModel(nobt);
     }
 
     @Override
@@ -57,7 +59,7 @@ public class NobtDaoImpl implements NobtDao {
         expense.setName(name);
         expense.setDebtee(debtee.getName());
         expense.setSplitStrategy(splitStrategy);
-        expense.setShares(shareMapper.mapToByteArray(shares));
+        expense.setShares(shares.stream().map(shareMapper::mapToDatabaseModel).collect(toList()));
 
 
         final NobtEntity nobt = findNobtEntity(nobtId).orElseThrow(() -> new UnknownNobtException(nobtId));
@@ -66,7 +68,7 @@ public class NobtDaoImpl implements NobtDao {
         em.merge(nobt);
         em.getTransaction().commit();
 
-        return expenseMapper.mapToDomain(expense);
+        return expenseMapper.mapToDomainModel(expense);
     }
 
     private Optional<NobtEntity> findNobtEntity(NobtId nobtId) {
@@ -97,7 +99,7 @@ public class NobtDaoImpl implements NobtDao {
 
         final Optional<NobtEntity> nobt = findNobtEntity(nobtId);
 
-        return nobt.map(nobtMapper::mapToDomain);
+        return nobt.map(nobtMapper::mapToDomainModel);
     }
 
 }

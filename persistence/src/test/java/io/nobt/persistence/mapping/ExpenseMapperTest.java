@@ -1,11 +1,14 @@
 package io.nobt.persistence.mapping;
 
 import io.nobt.persistence.entity.ExpenseEntity;
+import io.nobt.persistence.entity.ShareEntity;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.Collections;
 
 import static org.mockito.Mockito.verify;
 
@@ -27,13 +30,14 @@ public class ExpenseMapperTest {
 
         final ExpenseEntity expenseEntity = new ExpenseEntity();
 
-        final byte[] shareBytes = {1, 0, 1, 1};
-        expenseEntity.setShares(shareBytes);
+        final ShareEntity share = new ShareEntity();
+
+        expenseEntity.setShares(Collections.singletonList(share));
 
 
-        sut.mapToDomain(expenseEntity);
+        sut.mapToDomainModel(expenseEntity);
 
 
-        verify(shareMapperMock).mapToShareSet(shareBytes);
+        verify(shareMapperMock).mapToDomainModel(share);
     }
 }
