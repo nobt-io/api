@@ -1,4 +1,4 @@
-rootProject.name = 'parent'
+rootProject.name = 'nobt-io-API'
 include ':rest-api'
 include ':core'
 include ':util'
