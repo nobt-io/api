@@ -7,12 +7,8 @@ import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
 import io.nobt.persistence.entity.ShareEntity;
 import io.nobt.persistence.mapping.DomainModelMapper;
-import io.nobt.persistence.mapping.ExpenseMapper;
-import io.nobt.persistence.mapping.NobtMapper;
-import io.nobt.persistence.mapping.ShareMapper;
 
 import javax.persistence.EntityManager;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -73,20 +69,6 @@ public class NobtDaoImpl implements NobtDao {
 
     private Optional<NobtEntity> findNobtEntity(NobtId nobtId) {
         return Optional.ofNullable(em.find(NobtEntity.class, nobtId.getId()));
-    }
-
-    @Override
-    public Expense createExpense(NobtId nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors) {
-
-        if (debtors.isEmpty()) {
-            throw new IllegalArgumentException("Cannot save expense with no debtors!");
-        }
-
-        final BigDecimal amountPerDebtor = amount.divide(BigDecimal.valueOf(debtors.size()));
-
-        final List<Share> shares = debtors.stream().map(d -> new Share(d, Amount.fromBigDecimal(amountPerDebtor))).collect(toList());
-
-        return createExpense(nobtId, name, "AUTO - EQUAL", debtee, shares);
     }
 
     @Override

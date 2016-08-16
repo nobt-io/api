@@ -4,11 +4,8 @@ import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtDao;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author Matthias
@@ -36,20 +33,6 @@ public class InMemoryNobtDao implements NobtDao {
         nobt.addExpense(expense);
 
         return expense;
-    }
-
-    @Override
-    public Expense createExpense(NobtId nobtId, String name, BigDecimal amount, Person debtee, Set<Person> debtors) {
-
-        if (debtors.isEmpty()) {
-            throw new IllegalArgumentException("Cannot save expense with no debtors!");
-        }
-
-        final BigDecimal amountPerDebtor = amount.divide(BigDecimal.valueOf(debtors.size()));
-
-        final List<Share> shares = debtors.stream().map(d -> new Share(d, Amount.fromBigDecimal(amountPerDebtor))).collect(toList());
-
-        return createExpense(nobtId, name, "AUTO - EQUAL", debtee, shares);
     }
 
     @Override
