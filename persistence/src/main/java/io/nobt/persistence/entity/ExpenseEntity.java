@@ -1,20 +1,13 @@
 package io.nobt.persistence.entity;
 
-import io.nobt.persistence.JsonBinaryType;
-import org.hibernate.annotations.*;
-import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.util.List;
 
 /**
  * @author Matthias
  */
-@TypeDefs({
-        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
-})
 @Table(name = "expenses")
 @Entity
 public class ExpenseEntity {
@@ -37,7 +30,7 @@ public class ExpenseEntity {
     @JoinColumn(name = "NOBT_ID", nullable = false)
     private NobtEntity nobt;
 
-    @Type(type = "jsonb")
+    @Type(type = "io.nobt.persistence.JsonBinaryType")
     @Column(name = "shares")
     private List<ShareEntity> shares;
 
