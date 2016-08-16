@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static io.nobt.core.domain.Transaction.transaction;
-import static io.nobt.core.domain.test.StaticPersonFactory.*;
+import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static java.util.Collections.emptySet;
 import static junitparams.JUnitParamsRunner.$;
 

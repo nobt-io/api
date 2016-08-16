@@ -2,7 +2,7 @@ package io.nobt.persistence.dao;
 
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
-import io.nobt.core.domain.test.ShareFactory;
+import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
@@ -20,10 +20,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static io.nobt.core.domain.test.StaticPersonFactory.*;
-import static io.nobt.matchers.ExpenseMatchers.hasDebtee;
-import static io.nobt.matchers.ExpenseMatchers.hasShares;
-import static io.nobt.matchers.NobtMatchers.*;
+import static io.nobt.test.domain.factories.StaticPersonFactory.*;
+import static io.nobt.test.domain.matchers.ExpenseMatchers.hasDebtee;
+import static io.nobt.test.domain.matchers.ExpenseMatchers.hasShares;
+import static io.nobt.test.domain.matchers.NobtMatchers.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;

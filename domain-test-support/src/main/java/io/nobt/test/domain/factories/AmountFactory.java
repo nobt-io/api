@@ -1,4 +1,4 @@
-package io.nobt.core.domain.test;
+package io.nobt.test.domain.factories;
 
 import io.nobt.core.domain.Amount;
 

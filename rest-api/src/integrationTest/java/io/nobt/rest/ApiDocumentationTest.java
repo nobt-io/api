@@ -9,16 +9,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.restdocs.JUnitRestDocumentation;
-import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.restdocs.snippet.Attributes;
 
 import java.util.Arrays;
 import java.util.Set;
 
 import static com.jayway.restassured.RestAssured.given;
-import static io.nobt.core.domain.test.ShareFactory.randomShare;
-import static io.nobt.core.domain.test.ShareFactory.share;
-import static io.nobt.core.domain.test.StaticPersonFactory.*;
+import static io.nobt.test.domain.factories.ShareFactory.share;
+import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;

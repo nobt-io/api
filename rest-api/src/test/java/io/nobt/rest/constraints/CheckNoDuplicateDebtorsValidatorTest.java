@@ -1,17 +1,15 @@
 package io.nobt.rest.constraints;
 
 import io.nobt.core.domain.Share;
-import io.nobt.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
-import static io.nobt.core.domain.test.StaticPersonFactory.matthias;
-import static io.nobt.core.domain.test.StaticPersonFactory.thomas;
-import static io.nobt.core.domain.test.ShareFactory.randomShare;
+import static io.nobt.test.domain.factories.StaticPersonFactory.matthias;
+import static io.nobt.test.domain.factories.StaticPersonFactory.thomas;
+import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

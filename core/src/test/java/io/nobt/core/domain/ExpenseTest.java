@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Set;
 
 import static io.nobt.core.domain.Transaction.transaction;
-import static io.nobt.core.domain.test.AmountFactory.amount;
-import static io.nobt.core.domain.test.StaticPersonFactory.*;
+import static io.nobt.test.domain.factories.AmountFactory.amount;
+import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 

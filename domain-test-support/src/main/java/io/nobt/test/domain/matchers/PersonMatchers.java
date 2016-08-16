@@ -1,4 +1,4 @@
-package io.nobt.matchers;
+package io.nobt.test.domain.matchers;
 
 import io.nobt.core.domain.Person;
 import org.hamcrest.FeatureMatcher;

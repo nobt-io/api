@@ -5,16 +5,15 @@ mainClassName = 'io.nobt.sql.flyway.MigrationApp'
 
 dependencies {
 
-    // https://mvnrepository.com/artifact/org.springframework/spring-jdbc
+    compile project(':database-config')
+    compile project(':profiles')
+
     compile group: 'org.springframework', name: 'spring-jdbc', version: '4.3.2.RELEASE'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.5'
     compile group: 'org.flywaydb', name: 'flyway-core', version: '4.0.1'
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1208'
-    compile project(':database-config')
-    compile project(':profiles')
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.5'
 
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-
+    integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
     integrationTestCompile 'com.github.tdomzal:junit-docker-rule:0.1'
 }

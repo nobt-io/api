@@ -1,5 +1,4 @@
 dependencies {
-
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.1.0.Final'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.5'
 
