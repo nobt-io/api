@@ -1,12 +1,11 @@
 package io.nobt.rest.payloads;
 
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Transaction;
+
+import java.util.Set;
 
 public class NobtResource {
 

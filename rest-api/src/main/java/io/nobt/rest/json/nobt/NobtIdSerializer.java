@@ -1,12 +1,11 @@
 package io.nobt.rest.json.nobt;
 
-import java.io.IOException;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-
 import io.nobt.core.domain.NobtId;
+
+import java.io.IOException;
 
 public class NobtIdSerializer extends JsonSerializer<NobtId> {
 

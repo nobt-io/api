@@ -14,6 +14,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
 
+    integrationTestCompile project(':database-config:test')
     integrationTestCompile project(':db-migrations')
     integrationTestCompile 'com.github.tdomzal:junit-docker-rule:0.1'
 }

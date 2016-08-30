@@ -1,12 +1,10 @@
 package io.nobt.rest.payloads;
 
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import io.nobt.core.domain.Person;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import io.nobt.core.domain.Person;
+import java.util.Set;
 
 public class CreateNobtInput {
 

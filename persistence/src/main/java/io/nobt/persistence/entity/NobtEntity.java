@@ -1,14 +1,11 @@
 package io.nobt.persistence.entity;
 
 import io.nobt.util.Sets;
-import org.apache.logging.log4j.util.Strings;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Table(name = "nobts")
 @Entity

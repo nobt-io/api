@@ -1,4 +1,6 @@
-package io.nobt.dbconfig;
+package io.nobt.dbconfig.local;
+
+import io.nobt.persistence.DatabaseConfig;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

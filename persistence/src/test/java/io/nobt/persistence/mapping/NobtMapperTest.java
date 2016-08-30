@@ -2,8 +2,6 @@ package io.nobt.persistence.mapping;
 
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
-import io.nobt.persistence.mapping.ExpenseMapper;
-import io.nobt.persistence.mapping.NobtMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

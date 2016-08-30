@@ -1,4 +1,4 @@
-package io.nobt.dbconfig;
+package io.nobt.persistence;
 
 public interface DatabaseConfig {
 

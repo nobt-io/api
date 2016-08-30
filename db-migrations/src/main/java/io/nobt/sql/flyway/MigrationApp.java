@@ -1,14 +1,12 @@
 package io.nobt.sql.flyway;
 
-import java.util.concurrent.CountDownLatch;
-
-import org.flywaydb.core.Flyway;
-
-import io.nobt.dbconfig.CloudDatabaseConfig;
-import io.nobt.dbconfig.DatabaseConfig;
-import io.nobt.dbconfig.LocalDatabaseConfig;
+import io.nobt.dbconfig.cloud.CloudDatabaseConfig;
+import io.nobt.dbconfig.local.LocalDatabaseConfig;
+import io.nobt.persistence.DatabaseConfig;
 import io.nobt.profiles.Profile;
 import io.nobt.profiles.Profiles;
+
+import java.util.concurrent.CountDownLatch;
 
 public class MigrationApp {
 
@@ -19,10 +17,10 @@ public class MigrationApp {
 
         final DatabaseConfig databaseConfig = Profile.getCurrentProfile().getProfileDependentValue(() -> null, LocalDatabaseConfig::create, CloudDatabaseConfig::create);
 
-        migrationService.migrateDatabaseAt(databaseConfig.url(), databaseConfig.username(), databaseConfig.password());
+        migrationService.migrateDatabaseAt(databaseConfig);
 
         // do not exit app if running on cloud to prevent CF from signaling a "crashed" app
-        Profiles.ifProfile( Profiles::notCloud, latch::countDown);
+        Profiles.ifProfile(Profiles::notCloud, latch::countDown);
 
         latch.await();
     }

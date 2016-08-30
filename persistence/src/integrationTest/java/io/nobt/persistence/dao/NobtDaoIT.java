@@ -2,12 +2,14 @@ package io.nobt.persistence.dao;
 
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
-import io.nobt.test.domain.factories.ShareFactory;
+import io.nobt.dbconfig.test.PortParameterizablePostgresDatabaseConfig;
+import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtDao;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.sql.flyway.MigrationService;
+import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.util.Sets;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
@@ -15,10 +17,8 @@ import pl.domzal.junit.docker.rule.DockerRule;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasDebtee;
@@ -30,18 +30,20 @@ import static org.junit.Assume.assumeThat;
 
 public class NobtDaoIT {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    private static final PortParameterizablePostgresDatabaseConfig config = new PortParameterizablePostgresDatabaseConfig(6543);
 
     @ClassRule
     public static DockerRule postgresRule = DockerRule
             .builder()
             .imageName("postgres:9")
-            .expose("5432", "5432")
-            .env("POSTGRES_PASSWORD", "password")
+            .expose(config.port().toString(), "5432")
+            .env("POSTGRES_PASSWORD", config.password())
             .waitForMessage("PostgreSQL init process complete")
-            .keepContainer(false)
+            .keepContainer(true)
             .build();
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;
@@ -51,21 +53,13 @@ public class NobtDaoIT {
     @Before
     public void setUp() throws Exception {
 
-        final String url = "jdbc:postgresql://localhost:5432/postgres";
-        final String username = "postgres";
-        final String password = "password";
-
         // migrate database
         // we can safely call this method in the setUp method as flyway does nothing to a fully migrated DB
-        new MigrationService().migrateDatabaseAt(url, username, password);
+        new MigrationService().migrateDatabaseAt(config);
 
-        final HashMap<String, String> properties = new HashMap<String, String>() {{
-            put("javax.persistence.jdbc.url", url);
-            put("javax.persistence.jdbc.user", username);
-            put("javax.persistence.jdbc.password", password);
-        }};
+        final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
 
-        entityManagerFactory = Persistence.createEntityManagerFactory("persistence", properties);
+        entityManagerFactory = emfProvider.create(config);
         entityManager = entityManagerFactory.createEntityManager();
 
         final ShareMapper shareMapper = new ShareMapper();

@@ -6,7 +6,6 @@ import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.spring.SpringJdbcMigration;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.sql.JDBCType;
 import java.sql.Types;
 import java.util.List;
 

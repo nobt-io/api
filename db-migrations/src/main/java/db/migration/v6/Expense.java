@@ -1,9 +1,7 @@
 package db.migration.v6;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

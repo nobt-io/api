@@ -6,7 +6,6 @@ import io.nobt.core.domain.Share;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
-import java.util.Collection;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;

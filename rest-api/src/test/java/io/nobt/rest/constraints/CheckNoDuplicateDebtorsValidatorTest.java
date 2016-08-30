@@ -7,9 +7,9 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.StaticPersonFactory.matthias;
 import static io.nobt.test.domain.factories.StaticPersonFactory.thomas;
-import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
