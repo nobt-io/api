@@ -1,10 +1,11 @@
-package io.nobt.persistence.dao;
+package io.nobt.persistence.repository;
 
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
 import io.nobt.dbconfig.test.PortParameterizablePostgresDatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
-import io.nobt.persistence.NobtDao;
+import io.nobt.persistence.NobtRepository;
+import io.nobt.persistence.NobtRepositoryImpl;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
@@ -48,7 +49,7 @@ public class NobtDaoIT {
     private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;
 
-    private NobtDao sut;
+    private NobtRepository sut;
 
     @Before
     public void setUp() throws Exception {
@@ -66,7 +67,7 @@ public class NobtDaoIT {
         final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
         final NobtMapper nobtMapper = new NobtMapper(expenseMapper);
 
-        sut = new NobtDaoImpl(entityManager, nobtMapper, expenseMapper, shareMapper);
+        sut = new NobtRepositoryImpl(entityManager, nobtMapper, expenseMapper, shareMapper);
     }
 
     @After

@@ -8,9 +8,9 @@ import io.nobt.dbconfig.cloud.CloudDatabaseConfig;
 import io.nobt.dbconfig.local.LocalDatabaseConfig;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
-import io.nobt.persistence.NobtDao;
-import io.nobt.persistence.dao.InMemoryNobtDao;
-import io.nobt.persistence.dao.NobtDaoImpl;
+import io.nobt.persistence.NobtRepository;
+import io.nobt.persistence.InMemoryNobtRepository;
+import io.nobt.persistence.NobtRepositoryImpl;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.ShareEntity;
 import io.nobt.persistence.mapping.DomainModelMapper;
@@ -41,8 +41,8 @@ public class NobtApplication {
         final ObjectMapper objectMapper = new ObjectMapperFactory().create();
         final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-        final NobtDao nobtDao = CURRENT_PROFILE.getProfileDependentValue(
-                InMemoryNobtDao::new,
+        final NobtRepository nobtRepository = CURRENT_PROFILE.getProfileDependentValue(
+                InMemoryNobtRepository::new,
                 NobtApplication::createSqlBackedDao,
                 NobtApplication::createSqlBackedDao
         );
@@ -55,20 +55,20 @@ public class NobtApplication {
 
         new NobtRestApi(
                 Service.ignite(),
-                nobtDao,
+                nobtRepository,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
                 objectMapper
         ).run(port);
     }
 
-    private static NobtDao createSqlBackedDao() {
+    private static NobtRepository createSqlBackedDao() {
         final DatabaseConfig databaseConfig = CURRENT_PROFILE.getProfileDependentValue(() -> null, LocalDatabaseConfig::create, CloudDatabaseConfig::create);
         final EntityManager entityManager = new EntityManagerFactoryProvider().create(databaseConfig).createEntityManager();
 
         final DomainModelMapper<ShareEntity, Share> shareMapper = new ShareMapper();
         final DomainModelMapper<ExpenseEntity, Expense> expenseMapper = new ExpenseMapper(shareMapper);
 
-        return new NobtDaoImpl(entityManager, new NobtMapper(expenseMapper), expenseMapper, shareMapper);
+        return new NobtRepositoryImpl(entityManager, new NobtMapper(expenseMapper), expenseMapper, shareMapper);
     }
 }

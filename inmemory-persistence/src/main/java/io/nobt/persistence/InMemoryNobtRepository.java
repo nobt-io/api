@@ -1,8 +1,8 @@
-package io.nobt.persistence.dao;
+package io.nobt.persistence;
 
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
-import io.nobt.persistence.NobtDao;
+import io.nobt.persistence.NobtRepository;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * @author Matthias
  */
-public class InMemoryNobtDao implements NobtDao {
+public class InMemoryNobtRepository implements NobtRepository {
 
     private static final AtomicLong idGenerator = new AtomicLong(1);
     private static final Map<NobtId, Nobt> nobtDatabase = new HashMap<>();

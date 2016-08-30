@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public interface NobtDao {
+public interface NobtRepository {
 
 	Nobt createNobt(String nobtName, Set<Person> explicitParticipants);
 

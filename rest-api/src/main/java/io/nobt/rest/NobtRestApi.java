@@ -8,7 +8,7 @@ import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Transaction;
-import io.nobt.persistence.NobtDao;
+import io.nobt.persistence.NobtRepository;
 import io.nobt.profiles.Profiles;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.payloads.CreateExpenseInput;
@@ -38,15 +38,15 @@ public class NobtRestApi {
     private static final Logger UNHANDLED_EXCEPTION_LOGGER = LogManager.getLogger("io.nobt.rest.NobtApplication.unhandledExceptions");
 
     private final Service http;
-    private final NobtDao nobtDao;
+    private final NobtRepository nobtRepository;
     private final NobtCalculator nobtCalculator;
     private final BodyParser bodyParser;
     private final ObjectMapper objectMapper;
     private final SimpleViolationFactory simpleViolationFactory;
 
-    public NobtRestApi(Service ignite, NobtDao nobtDao, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper) {
+    public NobtRestApi(Service ignite, NobtRepository nobtRepository, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper) {
         this.http = ignite;
-        this.nobtDao = nobtDao;
+        this.nobtRepository = nobtRepository;
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
         this.objectMapper = objectMapper;
@@ -83,7 +83,7 @@ public class NobtRestApi {
             final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
             final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
 
-            Expense expense = nobtDao.createExpense(databaseId, input.name, input.splitStrategy, input.debtee, input.shares);
+            Expense expense = nobtRepository.createExpense(databaseId, input.name, input.splitStrategy, input.debtee, input.shares);
             resp.status(201);
 
             return expense;
@@ -95,7 +95,7 @@ public class NobtRestApi {
 
             final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
 
-            final Nobt nobt = nobtDao.get(databaseId);
+            final Nobt nobt = nobtRepository.get(databaseId);
             final Set<Transaction> transactions = nobtCalculator.calculate(nobt);
 
             return new NobtResource(nobt, transactions);
@@ -107,7 +107,7 @@ public class NobtRestApi {
 
             final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
 
-            Nobt nobt = nobtDao.createNobt(input.nobtName, input.explicitParticipants);
+            Nobt nobt = nobtRepository.createNobt(input.nobtName, input.explicitParticipants);
 
             res.status(201);
             res.header("Location", req.url() + "/" + nobt.getId().toExternalIdentifier());

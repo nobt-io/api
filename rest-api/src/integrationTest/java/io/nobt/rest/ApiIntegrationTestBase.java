@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.core.NobtCalculator;
 import io.nobt.dbconfig.test.PortParameterizablePostgresDatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
-import io.nobt.persistence.NobtDao;
-import io.nobt.persistence.dao.NobtDaoImpl;
+import io.nobt.persistence.NobtRepository;
+import io.nobt.persistence.NobtRepositoryImpl;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
@@ -28,7 +28,7 @@ public abstract class ApiIntegrationTestBase {
     protected static final PortParameterizablePostgresDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(5432);
 
     private Service http;
-    protected NobtDao nobtDao;
+    protected NobtRepository nobtRepository;
 
     @ClassRule
     public static DockerRule postgresRule = DockerRule
@@ -55,7 +55,7 @@ public abstract class ApiIntegrationTestBase {
         final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
         final NobtMapper nobtMapper = new NobtMapper(expenseMapper);
 
-        nobtDao = new NobtDaoImpl(
+        nobtRepository = new NobtRepositoryImpl(
                 entityManagerFactory.createEntityManager(),
                 nobtMapper,
                 expenseMapper,
@@ -66,7 +66,7 @@ public abstract class ApiIntegrationTestBase {
 
         new NobtRestApi(
                 http,
-                nobtDao,
+                nobtRepository,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
                 objectMapper

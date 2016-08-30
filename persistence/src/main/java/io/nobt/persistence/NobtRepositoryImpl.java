@@ -1,8 +1,8 @@
-package io.nobt.persistence.dao;
+package io.nobt.persistence;
 
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
-import io.nobt.persistence.NobtDao;
+import io.nobt.persistence.NobtRepository;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
 import io.nobt.persistence.entity.ShareEntity;
@@ -16,14 +16,14 @@ import java.util.Set;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
-public class NobtDaoImpl implements NobtDao {
+public class NobtRepositoryImpl implements NobtRepository {
 
     private final EntityManager em;
     private final DomainModelMapper<NobtEntity, Nobt> nobtMapper;
     private final DomainModelMapper<ExpenseEntity, Expense> expenseMapper;
     private final DomainModelMapper<ShareEntity, Share> shareMapper;
 
-    public NobtDaoImpl(EntityManager em, DomainModelMapper<NobtEntity, Nobt> nobtMapper, DomainModelMapper<ExpenseEntity, Expense> expenseMapper, DomainModelMapper<ShareEntity, Share> shareMapper) {
+    public NobtRepositoryImpl(EntityManager em, DomainModelMapper<NobtEntity, Nobt> nobtMapper, DomainModelMapper<ExpenseEntity, Expense> expenseMapper, DomainModelMapper<ShareEntity, Share> shareMapper) {
         this.em = em;
         this.nobtMapper = nobtMapper;
         this.expenseMapper = expenseMapper;

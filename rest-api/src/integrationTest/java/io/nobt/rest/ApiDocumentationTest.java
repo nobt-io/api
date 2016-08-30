@@ -78,7 +78,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public void shouldAddNewExpense() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final Nobt nobt = nobtDao.createNobt("Grillfeier", explicitParticipants);
+        final Nobt nobt = nobtRepository.createNobt("Grillfeier", explicitParticipants);
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -127,9 +127,9 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public void shouldGetCompleteNobt() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final Nobt nobt = nobtDao.createNobt("Grillfeier", explicitParticipants);
+        final Nobt nobt = nobtRepository.createNobt("Grillfeier", explicitParticipants);
 
-        nobtDao.createExpense(nobt.getId(), "Fleisch", "EVENLY", thomas, Arrays.asList(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)));
+        nobtRepository.createExpense(nobt.getId(), "Fleisch", "EVENLY", thomas, Arrays.asList(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)));
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -159,7 +159,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public void shouldRejectExpenseWithDuplicateDebtor() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final Nobt nobt = nobtDao.createNobt("Burger essen!", explicitParticipants);
+        final Nobt nobt = nobtRepository.createNobt("Burger essen!", explicitParticipants);
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
