@@ -69,6 +69,6 @@ public class NobtApplication {
         final DomainModelMapper<ShareEntity, Share> shareMapper = new ShareMapper();
         final DomainModelMapper<ExpenseEntity, Expense> expenseMapper = new ExpenseMapper(shareMapper);
 
-        return new NobtRepositoryImpl(entityManager, new NobtMapper(expenseMapper), expenseMapper, shareMapper);
+        return new NobtRepositoryImpl(entityManager, new NobtMapper(expenseMapper));
     }
 }

@@ -1,13 +1,8 @@
-apply plugin: 'application'
 apply from: rootProject.rootDir.path + '/gradle/integrationTest.gradle'
-
-mainClassName = 'io.nobt.sql.flyway.MigrationApp'
 
 dependencies {
 
-    compile project(':database-config:local')
-    compile project(':database-config:cloud')
-    compile project(':profiles')
+    compile project(':persistence')
 
     compile group: 'org.springframework', name: 'spring-jdbc', version: '4.3.2.RELEASE'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.5'

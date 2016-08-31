@@ -26,9 +26,7 @@ public class NobtTest {
     @Before
     public void setUp() throws Exception {
 
-        sut = new Nobt(null, "Something", Sets.newHashSet(thomas))
-                .addExpense(firstExpense)
-                .addExpense(secondExpense);
+        sut = new Nobt(null, "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense));
 
         when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
                 randomShare(david),

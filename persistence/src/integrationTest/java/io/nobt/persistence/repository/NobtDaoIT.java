@@ -31,7 +31,7 @@ import static org.junit.Assume.assumeThat;
 
 public class NobtDaoIT {
 
-    private static final PortParameterizablePostgresDatabaseConfig config = new PortParameterizablePostgresDatabaseConfig(6543);
+    private static final PortParameterizablePostgresDatabaseConfig config = new PortParameterizablePostgresDatabaseConfig(8765);
 
     @ClassRule
     public static DockerRule postgresRule = DockerRule
@@ -67,7 +67,7 @@ public class NobtDaoIT {
         final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
         final NobtMapper nobtMapper = new NobtMapper(expenseMapper);
 
-        sut = new NobtRepositoryImpl(entityManager, nobtMapper, expenseMapper, shareMapper);
+        sut = new NobtRepositoryImpl(entityManager, nobtMapper);
     }
 
     @After
@@ -77,20 +77,18 @@ public class NobtDaoIT {
     }
 
     @Test
-    public void shouldPersistAndRetrieveNobt() throws Exception {
+    public void shouldSaveNobt() throws Exception {
 
         final String name = "Some name";
         final Person[] explicitParticipants = {thomas, david};
 
-        final Nobt nobt = sut.createNobt(name, Sets.newHashSet(explicitParticipants));
+        final Nobt nobtToSave = new Nobt(null, name, Sets.newHashSet(explicitParticipants), Collections.emptySet());
 
-        assumeThat(nobt, allOf(
-                hasName(equalTo(name)),
-                hasParticipants(containsInAnyOrder(explicitParticipants))
-        ));
+        final NobtId id = sut.save(nobtToSave);
 
+        assumeThat(id, is(notNullValue()));
 
-        final Nobt retrievedNobt = sut.get(nobt.getId());
+        final Nobt retrievedNobt = sut.getById(id);
 
         assertThat(retrievedNobt, allOf(
                 hasName(equalTo(name)),
@@ -104,7 +102,7 @@ public class NobtDaoIT {
         final NobtId unknownId = new NobtId(1234L);
 
         expectedException.expect(UnknownNobtException.class);
-        sut.get(unknownId);
+        sut.getById(unknownId);
     }
 
     @Test
@@ -113,19 +111,12 @@ public class NobtDaoIT {
         final Share thomasShare = ShareFactory.randomShare(thomas);
         final Share matthiasShare = ShareFactory.randomShare(matthias);
 
-        final Nobt nobt = sut.createNobt("Some name", Collections.emptySet());
+        final Nobt nobtToSave = new Nobt(null, "Some name", Collections.emptySet(), Collections.emptySet());
+        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare));
 
-        final Expense expense = sut.createExpense(nobt.getId(), "Billa", "UNKNOWN", thomas, Arrays.asList(thomasShare, matthiasShare));
+        final NobtId id = sut.save(nobtToSave);
 
-        // early fail if expense cannot be properly persisted
-        assumeThat(expense, allOf(
-                hasDebtee(equalTo(thomas)),
-                hasShares(containsInAnyOrder(thomasShare, matthiasShare))
-                )
-        );
-
-
-        final Nobt retrievedNobt = sut.get(nobt.getId());
+        final Nobt retrievedNobt = sut.getById(id);
 
         assertThat(retrievedNobt, hasExpenses(
                 allOf(

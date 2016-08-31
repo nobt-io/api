@@ -3,6 +3,7 @@ package io.nobt.rest;
 import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.specification.RequestSpecification;
 import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Person;
 import io.nobt.util.Sets;
 import org.junit.Before;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import org.springframework.restdocs.JUnitRestDocumentation;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 
 import static com.jayway.restassured.RestAssured.given;
@@ -78,7 +80,8 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public void shouldAddNewExpense() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final Nobt nobt = nobtRepository.createNobt("Grillfeier", explicitParticipants);
+
+        final NobtId id = nobtRepository.save(new Nobt(null, "Grillfeier", explicitParticipants, Collections.emptySet()));
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -116,7 +119,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
                 .when()
 
-                .post("/nobts/{nobtId}/expenses", nobt.getId().toExternalIdentifier())
+                .post("/nobts/{nobtId}/expenses", id.toExternalIdentifier())
 
                 .then()
 
@@ -127,9 +130,11 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public void shouldGetCompleteNobt() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final Nobt nobt = nobtRepository.createNobt("Grillfeier", explicitParticipants);
 
-        nobtRepository.createExpense(nobt.getId(), "Fleisch", "EVENLY", thomas, Arrays.asList(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)));
+        final Nobt nobt = new Nobt(null, "Grillfeier", explicitParticipants, Collections.emptySet());
+        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)));
+
+        final NobtId id = nobtRepository.save(nobt);
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -148,7 +153,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
                 .when()
 
-                .get("/nobts/{nobtId}", nobt.getId().toExternalIdentifier())
+                .get("/nobts/{nobtId}", id.toExternalIdentifier())
 
                 .then()
 
@@ -159,7 +164,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public void shouldRejectExpenseWithDuplicateDebtor() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final Nobt nobt = nobtRepository.createNobt("Burger essen!", explicitParticipants);
+        final NobtId id = nobtRepository.save(new Nobt(null, "Burger essen!", explicitParticipants, Collections.emptySet()));
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -196,7 +201,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
                 .when()
 
-                .post("/nobts/{nobtId}/expenses", nobt.getId().toExternalIdentifier())
+                .post("/nobts/{nobtId}/expenses", id.toExternalIdentifier())
 
                 .then()
 

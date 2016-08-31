@@ -22,10 +22,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
+// TODO using more than one subclass of this is not possible because the port is hard coded here and that makes parallel execution impossible
 public abstract class ApiIntegrationTestBase {
 
     protected static final int ACTUAL_PORT = 18080;
-    protected static final PortParameterizablePostgresDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(5432);
+    protected static final PortParameterizablePostgresDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(6543);
 
     private Service http;
     protected NobtRepository nobtRepository;
@@ -57,9 +58,7 @@ public abstract class ApiIntegrationTestBase {
 
         nobtRepository = new NobtRepositoryImpl(
                 entityManagerFactory.createEntityManager(),
-                nobtMapper,
-                expenseMapper,
-                shareMapper
+                nobtMapper
         );
 
         http = Service.ignite();

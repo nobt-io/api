@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
-import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Transaction;
@@ -25,11 +24,12 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static io.nobt.profiles.Profiles.ifProfile;
+import static java.util.Collections.*;
 import static java.util.stream.Collectors.toList;
 
 public class NobtRestApi {
@@ -50,13 +50,12 @@ public class NobtRestApi {
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
         this.objectMapper = objectMapper;
-        simpleViolationFactory = new SimpleViolationFactory(objectMapper);
+        this.simpleViolationFactory = new SimpleViolationFactory(objectMapper);
     }
 
     public void run(int port) {
         http.port(port);
 
-        useApplicationJsonAsDefaultReponseContentType();
         setupCORS();
 
         registerApplicationRoutes();
@@ -67,7 +66,6 @@ public class NobtRestApi {
         }));
 
         handleValidationExceptions();
-
         handleUnknownExceptions();
     }
 
@@ -83,11 +81,17 @@ public class NobtRestApi {
             final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
             final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
 
-            Expense expense = nobtRepository.createExpense(databaseId, input.name, input.splitStrategy, input.debtee, input.shares);
+
+            final Nobt nobt = nobtRepository.getById(databaseId);
+            nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares));
+
+            nobtRepository.save(nobt);
+
+
             resp.status(201);
 
-            return expense;
-        }, objectMapper::writeValueAsString);
+            return "";
+        });
     }
 
     private void registerRetrieveNobtRoute() {
@@ -95,8 +99,12 @@ public class NobtRestApi {
 
             final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
 
-            final Nobt nobt = nobtRepository.get(databaseId);
+
+            final Nobt nobt = nobtRepository.getById(databaseId);
             final Set<Transaction> transactions = nobtCalculator.calculate(nobt);
+
+
+            res.header("Content-Type", "application/json");
 
             return new NobtResource(nobt, transactions);
         }, objectMapper::writeValueAsString);
@@ -107,22 +115,23 @@ public class NobtRestApi {
 
             final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
 
-            Nobt nobt = nobtRepository.createNobt(input.nobtName, input.explicitParticipants);
+
+            final Nobt unpersistedNobt = new Nobt(null, input.nobtName, input.explicitParticipants, emptySet());
+            final NobtId id = nobtRepository.save(unpersistedNobt);
+
 
             res.status(201);
-            res.header("Location", req.url() + "/" + nobt.getId().toExternalIdentifier());
+            res.header("Location", req.url() + "/" + id.toExternalIdentifier());
+            res.header("Content-Type", "application/json");
+            final Nobt nobt = nobtRepository.getById(id);
 
-            return new NobtResource(nobt, Collections.emptySet());
+            return new NobtResource(nobt, emptySet());
         }, objectMapper::writeValueAsString);
     }
 
     private static NobtId decodeNobtIdentifierToDatabaseId(Request req) {
         final String externalIdentifier = req.params(":nobtId");
         return NobtId.fromExternalIdentifier(externalIdentifier);
-    }
-
-    private void useApplicationJsonAsDefaultReponseContentType() {
-        http.before((request, response) -> response.header("Content-Type", "application/json"));
     }
 
     private void setupCORS() {

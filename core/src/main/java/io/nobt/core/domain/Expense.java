@@ -1,5 +1,6 @@
 package io.nobt.core.domain;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,12 +18,13 @@ public class Expense {
     private final String name;
     private final Person debtee;
     private final String splitStrategy;
-    private final Set<Share> shares = new HashSet<>();
+    private final Set<Share> shares;
 
-    public Expense(String name, String splitStrategy, Person debtee) {
+    public Expense(String name, String splitStrategy, Person debtee, Set<Share> shares) {
         this.name = name;
         this.splitStrategy = splitStrategy;
         this.debtee = debtee;
+        this.shares = shares;
     }
 
     public String getName() {
@@ -38,7 +40,7 @@ public class Expense {
     }
 
     public Set<Share> getShares() {
-        return shares;
+        return Collections.unmodifiableSet(shares);
     }
 
     public Set<Person> getParticipants() {
@@ -55,10 +57,5 @@ public class Expense {
                 .stream()
                 .map(share -> transaction(share.getDebtor(), share.getAmount(), debtee))
                 .collect(toList());
-    }
-
-    public Expense addShare(Share share) {
-        this.shares.add(share);
-        return this;
     }
 }

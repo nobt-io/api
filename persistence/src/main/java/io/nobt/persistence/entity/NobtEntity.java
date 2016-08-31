@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.StringJoiner;
 
 @Table(name = "nobts")
 @Entity
@@ -14,7 +15,7 @@ public class NobtEntity {
     @Id
     @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    private Long id;
 
     @Column(name = "nobtName", nullable = false, length = 50)
     private String name;
@@ -24,15 +25,6 @@ public class NobtEntity {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL)
     private Set<ExpenseEntity> expenses = new HashSet<>();
-
-    public NobtEntity(String name, Set<String> explicitParticipants) {
-        this.name = name;
-        this.explicitParticipants = String.join(";", explicitParticipants);
-    }
-
-    public NobtEntity() {
-
-    }
 
     public String getName() {
         return name;
@@ -54,11 +46,23 @@ public class NobtEntity {
         expense.setNobt(this);
     }
 
+    public void addExplicitParticipant(String participant) {
+        if (explicitParticipants == null) {
+            explicitParticipants = participant;
+        } else {
+            explicitParticipants = explicitParticipants + ";" + participant;
+        }
+    }
+
     public Set<String> getExplicitParticipants() {
         return explicitParticipants != null ? Sets.newHashSet(explicitParticipants.split(";")) : Collections.emptySet();
     }
 
-    public long getId() {
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
         return id;
     }
 }

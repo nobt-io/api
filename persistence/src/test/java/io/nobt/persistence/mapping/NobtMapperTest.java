@@ -30,7 +30,9 @@ public class NobtMapperTest {
         final ExpenseEntity firstExpense = new ExpenseEntity();
         final ExpenseEntity secondExpense = new ExpenseEntity();
 
-        final NobtEntity entity = new NobtEntity(null, emptySet());
+        final NobtEntity entity = new NobtEntity();
+
+        entity.setId(123L);
         entity.addExpense(firstExpense);
         entity.addExpense(secondExpense);
 

@@ -1,47 +1,33 @@
 package io.nobt.persistence;
 
 import io.nobt.core.UnknownNobtException;
-import io.nobt.core.domain.*;
-import io.nobt.persistence.NobtRepository;
+import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.NobtId;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-/**
- * @author Matthias
- */
 public class InMemoryNobtRepository implements NobtRepository {
 
     private static final AtomicLong idGenerator = new AtomicLong(1);
     private static final Map<NobtId, Nobt> nobtDatabase = new HashMap<>();
 
     @Override
-    public Nobt createNobt(String nobtName, Set<Person> explicitParticipants) {
+    public NobtId save(Nobt nobt) {
 
-        Nobt nobt = new Nobt(new NobtId(idGenerator.getAndIncrement()), nobtName, explicitParticipants);
-        nobtDatabase.put(nobt.getId(), nobt);
-        return nobt;
+        final NobtId id = new NobtId(idGenerator.getAndIncrement());
+
+        final Nobt copy = new Nobt(id, nobt.getName(), nobt.getParticipatingPersons(), nobt.getExpenses());
+
+        nobtDatabase.put(id, copy);
+
+        return id;
     }
 
     @Override
-    public Expense createExpense(NobtId nobtId, String name, String splitStrategy, Person debtee, List<Share> shares) {
-        final Nobt nobt = get(nobtId);
-
-        final Expense expense = new Expense(name, splitStrategy, debtee);
-        shares.forEach(expense::addShare);
-
-        nobt.addExpense(expense);
-
-        return expense;
-    }
-
-    @Override
-    public Nobt get(NobtId id) {
-        return find(id).orElseThrow(() -> new UnknownNobtException(id));
-    }
-
-    @Override
-    public Optional<Nobt> find(NobtId id) {
-        return Optional.ofNullable(nobtDatabase.get(id));
+    public Nobt getById(NobtId id) {
+        return Optional.ofNullable(nobtDatabase.get(id)).orElseThrow(() -> new UnknownNobtException(id));
     }
 }
