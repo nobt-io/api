@@ -3,6 +3,7 @@ package io.nobt.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.core.NobtCalculator;
 import io.nobt.dbconfig.test.PortParameterizablePostgresDatabaseConfig;
+import io.nobt.dbconfig.test.TestDatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
 import io.nobt.persistence.NobtRepositoryImpl;
@@ -12,6 +13,7 @@ import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.json.ObjectMapperFactory;
 import io.nobt.sql.flyway.MigrationService;
+import io.nobt.test.PostgresDockerRule;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -26,20 +28,13 @@ import javax.validation.Validator;
 public abstract class ApiIntegrationTestBase {
 
     protected static final int ACTUAL_PORT = 18080;
-    protected static final PortParameterizablePostgresDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(6543);
+    protected static final TestDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(6543);
 
     private Service http;
     protected NobtRepository nobtRepository;
 
     @ClassRule
-    public static DockerRule postgresRule = DockerRule
-            .builder()
-            .imageName("postgres:9")
-            .expose(databaseConfig.port().toString(), "5432")
-            .env("POSTGRES_PASSWORD", databaseConfig.password())
-            .waitForMessage("PostgreSQL init process complete")
-            .keepContainer(false)
-            .build();
+    public static PostgresDockerRule postgresDockerRule = PostgresDockerRule.forDatabase(databaseConfig);
 
     @Before
     public void startAPI() throws Exception {

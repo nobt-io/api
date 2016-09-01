@@ -1,0 +1,4 @@
+dependencies {
+    compile project(':database-config:test')
+    compile 'com.github.tdomzal:junit-docker-rule:0.1'
+}

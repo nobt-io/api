@@ -1,9 +1,8 @@
 package io.nobt.dbconfig.test;
 
-import io.nobt.persistence.DatabaseConfig;
+public class DefaultPostgresDatabaseConfig implements TestDatabaseConfig {
 
-public class DefaultPostgresDatabaseConfig implements DatabaseConfig {
-
+    @Override
     public Integer port() {
         return 5432;
     }

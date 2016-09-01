@@ -6,11 +6,7 @@ import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Share;
 import io.nobt.dbconfig.cloud.CloudDatabaseConfig;
 import io.nobt.dbconfig.local.LocalDatabaseConfig;
-import io.nobt.persistence.DatabaseConfig;
-import io.nobt.persistence.EntityManagerFactoryProvider;
-import io.nobt.persistence.NobtRepository;
-import io.nobt.persistence.InMemoryNobtRepository;
-import io.nobt.persistence.NobtRepositoryImpl;
+import io.nobt.persistence.*;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.ShareEntity;
 import io.nobt.persistence.mapping.DomainModelMapper;
@@ -20,6 +16,7 @@ import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.profiles.Profile;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.json.ObjectMapperFactory;
+import io.nobt.sql.flyway.MigrationService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import spark.Service;
@@ -38,6 +35,12 @@ public class NobtApplication {
 
         LOGGER.info("Running in profile {}.", CURRENT_PROFILE);
 
+        final DatabaseConfig databaseConfig = getDatabaseConfig();
+
+        if (databaseConfig != null) {
+            migrateDatabase(databaseConfig);
+        }
+
         final ObjectMapper objectMapper = new ObjectMapperFactory().create();
         final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
@@ -53,22 +56,33 @@ public class NobtApplication {
                 () -> Integer.parseInt(System.getenv("PORT"))
         );
 
-        new NobtRestApi(
+        final NobtRestApi api = new NobtRestApi(
                 Service.ignite(),
                 nobtRepository,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
                 objectMapper
-        ).run(port);
+        );
+
+        api.run(port);
+    }
+
+    private static void migrateDatabase(DatabaseConfig databaseConfig) {
+        final MigrationService migrationService = new MigrationService();
+        migrationService.migrateDatabaseAt(databaseConfig);
     }
 
     private static NobtRepository createSqlBackedDao() {
-        final DatabaseConfig databaseConfig = CURRENT_PROFILE.getProfileDependentValue(() -> null, LocalDatabaseConfig::create, CloudDatabaseConfig::create);
+        final DatabaseConfig databaseConfig = getDatabaseConfig();
         final EntityManager entityManager = new EntityManagerFactoryProvider().create(databaseConfig).createEntityManager();
 
         final DomainModelMapper<ShareEntity, Share> shareMapper = new ShareMapper();
         final DomainModelMapper<ExpenseEntity, Expense> expenseMapper = new ExpenseMapper(shareMapper);
 
         return new NobtRepositoryImpl(entityManager, new NobtMapper(expenseMapper));
+    }
+
+    private static DatabaseConfig getDatabaseConfig() {
+        return CURRENT_PROFILE.getProfileDependentValue(() -> null, LocalDatabaseConfig::create, CloudDatabaseConfig::create);
     }
 }

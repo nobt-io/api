@@ -3,6 +3,7 @@ package io.nobt.persistence.repository;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
 import io.nobt.dbconfig.test.PortParameterizablePostgresDatabaseConfig;
+import io.nobt.dbconfig.test.TestDatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
 import io.nobt.persistence.NobtRepositoryImpl;
@@ -10,6 +11,7 @@ import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.sql.flyway.MigrationService;
+import io.nobt.test.PostgresDockerRule;
 import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.util.Sets;
 import org.junit.*;
@@ -18,7 +20,6 @@ import pl.domzal.junit.docker.rule.DockerRule;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
@@ -31,17 +32,10 @@ import static org.junit.Assume.assumeThat;
 
 public class NobtDaoIT {
 
-    private static final PortParameterizablePostgresDatabaseConfig config = new PortParameterizablePostgresDatabaseConfig(8765);
+    private static final TestDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(8765);
 
     @ClassRule
-    public static DockerRule postgresRule = DockerRule
-            .builder()
-            .imageName("postgres:9")
-            .expose(config.port().toString(), "5432")
-            .env("POSTGRES_PASSWORD", config.password())
-            .waitForMessage("PostgreSQL init process complete")
-            .keepContainer(true)
-            .build();
+    public static PostgresDockerRule postgresDockerRule = PostgresDockerRule.forDatabase(databaseConfig);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -56,11 +50,11 @@ public class NobtDaoIT {
 
         // migrate database
         // we can safely call this method in the setUp method as flyway does nothing to a fully migrated DB
-        new MigrationService().migrateDatabaseAt(config);
+        new MigrationService().migrateDatabaseAt(databaseConfig);
 
         final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
 
-        entityManagerFactory = emfProvider.create(config);
+        entityManagerFactory = emfProvider.create(databaseConfig);
         entityManager = entityManagerFactory.createEntityManager();
 
         final ShareMapper shareMapper = new ShareMapper();

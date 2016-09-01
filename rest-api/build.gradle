@@ -31,6 +31,7 @@ dependencies {
     compile project(':persistence')
     compile project(':inmemory-persistence')
     compile project(':log4j2-gitlab-issue-appender')
+    compile project(':db-migrations')
 
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.1.0.Final'
 
@@ -50,9 +51,8 @@ dependencies {
     testCompile(group: 'commons-logging', name: 'commons-logging', version: '1.1.1')
 
     integrationTestCompile project(':database-config:test')
-    integrationTestCompile project(':db-migrations')
+    integrationTestCompile project(':postgres-docker-rule')
     integrationTestCompile group: 'org.springframework.restdocs', name: 'spring-restdocs-restassured', version: '1.1.1.RELEASE'
-    integrationTestCompile 'com.github.tdomzal:junit-docker-rule:0.1'
 }
 
 distributions {
