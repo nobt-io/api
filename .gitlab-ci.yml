@@ -1,28 +1,16 @@
 stages:
-  - test
   - build
   - deploy
 
-test_rest-api:
-  image: sdorra/oracle-java-8
-  stage: test
-  script:
-    - ./gradlew clean check -Dorg.gradle.parallel=true
-  artifacts:
-    when: on_failure
-    paths:
-      - '*/build/reports/*'
-
 build_rest-api:
   image: sdorra/oracle-java-8
-  services:
-    - docker:dind
   stage: build
   script:
-    - ./gradlew distZip
+    - ./gradlew clean build -Dorg.gradle.parallel=true
   artifacts:
     paths:
-      - rest-api/build/distributions/*.zip
+      - 'rest-api/build/distributions/*.zip'
+      - '*/build/reports/*'
 
 deploy_on_development:
   image: governmentpaas/cf-cli
