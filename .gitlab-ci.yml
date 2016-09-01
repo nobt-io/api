@@ -4,6 +4,8 @@ stages:
 
 build_rest-api:
   image: sdorra/oracle-java-8
+  services:
+    - docker:dind
   stage: build
   script:
     - ./gradlew clean build -Dorg.gradle.parallel=true
