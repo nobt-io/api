@@ -28,10 +28,20 @@ public class PostgresDockerRule extends ExternalResource {
     @Override
     protected void before() throws Throwable {
         delegate.before();
+
+        waitMs(500);
     }
 
     @Override
     protected void after() {
         delegate.after();
+    }
+
+    private static void waitMs(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+
+        }
     }
 }
