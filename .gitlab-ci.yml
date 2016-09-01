@@ -3,10 +3,12 @@ stages:
   - deploy
 
 build_rest-api:
-  image: sdorra/oracle-java-8
+  image: openjdk:8
   services:
-    - docker:dind
+    - docker:latest
   stage: build
+  before_script:
+    - export DOCKER_HOST=tcp://docker:2375
   script:
     - ./gradlew clean build -Dorg.gradle.parallel=true
   artifacts:
