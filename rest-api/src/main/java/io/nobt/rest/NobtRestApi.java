@@ -84,7 +84,6 @@ public class NobtRestApi {
 
             final Nobt nobt = nobtRepository.getById(databaseId);
             nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares));
-
             nobtRepository.save(nobt);
 
 
@@ -123,6 +122,7 @@ public class NobtRestApi {
             res.status(201);
             res.header("Location", req.url() + "/" + id.toExternalIdentifier());
             res.header("Content-Type", "application/json");
+
             final Nobt nobt = nobtRepository.getById(id);
 
             return new NobtResource(nobt, emptySet());
