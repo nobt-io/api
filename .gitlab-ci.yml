@@ -8,6 +8,7 @@ build_rest-api:
   script:
     - ./gradlew clean build -Dorg.gradle.parallel=true
   artifacts:
+    when: always
     paths:
       - 'rest-api/build/distributions/*.zip'
       - '*/build/reports/*'
