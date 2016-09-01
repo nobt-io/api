@@ -7,7 +7,7 @@ test_rest-api:
   image: sdorra/oracle-java-8
   stage: test
   script:
-    - ./gradlew clean test
+    - ./gradlew clean check -Dorg.gradle.parallel=true
   artifacts:
     when: on_failure
     paths:
@@ -15,9 +15,11 @@ test_rest-api:
 
 build_rest-api:
   image: sdorra/oracle-java-8
+  services:
+    - docker:dind
   stage: build
   script:
-    - ./gradlew clean distZip
+    - ./gradlew distZip
   artifacts:
     paths:
       - rest-api/build/distributions/*.zip
