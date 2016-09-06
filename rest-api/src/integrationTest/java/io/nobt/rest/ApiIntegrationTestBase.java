@@ -13,16 +13,17 @@ import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.json.ObjectMapperFactory;
 import io.nobt.sql.flyway.MigrationService;
-import io.nobt.test.PostgresDockerRule;
+import io.nobt.test.persistence.DatabaseAvailabilityCheck;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
-import pl.domzal.junit.docker.rule.DockerRule;
+import org.junit.BeforeClass;
 import spark.Service;
 
 import javax.persistence.EntityManagerFactory;
 import javax.validation.Validation;
 import javax.validation.Validator;
+
+import static org.awaitility.Awaitility.await;
 
 // TODO using more than one subclass of this is not possible because the port is hard coded here and that makes parallel execution impossible
 public abstract class ApiIntegrationTestBase {
@@ -33,8 +34,12 @@ public abstract class ApiIntegrationTestBase {
     private Service http;
     protected NobtRepository nobtRepository;
 
-    @ClassRule
-    public static PostgresDockerRule postgresDockerRule = PostgresDockerRule.forDatabase(databaseConfig);
+    @BeforeClass
+    public static void waitForDatabase() {
+        final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
+
+        await().until(availabilityCheck::isDatabaseUp);
+    }
 
     @Before
     public void startAPI() throws Exception {

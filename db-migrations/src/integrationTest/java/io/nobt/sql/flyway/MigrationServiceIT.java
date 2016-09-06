@@ -1,21 +1,26 @@
 package io.nobt.sql.flyway;
 
-import io.nobt.dbconfig.test.PortParameterizablePostgresDatabaseConfig;
+import io.nobt.dbconfig.test.DefaultPostgresDatabaseConfig;
 import io.nobt.dbconfig.test.TestDatabaseConfig;
-import io.nobt.test.PostgresDockerRule;
+import io.nobt.test.persistence.DatabaseAvailabilityCheck;
 import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import pl.domzal.junit.docker.rule.DockerRule;
+
+import static org.awaitility.Awaitility.await;
 
 public class MigrationServiceIT {
 
-    private static final TestDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(7654);
-
-    @ClassRule
-    public static PostgresDockerRule postgresDockerRule = PostgresDockerRule.forDatabase(databaseConfig);
+    private static final TestDatabaseConfig databaseConfig = new DefaultPostgresDatabaseConfig();
 
     private MigrationService sut;
+
+    @BeforeClass
+    public static void waitForDatabase() {
+        final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
+
+        await().until(availabilityCheck::isDatabaseUp);
+    }
 
     @Before
     public void setUp() throws Exception {

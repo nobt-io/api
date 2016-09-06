@@ -12,5 +12,4 @@ include 'hibernate-postgres-json-support'
 include 'database-config:cloud'
 include 'database-config:local'
 include 'database-config:test'
-include 'postgres-docker-rule'
-
+include 'persistence-test-support'
