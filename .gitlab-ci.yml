@@ -3,7 +3,7 @@ stages:
   - deploy
 
 build_rest-api:
-  image: openjdk:8-jdk-alpine
+  image: openjdk:8
   stage: build
   services:
     - postgres:9
