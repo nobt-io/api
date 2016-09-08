@@ -13,7 +13,8 @@ build_rest-api:
     - ./gradlew clean
   script:
     - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel
-    - ./gradlew test :rest-api:distZip -Dorg.gradle.parallel=true
+    - ./gradlew test -x integrationTest -Dorg.gradle.parallel=true # unit tests are fine to be run in parallel
+    - ./gradlew :rest-api:distZip
   artifacts:
     when: always
     paths:
