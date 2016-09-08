@@ -3,17 +3,15 @@ stages:
   - deploy
 
 build_rest-api:
-  image: openjdk:8
+  image: openjdk:8 # TODO we should use a slimmer image here, only need java and bash
   stage: build
   services:
     - postgres:9
   variables:
-    TEST_POSTGRES_HOST: 'postgres'
-  before_script:
-    - ./gradlew clean
+    TEST_POSTGRES_HOST: 'postgres' # this is the hostname of the docker container that is linked to our test container, needs to be set for our integration tests
   script:
-    - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel
     - ./gradlew test -x integrationTest -Dorg.gradle.parallel=true # unit tests are fine to be run in parallel
+    - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel
     - ./gradlew :rest-api:distZip
   artifacts:
     when: always
