@@ -13,13 +13,17 @@ import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.json.ObjectMapperFactory;
 import io.nobt.sql.flyway.MigrationService;
+import io.nobt.test.persistence.DatabaseAvailabilityCheck;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import spark.Service;
 
 import javax.persistence.EntityManagerFactory;
 import javax.validation.Validation;
 import javax.validation.Validator;
+
+import static org.awaitility.Awaitility.await;
 
 public abstract class ApiIntegrationTestBase {
 
@@ -28,6 +32,13 @@ public abstract class ApiIntegrationTestBase {
 
     private Service http;
     protected NobtRepository nobtRepository;
+
+    @BeforeClass
+    public static void waitForDatabase() {
+        final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
+
+        await().until(availabilityCheck::isDatabaseUp);
+    }
 
     @Before
     public void startAPI() throws Exception {

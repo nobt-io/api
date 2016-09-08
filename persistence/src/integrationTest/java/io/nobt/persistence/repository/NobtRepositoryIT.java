@@ -15,6 +15,7 @@ import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.domain.factories.ShareFactory;
+import io.nobt.test.persistence.DatabaseAvailabilityCheck;
 import io.nobt.util.Sets;
 import org.junit.After;
 import org.junit.Before;
@@ -30,6 +31,7 @@ import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasDebtee;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasShares;
 import static io.nobt.test.domain.matchers.NobtMatchers.*;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
@@ -45,6 +47,13 @@ public class NobtRepositoryIT {
     private static EntityManager entityManager;
 
     private NobtRepository sut;
+
+    @BeforeClass
+    public static void waitForDatabase() {
+        final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
+
+        await().until(availabilityCheck::isDatabaseUp);
+    }
 
     @Before
     public void setUp() throws Exception {
