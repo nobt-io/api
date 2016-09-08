@@ -14,9 +14,7 @@ import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.json.ObjectMapperFactory;
 import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.persistence.DatabaseAvailabilityCheck;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import spark.Service;
 
@@ -33,12 +31,11 @@ public abstract class ApiIntegrationTestBase {
 
     private static DatabaseConfig databaseConfig;
     private static MigrationService migrationService;
+    private static Service http;
+    private static EntityManager entityManager;
+    private static EntityManagerFactory entityManagerFactory;
 
-    private Service http;
-    protected NobtRepository nobtRepository;
-
-    private EntityManager entityManager;
-    private EntityManagerFactory entityManagerFactory;
+    protected static NobtRepository nobtRepository;
 
     @BeforeClass
     public static void setupEnvironment() {
@@ -50,15 +47,6 @@ public abstract class ApiIntegrationTestBase {
         await().until(availabilityCheck::isDatabaseUp);
 
         migrationService.migrate();
-    }
-
-    @AfterClass
-    public static void cleanupEnvironment() {
-        migrationService.clean();
-    }
-
-    @Before
-    public void startAPI() throws Exception {
 
         final ObjectMapper objectMapper = new ObjectMapperFactory().create();
         final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -87,10 +75,13 @@ public abstract class ApiIntegrationTestBase {
         ).run(ACTUAL_PORT);
     }
 
-    @After
-    public void stopAPI() throws Exception {
+    @AfterClass
+    public static void cleanupEnvironment() {
         http.stop();
+
         entityManager.close();
         entityManagerFactory.close();
+
+        migrationService.clean();
     }
 }
