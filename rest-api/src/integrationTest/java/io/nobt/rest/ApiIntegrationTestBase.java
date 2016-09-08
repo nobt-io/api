@@ -2,7 +2,7 @@ package io.nobt.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.core.NobtCalculator;
-import io.nobt.dbconfig.test.PortParameterizablePostgresDatabaseConfig;
+import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
 import io.nobt.dbconfig.test.TestDatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
@@ -13,28 +13,21 @@ import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.json.ObjectMapperFactory;
 import io.nobt.sql.flyway.MigrationService;
-import io.nobt.test.PostgresDockerRule;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
-import pl.domzal.junit.docker.rule.DockerRule;
 import spark.Service;
 
 import javax.persistence.EntityManagerFactory;
 import javax.validation.Validation;
 import javax.validation.Validator;
 
-// TODO using more than one subclass of this is not possible because the port is hard coded here and that makes parallel execution impossible
 public abstract class ApiIntegrationTestBase {
 
     protected static final int ACTUAL_PORT = 18080;
-    protected static final TestDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(6543);
+    protected static final TestDatabaseConfig databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
 
     private Service http;
     protected NobtRepository nobtRepository;
-
-    @ClassRule
-    public static PostgresDockerRule postgresDockerRule = PostgresDockerRule.forDatabase(databaseConfig);
 
     @Before
     public void startAPI() throws Exception {

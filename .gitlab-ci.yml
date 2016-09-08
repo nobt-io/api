@@ -4,11 +4,9 @@ stages:
 
 build_rest-api:
   image: openjdk:8
-  services:
-    - docker:latest
   stage: build
-  before_script:
-    - export DOCKER_HOST=tcp://docker:2375
+  services:
+    - postgres:9
   script:
     - ./gradlew clean build -Dorg.gradle.parallel=true
   artifacts:
@@ -26,7 +24,5 @@ deploy_on_development:
     - cf target -o nobt.io -s development
   script:
     - cf push -n nobt-io-dev -p rest-api/build/distributions/*.zip
-  except:
-    - tags
   only:
     - master

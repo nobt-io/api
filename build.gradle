@@ -3,19 +3,18 @@ allprojects {
 
     group = 'io.nobt'
     version = '0.0.2'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        jcenter()
+    }
 }
 
 subprojects {
     apply plugin: 'java'
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
-
-    repositories {
-        mavenLocal()
-        jcenter()
-
-        maven { url "http://repo.maven.apache.org/maven2" }
-    }
 
     dependencies {
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.5'

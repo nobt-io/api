@@ -1,8 +1,11 @@
 package io.nobt.persistence.repository;
 
 import io.nobt.core.UnknownNobtException;
-import io.nobt.core.domain.*;
-import io.nobt.dbconfig.test.PortParameterizablePostgresDatabaseConfig;
+import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.NobtId;
+import io.nobt.core.domain.Person;
+import io.nobt.core.domain.Share;
+import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
 import io.nobt.dbconfig.test.TestDatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
@@ -11,12 +14,13 @@ import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.sql.flyway.MigrationService;
-import io.nobt.test.PostgresDockerRule;
 import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.util.Sets;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import pl.domzal.junit.docker.rule.DockerRule;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -30,12 +34,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 
-public class NobtDaoIT {
+public class NobtRepositoryIT {
 
-    private static final TestDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(8765);
-
-    @ClassRule
-    public static PostgresDockerRule postgresDockerRule = PostgresDockerRule.forDatabase(databaseConfig);
+    private static final TestDatabaseConfig databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

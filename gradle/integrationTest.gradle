@@ -1,5 +1,4 @@
 // Add integration test source sets
-
 sourceSets {
     integrationTest { sourceSet ->
         ["java"].each {

@@ -1,19 +1,13 @@
 package io.nobt.sql.flyway;
 
-import io.nobt.dbconfig.test.PortParameterizablePostgresDatabaseConfig;
+import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
 import io.nobt.dbconfig.test.TestDatabaseConfig;
-import io.nobt.test.PostgresDockerRule;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Test;
-import pl.domzal.junit.docker.rule.DockerRule;
 
 public class MigrationServiceIT {
 
-    private static final TestDatabaseConfig databaseConfig = new PortParameterizablePostgresDatabaseConfig(7654);
-
-    @ClassRule
-    public static PostgresDockerRule postgresDockerRule = PostgresDockerRule.forDatabase(databaseConfig);
+    private static final TestDatabaseConfig databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
 
     private MigrationService sut;
 
