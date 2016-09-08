@@ -24,6 +24,7 @@ import spark.Service;
 import javax.persistence.EntityManager;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import java.util.Optional;
 
 public class NobtApplication {
 
@@ -37,9 +38,7 @@ public class NobtApplication {
 
         final DatabaseConfig databaseConfig = getDatabaseConfig();
 
-        if (databaseConfig != null) {
-            migrateDatabase(databaseConfig);
-        }
+        Optional.ofNullable(databaseConfig).ifPresent(NobtApplication::migrateDatabase);
 
         final ObjectMapper objectMapper = new ObjectMapperFactory().create();
         final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
@@ -68,8 +67,8 @@ public class NobtApplication {
     }
 
     private static void migrateDatabase(DatabaseConfig databaseConfig) {
-        final MigrationService migrationService = new MigrationService();
-        migrationService.migrateDatabaseAt(databaseConfig);
+        final MigrationService migrationService = new MigrationService(databaseConfig);
+        migrationService.migrate();
     }
 
     private static NobtRepository createSqlBackedDao() {

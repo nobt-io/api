@@ -6,7 +6,7 @@ import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
 import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
-import io.nobt.dbconfig.test.TestDatabaseConfig;
+import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
 import io.nobt.persistence.NobtRepositoryImpl;
@@ -35,8 +35,8 @@ import static org.junit.Assume.assumeThat;
 
 public class NobtRepositoryIT {
 
-    private static final TestDatabaseConfig databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
-    private static final DatabaseAvailabilityCheck availabilityCheck =  new DatabaseAvailabilityCheck(databaseConfig);
+    private static DatabaseConfig databaseConfig;
+    private static MigrationService migrationService;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -47,16 +47,24 @@ public class NobtRepositoryIT {
     private NobtRepository sut;
 
     @BeforeClass
-    public static void waitForDatabase() {
+    public static void setupEnvironment() {
+
+        databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
+        migrationService = new MigrationService(databaseConfig);
+
+        DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
         await().until(availabilityCheck::isDatabaseUp);
+
+        migrationService.migrate();
+    }
+
+    @AfterClass
+    public static void cleanupEnvironment() {
+        migrationService.clean();
     }
 
     @Before
     public void setUp() throws Exception {
-
-        // migrate database
-        // we can safely call this method in the setUp method as flyway does nothing to a fully migrated DB
-        new MigrationService().migrateDatabaseAt(databaseConfig);
 
         final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
 

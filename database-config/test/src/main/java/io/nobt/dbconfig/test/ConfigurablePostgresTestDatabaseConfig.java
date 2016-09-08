@@ -1,8 +1,10 @@
 package io.nobt.dbconfig.test;
 
+import io.nobt.persistence.DatabaseConfig;
+
 import java.util.Optional;
 
-public class ConfigurablePostgresTestDatabaseConfig implements TestDatabaseConfig {
+public class ConfigurablePostgresTestDatabaseConfig implements DatabaseConfig {
 
     public static final String PORT_KEY = "TEST_POSTGRES_PORT";
     public static final String HOST_KEY = "TEST_POSTGRES_HOST";
@@ -21,7 +23,7 @@ public class ConfigurablePostgresTestDatabaseConfig implements TestDatabaseConfi
         this.password = password;
     }
 
-    public static TestDatabaseConfig parse(EnvVariableSupplier supplier) {
+    public static DatabaseConfig parse(EnvVariableSupplier supplier) {
 
         final int port = supplier.tryGet(PORT_KEY).map(Integer::parseInt).orElse(5432);
         final String host = supplier.tryGet(HOST_KEY).orElse("localhost");
@@ -32,13 +34,8 @@ public class ConfigurablePostgresTestDatabaseConfig implements TestDatabaseConfi
     }
 
     @Override
-    public Integer port() {
-        return port;
-    }
-
-    @Override
     public String url() {
-        return String.format("jdbc:postgresql://%s:%d/postgres", host, port());
+        return String.format("jdbc:postgresql://%s:%d/postgres", host, port);
     }
 
     @Override

@@ -7,8 +7,13 @@ build_rest-api:
   stage: build
   services:
     - postgres:9
+  variables:
+    - TEST_POSTGRES_HOST: 'postgres'
+  before_script:
+    - ./gradlew clean
   script:
-    - ./gradlew clean build -Dorg.gradle.parallel=true
+    - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel
+    - ./gradlew test :rest-api:distZip -Dorg.gradle.parallel=true
   artifacts:
     when: always
     paths:

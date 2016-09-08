@@ -5,11 +5,18 @@ import org.flywaydb.core.Flyway;
 
 public class MigrationService {
 
-    public void migrateDatabaseAt(DatabaseConfig databaseConfig) {
+    private final Flyway flyway;
 
-        Flyway flyway = new Flyway();
-        flyway.setDataSource(databaseConfig.url(), databaseConfig.username(), databaseConfig.password());
+    public MigrationService(DatabaseConfig config) {
+        this.flyway = new Flyway();
+        this.flyway.setDataSource(config.url(), config.username(), config.password());
+    }
 
+    public void migrate() {
         flyway.migrate();
+    }
+
+    public void clean() {
+        flyway.clean();
     }
 }
