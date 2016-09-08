@@ -24,7 +24,7 @@ deploy_on_development:
   stage: deploy
   before_script:
     - cf api https://api.run.pivotal.io
-    - cf auth bot@nobt.io YP8y1NQCqdcbbgfdLw0b
+    - cf auth $CF_BUILD_USER $CF_BUILD_USER_PASSWORD
     - cf target -o nobt.io -s development
   script:
     - cf push -n nobt-io-dev -p rest-api/build/distributions/*.zip
