@@ -17,10 +17,7 @@ import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.test.persistence.DatabaseAvailabilityCheck;
 import io.nobt.util.Sets;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import javax.persistence.EntityManager;
@@ -39,6 +36,7 @@ import static org.junit.Assume.assumeThat;
 public class NobtRepositoryIT {
 
     private static final TestDatabaseConfig databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
+    private static final DatabaseAvailabilityCheck availabilityCheck =  new DatabaseAvailabilityCheck(databaseConfig);
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -50,8 +48,6 @@ public class NobtRepositoryIT {
 
     @BeforeClass
     public static void waitForDatabase() {
-        final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
-
         await().until(availabilityCheck::isDatabaseUp);
     }
 

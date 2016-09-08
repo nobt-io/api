@@ -12,13 +12,12 @@ import static org.awaitility.Awaitility.await;
 public class MigrationServiceIT {
 
     private static final TestDatabaseConfig databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
+    private static final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
 
     private MigrationService sut;
 
     @BeforeClass
     public static void waitForDatabase() {
-        final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
-
         await().until(availabilityCheck::isDatabaseUp);
     }
 

@@ -29,14 +29,13 @@ public abstract class ApiIntegrationTestBase {
 
     protected static final int ACTUAL_PORT = 18080;
     protected static final TestDatabaseConfig databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
+    protected static final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
 
     private Service http;
     protected NobtRepository nobtRepository;
 
     @BeforeClass
     public static void waitForDatabase() {
-        final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
-
         await().until(availabilityCheck::isDatabaseUp);
     }
 
