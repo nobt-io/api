@@ -20,7 +20,7 @@ Upon startup, the application chooses one of three profiles:
     - PostgreSQL database specified by the `elephant-sql` service. 
    
 - For all none-database related development (frontend, business-logic) the `STANDALONE` profile should fulfill all your needs. 
-- If you mess with the database, you will probably want to test your changes against a local database in which case the `LOCAL` profile comes in handy. (And the `create-docker-db-container.sh` script in the `/bin` folder which provisions a docker container with an up and running postgres database.)
+- If you mess with the database, you will probably want to test your changes against a local database in which case the `LOCAL` profile comes in handy.
 - Running the application in the `CLOUD` profile yourself does not make much sense, as you would have to emulate a cloudfoundry environment. (Which is a none-trivial task.)
 
 # Documentation

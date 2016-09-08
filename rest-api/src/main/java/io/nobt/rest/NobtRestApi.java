@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import static io.nobt.profiles.Profiles.ifProfile;
-import static java.util.Collections.*;
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
 public class NobtRestApi {
@@ -44,8 +44,8 @@ public class NobtRestApi {
     private final ObjectMapper objectMapper;
     private final SimpleViolationFactory simpleViolationFactory;
 
-    public NobtRestApi(Service ignite, NobtRepository nobtRepository, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper) {
-        this.http = ignite;
+    public NobtRestApi(Service service, NobtRepository nobtRepository, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper) {
+        this.http = service;
         this.nobtRepository = nobtRepository;
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
@@ -84,7 +84,6 @@ public class NobtRestApi {
 
             final Nobt nobt = nobtRepository.getById(databaseId);
             nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares));
-
             nobtRepository.save(nobt);
 
 
@@ -123,6 +122,7 @@ public class NobtRestApi {
             res.status(201);
             res.header("Location", req.url() + "/" + id.toExternalIdentifier());
             res.header("Content-Type", "application/json");
+
             final Nobt nobt = nobtRepository.getById(id);
 
             return new NobtResource(nobt, emptySet());
