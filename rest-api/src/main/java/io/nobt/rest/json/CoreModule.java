@@ -4,16 +4,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-
-import io.nobt.core.domain.Amount;
-import io.nobt.core.domain.Expense;
-import io.nobt.core.domain.NobtId;
-import io.nobt.core.domain.Person;
+import io.nobt.core.domain.*;
 import io.nobt.rest.json.amount.AmountDeserializer;
 import io.nobt.rest.json.amount.AmountSerializer;
 import io.nobt.rest.json.expense.ExpenseMixin;
+import io.nobt.rest.json.nobt.NobtIdSerializer;
+import io.nobt.rest.json.nobt.NobtMixin;
 import io.nobt.rest.json.person.PersonDeserializer;
 import io.nobt.rest.json.person.PersonSerializer;
+import io.nobt.rest.json.share.ShareMixin;
 
 public class CoreModule extends SimpleModule {
 
@@ -26,6 +25,8 @@ public class CoreModule extends SimpleModule {
 
         addSerializer(NobtId.class, new NobtIdSerializer());
 
+        setMixInAnnotation(Share.class, ShareMixin.class);
+        setMixInAnnotation(Nobt.class, NobtMixin.class);
         setMixInAnnotation(Expense.class, ExpenseMixin.class);
     }
 

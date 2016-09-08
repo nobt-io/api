@@ -8,11 +8,13 @@ import static java.math.RoundingMode.HALF_UP;
 
 public final class Amount {
 
-	private static final RoundingMode ROUNDING_MODE = HALF_UP;
-	private static final int INTERNAL_SCALE = 10;
-	private static final int EXTERNAL_SCALE = 2;
+    public static final Amount ZERO = new Amount(BigDecimal.ZERO);
 
-	private final BigDecimal value;
+    private static final RoundingMode ROUNDING_MODE = HALF_UP;
+    private static final int INTERNAL_SCALE = 10;
+    private static final int EXTERNAL_SCALE = 2;
+
+    private final BigDecimal value;
 
     private Amount(BigDecimal value) {
         this.value = value;
@@ -42,9 +44,9 @@ public final class Amount {
         return fromBigDecimal(value.add(other.value));
     }
 
-	public Amount divide(BigDecimal other) {
-		return fromBigDecimal(value.divide(other, INTERNAL_SCALE, HALF_UP));
-	}
+    public Amount divide(BigDecimal other) {
+        return fromBigDecimal(value.divide(other, INTERNAL_SCALE, HALF_UP));
+    }
 
     public Amount absolute() {
         return fromBigDecimal(value.abs());
@@ -55,7 +57,7 @@ public final class Amount {
         if (this == o) return true;
         if (!(o instanceof Amount)) return false;
         Amount amount = (Amount) o;
-        return Objects.equals(value, amount.value);
+        return Objects.equals(getRoundedValue(), amount.getRoundedValue());
     }
 
     @Override
@@ -63,8 +65,8 @@ public final class Amount {
         return Objects.hash(value);
     }
 
-	@Override
-	public String toString() {
-		return String.format("%s EURO", getRoundedValue());
-	}
+    @Override
+    public String toString() {
+        return String.format("%s EURO", getRoundedValue());
+    }
 }

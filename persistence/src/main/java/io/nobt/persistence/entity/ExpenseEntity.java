@@ -1,9 +1,8 @@
 package io.nobt.persistence.entity;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,27 +20,22 @@ public class ExpenseEntity {
     @Column(name = "expenseName", nullable = false, length = 50)
     private String name;
 
-    @Column(name = "amount", nullable = false)
-    private BigDecimal amount;
-
-    @Column(name = "debtee")
+    @Column(name = "debtee", nullable = false)
     private String debtee;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @Column(name = "splitStrategy", nullable = false)
+    private String splitStrategy;
+
+    @ManyToOne
     @JoinColumn(name = "NOBT_ID", nullable = false)
     private NobtEntity nobt;
 
-    @Column(name = "debtors")
-    private String debtorList;
+    @Type(type = "io.nobt.persistence.JsonBinaryType")
+    @Column(name = "shares")
+    private List<ShareEntity> shares;
 
-    public ExpenseEntity(String name, BigDecimal amount, String debtee) {
-        this.name = name;
-        this.amount = amount;
-        this.debtee = debtee;
-    }
-
-    public ExpenseEntity() {
-
+    public long getId() {
+        return id;
     }
 
     public String getName() {
@@ -52,20 +46,20 @@ public class ExpenseEntity {
         this.name = name;
     }
 
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
-
     public String getDebtee() {
         return debtee;
     }
 
     public void setDebtee(String debtee) {
         this.debtee = debtee;
+    }
+
+    public String getSplitStrategy() {
+        return splitStrategy;
+    }
+
+    public void setSplitStrategy(String splitStrategy) {
+        this.splitStrategy = splitStrategy;
     }
 
     public NobtEntity getNobt() {
@@ -76,24 +70,11 @@ public class ExpenseEntity {
         this.nobt = nobt;
     }
 
-    public List<String> getDebtors() {
-
-        if (debtorList == null) {
-            return Collections.emptyList();
-        }
-
-        return Arrays.asList(debtorList.split(";"));
+    public List<ShareEntity> getShares() {
+        return shares;
     }
 
-    public void addDebtor(String debtor) {
-        if (debtorList == null) {
-            debtorList = debtor;
-        } else {
-            debtorList = debtorList + ";" + debtor;
-        }
-    }
-
-    public long getId() {
-        return id;
+    public void setShares(List<ShareEntity> shares) {
+        this.shares = shares;
     }
 }

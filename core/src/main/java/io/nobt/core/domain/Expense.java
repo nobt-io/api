@@ -1,74 +1,61 @@
 package io.nobt.core.domain;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
+import java.util.List;
 import java.util.Set;
 
+import static io.nobt.core.domain.Transaction.transaction;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+
 /**
- * @author Matthias
- *
+ * An expense represents a domain entity that describes a payment of some sort done by one person ({@link Expense#debtee})
+ * where several other persons take part it. (specified through the {@link Expense#shares} collection.)
  */
 public class Expense {
 
-	private String name;
-	private Amount amount;
-	private Person debtee;
-	private Set<Person> debtors = new HashSet<Person>();
+    private final String name;
+    private final Person debtee;
+    private final String splitStrategy;
+    private final Set<Share> shares;
 
-	public Expense(String name, Amount amount, Person debtee) {
-		this.name = name;
-		this.amount = amount;
-		this.debtee = debtee;
-	}
+    public Expense(String name, String splitStrategy, Person debtee, Set<Share> shares) {
+        this.name = name;
+        this.splitStrategy = splitStrategy;
+        this.debtee = debtee;
+        this.shares = shares;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public Amount getOverallAmount() {
-		return amount;
-	}
+    public String getSplitStrategy() {
+        return splitStrategy;
+    }
 
-	public Amount getAmountPerDebtor() {
-		return amount.divide(new BigDecimal(debtors.size()));
-	}
+    public Person getDebtee() {
+        return debtee;
+    }
 
-	public Person getDebtee() {
-		return debtee;
-	}
+    public Set<Share> getShares() {
+        return Collections.unmodifiableSet(shares);
+    }
 
-	public Set<Person> getDebtors() {
-		return Collections.unmodifiableSet(debtors);
-	}
+    public Set<Person> getParticipants() {
+        final Set<Person> debtors = shares.stream().map(Share::getDebtor).collect(toSet());
 
-	public void addDebtor(Person debtor) {
-		this.debtors.add(debtor);
-	}
+        final HashSet<Person> copyOfDebtors = new HashSet<>(debtors);
+        copyOfDebtors.add(debtee);
 
-	/**
-	 * Use {@link Expense#addDebtor(Person)} instead.
-	 * @param debtors
-     */
-	@Deprecated
-	public void setDebtors(Set<Person> debtors) {
-		this.debtors = debtors;
-	}
+        return copyOfDebtors;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Expense)) return false;
-		Expense expense = (Expense) o;
-		return Objects.equals(name, expense.name) &&
-				Objects.equals(amount, expense.amount) &&
-				Objects.equals(debtee, expense.debtee) &&
-				Objects.equals(debtors, expense.debtors);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(name, amount, debtee, debtors);
-	}
+    public List<Transaction> getTransactions() {
+        return shares
+                .stream()
+                .map(share -> transaction(share.getDebtor(), share.getAmount(), debtee))
+                .collect(toList());
+    }
 }

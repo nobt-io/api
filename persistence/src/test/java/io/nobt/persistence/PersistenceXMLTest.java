@@ -1,14 +1,15 @@
 package io.nobt.persistence;
 
-import org.hamcrest.CoreMatchers;
 import org.hibernate.jpa.boot.internal.ParsedPersistenceXmlDescriptor;
 import org.hibernate.jpa.boot.internal.PersistenceXmlParser;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 public class PersistenceXMLTest {
 
@@ -23,6 +24,6 @@ public class PersistenceXMLTest {
 
         final String hbm2ddlValue = properties.getProperty("hibernate.hbm2ddl.auto");
 
-        Assert.assertThat(hbm2ddlValue, CoreMatchers.is("validate"));
+        assertThat(hbm2ddlValue, is("validate"));
     }
 }

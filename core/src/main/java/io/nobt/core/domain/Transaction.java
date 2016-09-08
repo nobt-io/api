@@ -27,6 +27,7 @@ public class Transaction {
 		this.debtee = debtee;
 	}
 
+	@Deprecated
 	public static Transaction transaction(String debtor, double amount, String debtee) {
 		return transaction(forName(debtor), Amount.fromDouble(amount), forName(debtee));
 	}

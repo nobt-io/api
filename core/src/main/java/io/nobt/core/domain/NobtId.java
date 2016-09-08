@@ -1,9 +1,9 @@
 package io.nobt.core.domain;
 
-import java.util.Objects;
-
 import io.nobt.core.PseudoCrypter;
 import io.nobt.core.ShortURL;
+
+import java.util.Objects;
 
 public final class NobtId {
 

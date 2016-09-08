@@ -2,24 +2,27 @@ package io.nobt.core.domain;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
 
 public class Nobt {
 
-    private NobtId id;
-    private String name;
+    private final NobtId id;
+    private final String name;
     private final Set<Person> explicitParticipants;
+    private final Set<Expense> expenses;
 
-    private Set<Expense> expenses = new HashSet<>();
-
-    public Nobt(NobtId id, String name) {
-        this(id, name, Collections.emptySet());
-    }
-
-    public Nobt(NobtId id, String name, Set<Person> explicitParticipants) {
+    public Nobt(NobtId id, String name, Set<Person> explicitParticipants, Set<Expense> expenses) {
         this.id = id;
         this.name = name;
         this.explicitParticipants = explicitParticipants;
+        this.expenses = new HashSet<>(expenses);
+    }
+
+    public NobtId getId() {
+        return id;
     }
 
     public String getName() {
@@ -27,26 +30,31 @@ public class Nobt {
     }
 
     public Set<Expense> getExpenses() {
-        return expenses;
+        return Collections.unmodifiableSet(expenses);
     }
 
     public Set<Person> getParticipatingPersons() {
-        final Set<Person> participatingPersons = expenses
+
+        final HashSet<Person> allPersons = new HashSet<>(explicitParticipants);
+
+        expenses.stream()
+                .flatMap(expense -> expense.getParticipants().stream() )
+                .forEach(allPersons::add);
+
+        return allPersons;
+    }
+
+    public List<Transaction> getAllTransactions() {
+        return expenses
                 .stream()
-                .map(Expense::getDebtors)
-                .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
-
-        expenses.stream().map(Expense::getDebtee).forEach(participatingPersons::add);
-        explicitParticipants.stream().forEach(participatingPersons::add);
-
-        return participatingPersons;
+                .flatMap(expense -> expense.getTransactions().stream())
+                .collect(toList());
     }
 
-    public void addExpense(Expense expense) {
-        this.expenses.add(expense);
-    }
+    public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares) {
 
-    public NobtId getId() {
-        return id;
+        final Expense newExpense = new Expense(name, splitStrategy, debtee, shares);
+
+        expenses.add(newExpense);
     }
 }

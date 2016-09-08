@@ -1,49 +1,32 @@
 stages:
-  - test
   - build
   - deploy
 
-test_rest-api:
-  image: sdorra/oracle-java-8
-  stage: test
+build_rest-api:
+  image: openjdk:8 # TODO we should use a slimmer image here, only need java and bash
+  stage: build
+  services:
+    - postgres:9
+  variables:
+    TEST_POSTGRES_HOST: 'postgres' # this is the hostname of the docker container that is linked to our test container, needs to be set for our integration tests
   script:
-    - ./gradlew clean test
+    - ./gradlew test -x integrationTest -Dorg.gradle.parallel=true # unit tests are fine to be run in parallel
+    - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel
+    - ./gradlew :rest-api:distZip
   artifacts:
-    when: on_failure
+    when: always
     paths:
+      - 'rest-api/build/distributions/*.zip'
       - '*/build/reports/*'
 
-build_rest-api:
-  image: sdorra/oracle-java-8
-  stage: build
-  script:
-    - ./gradlew clean distZip
-  artifacts:
-    paths:
-      - rest-api/build/distributions/*.zip
-
-deploy_on_beta:
+deploy_on_development:
   image: governmentpaas/cf-cli
   stage: deploy
   before_script:
     - cf api https://api.run.pivotal.io
-    - cf auth c2895380@trbvn.com YP8y1NQCqdcbbgfdLw0b
-    - cf target -o nobt.io -s beta
+    - cf auth $CF_BUILD_USER $CF_BUILD_USER_PASSWORD
+    - cf target -o nobt.io -s development
   script:
-    - cf push -n nobt-io-beta -p rest-api/build/distributions/*.zip
-  except:
-    - tags
+    - cf push -n nobt-io-dev -p rest-api/build/distributions/*.zip
   only:
     - master
-
-deploy_on_production:
-  image: governmentpaas/cf-cli
-  stage: deploy
-  before_script:
-    - cf api https://api.run.pivotal.io
-    - cf auth c2895380@trbvn.com YP8y1NQCqdcbbgfdLw0b
-    - cf target -o nobt.io -s production
-  script:
-    - cf push -n nobt-io -p rest-api/build/distributions/*.zip
-  only:
-    - tags

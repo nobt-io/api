@@ -31,14 +31,38 @@ In addition to the information that was sent to the API, two arrays are returned
 
 == Add an expense to a nobt
 
+Creating an expense requires some client logic as the API only accepts `shares` of an expense.
+The client must split the overall amount of the expense in shares consisting of the name of the debtor and the associated amount.
+The sum of all amounts of all shares forms the overall amount of the expense.
+
+This design allows the client to present the user with several possibilities to split his expense. For example:
+
+- Split by percentage
+- Split evenly among debtors
+- Split by weighted shares
+- Custom value per debtor
+
+The client may store an identifier in the `splitStrategy` field for each expense that identifies the way the shares have been calculated.
+
 Given the url in the `Location` header that was returned in the previous response, we can add an expense to this nobt if we post an expense to the `/expenses` sub-resource.
 
 include::{snippets}/create-expense/http-request.adoc[]
 include::{snippets}/create-expense/request-fields.adoc[]
 
-The request was successful if the server returns a statuscode of 201. For convenience, the response includes the sent data.
+The request was successful if the server returns a status-code of 201. For convenience, the response includes the sent data.
 
 include::{snippets}/create-expense/http-response.adoc[]
+
+Sending a faulty request results in a status-code of 400. In the case of creating an expense for a nobt, this occurs if the same debtor (identified by the name), occurs twice in the list of shares for an expense.
+
+An example for such a faulty request would be:
+
+include::{snippets}/duplicate-debtor/http-request.adoc[]
+
+The response in the case of an validation failure is:
+
+include::{snippets}/duplicate-debtor/http-response.adoc[]
+include::{snippets}/duplicate-debtor/response-fields.adoc[]
 
 == Retrieve the nobt
 

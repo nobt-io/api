@@ -1,52 +1,59 @@
 package io.nobt.core.domain;
 
-import static io.nobt.core.PersonFactory.david;
-import static io.nobt.core.PersonFactory.lukas;
-import static io.nobt.core.PersonFactory.matthias;
-import static io.nobt.core.PersonFactory.thomas;
-import static io.nobt.core.PersonFactory.thomasB;
-import static io.nobt.util.Sets.newHashSet;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
-
-import java.util.Set;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import io.nobt.matchers.NobtMatchers;
 import io.nobt.util.Sets;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import static io.nobt.test.domain.factories.ShareFactory.randomShare;
+import static io.nobt.test.domain.factories.StaticPersonFactory.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
 public class NobtTest {
 
-    @Test
-    public void testShouldReturnAllParticipatingPersonsOfAllExpenses() throws Exception {
+    private Nobt sut;
 
-        final Nobt billa = new Nobt(null, "Billa");
+    @Mock
+    private Expense firstExpense;
 
-        thomas = Person.forName("Thomas");
-        final Expense obst = new Expense("Obst", Amount.fromDouble(10), thomas);
-        thomas = Person.forName("Thomas");
-        obst.setDebtors(newHashSet(thomas, lukas, matthias));
+    @Mock
+    private Expense secondExpense;
 
-        final Expense bier = new Expense("Bier", Amount.fromDouble(30), david);
-        thomas = Person.forName("Thomas");
-        bier.setDebtors(newHashSet(thomas, thomasB, matthias, david));
+    @Before
+    public void setUp() throws Exception {
 
-        billa.addExpense(obst);
-        billa.addExpense(bier);
+        sut = new Nobt(null, "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense));
 
-        final Set<Person> actualPersons = billa.getParticipatingPersons();
+        when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
+                randomShare(david),
+                randomShare(lukas)
+        ));
 
-        thomas = Person.forName("Thomas");
-        assertThat(actualPersons, containsInAnyOrder(thomas, lukas, matthias, thomasB, david));
+        when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
+                randomShare(matthias),
+                randomShare(simon)
+        ));
     }
 
     @Test
-    public void shouldAddExplicitParticipantsToParticipatingPersons() throws Exception {
+    public void shouldBuildListOfTransactionsFromEveryExpense() throws Exception {
 
-        final Nobt something = new Nobt(null, "Something", Sets.newHashSet(Person.forName("Thomas")));
+        sut.getAllTransactions();
 
-        Assert.assertThat(something, NobtMatchers.hasExplicitParticipantWithName("Thomas"));
+        verify(firstExpense).getTransactions();
+        verify(secondExpense).getTransactions();
+    }
+
+    @Test
+    public void shouldBuildListOfPersonsFromEveryExpense() throws Exception {
+
+        sut.getParticipatingPersons();
+
+        verify(firstExpense).getParticipants();
+        verify(secondExpense).getParticipants();
     }
 }
