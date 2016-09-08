@@ -8,7 +8,7 @@ build_rest-api:
   services:
     - postgres:9
   variables:
-    - TEST_POSTGRES_HOST: 'postgres'
+    TEST_POSTGRES_HOST: 'postgres'
   before_script:
     - ./gradlew clean
   script:
