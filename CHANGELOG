@@ -1,3 +1,10 @@
+## Version 0.0.3:
+
+This version drops the support for profiles and instead introduces specific environment variables for configuration. 
+This allows for a more fine-grained configuration of the API.
+
+For backwards-compatiblity reasons, a shell and a bash-script are located under the `bin/` folder that configure the application in the same way the `STANDALONE` profile did before.
+
 ## Version 0.0.2:
 
 The main change in this version is the introduction of `shares` per expense that allows the client to split an expense into arbitrary parts. Previously an expense was always evenly split among all participants. Due to this change, two endpoints required breaking changes.
