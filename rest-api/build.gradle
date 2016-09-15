@@ -11,7 +11,7 @@ plugins {
 apply plugin: 'application'
 apply from: rootProject.rootDir.path + '/gradle/integrationTest.gradle'
 
-mainClassName = 'io.nobt.rest.NobtApplication'
+mainClassName = 'io.nobt.application.NobtApplication'
 
 ext {
     snippetsDir = file('build/generated-snippets')
