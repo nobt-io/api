@@ -1,11 +1,11 @@
 package io.nobt.persistence.repository;
 
+import io.nobt.application.env.Config;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
-import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
@@ -24,6 +24,8 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.util.Collections;
 
+import static io.nobt.application.env.Config.Keys.DATABASE_CONNECTION_STRING;
+import static io.nobt.application.env.MissingConfigurationException.missingConfigurationException;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasDebtee;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasShares;
@@ -49,7 +51,7 @@ public class NobtRepositoryIT {
     @BeforeClass
     public static void setupEnvironment() {
 
-        databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
+        databaseConfig = Config.database().orElseThrow(missingConfigurationException(DATABASE_CONNECTION_STRING));
         migrationService = new MigrationService(databaseConfig);
 
         DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);

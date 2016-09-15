@@ -7,9 +7,11 @@ import io.nobt.persistence.entity.NobtEntity;
 import io.nobt.persistence.mapping.DomainModelMapper;
 
 import javax.persistence.EntityManager;
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Optional;
 
-public class NobtRepositoryImpl implements NobtRepository {
+public class NobtRepositoryImpl implements NobtRepository, Closeable {
 
     private final EntityManager em;
     private final DomainModelMapper<NobtEntity, Nobt> nobtMapper;
@@ -45,5 +47,10 @@ public class NobtRepositoryImpl implements NobtRepository {
         final Optional<NobtEntity> nobt = Optional.ofNullable(em.find(NobtEntity.class, id.getId()));
 
         return nobt.map(nobtMapper::mapToDomainModel).orElseThrow(() -> new UnknownNobtException(id));
+    }
+
+    @Override
+    public void close() throws IOException {
+        em.close();
     }
 }

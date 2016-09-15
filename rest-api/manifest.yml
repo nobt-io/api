@@ -6,4 +6,7 @@ applications:
   services:
     - database
   env:
-    profile: CLOUD
+    USE_IN_MEMORY_DATABASE: false
+    REPORT_SERVER_ERRORS_AS_ISSUES: true
+    WRITE_STACKTRACE_TO_RESPONSE: false
+    MIGRATE_DATABASE_AT_STARTUP: true

@@ -1,6 +1,6 @@
 package io.nobt.logging;
 
-import io.nobt.profiles.Profiles;
+import io.nobt.application.env.Config;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
@@ -20,8 +20,6 @@ import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.nobt.profiles.Profile.CLOUD;
-
 @Plugin(name = "GitLabIssueAppender", category = "Core", elementType = "appender")
 public class GitLabIssueAppender extends AbstractAppender {
 
@@ -39,27 +37,27 @@ public class GitLabIssueAppender extends AbstractAppender {
     @Override
     public void append(LogEvent logEvent) {
 
-        Profiles.ifProfile(p -> p == CLOUD, () -> {
-            if (logEvent.getThrown() != null) {
-                final Throwable exception = logEvent.getThrown();
+        final Boolean shouldReportErrorsAsIssues = Config.reportServerErrorsAsIssues().orElse(false);
 
-                final String issueTitle = new String(getLayout().toByteArray(logEvent), Charset.forName("UTF-8"));
-                final String issueDescription = getStacktraceAsString(exception);
-                final String formattedDescription = String.format("````java\n\r%s\n\r````", issueDescription);
+        if (shouldReportErrorsAsIssues && logEvent.getThrown() != null) {
+            final Throwable exception = logEvent.getThrown();
 
-                final String hashOfDescription = MD5Util.createMD5Hash(formattedDescription);
+            final String issueTitle = new String(getLayout().toByteArray(logEvent), Charset.forName("UTF-8"));
+            final String issueDescription = getStacktraceAsString(exception);
+            final String formattedDescription = String.format("````java\n\r%s\n\r````", issueDescription);
 
-                if (!history.contains(hashOfDescription)) {
-                    try {
-                        api.createIssue(projectId, 0, 0, "bug", formattedDescription, issueTitle);
-                    } catch (IOException e) {
-                        LOGGER.error("Failed to create issue on GitLab", e);
-                    }
+            final String hashOfDescription = MD5Util.createMD5Hash(formattedDescription);
 
-                    history.add(hashOfDescription);
+            if (!history.contains(hashOfDescription)) {
+                try {
+                    api.createIssue(projectId, 0, 0, "bug", formattedDescription, issueTitle);
+                } catch (IOException e) {
+                    LOGGER.error("Failed to create issue on GitLab", e);
                 }
+
+                history.add(hashOfDescription);
             }
-        });
+        }
     }
 
     private String getStacktraceAsString(Throwable exception) {

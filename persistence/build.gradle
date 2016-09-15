@@ -14,7 +14,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     integrationTestCompile project(':db-migrations')
-    integrationTestCompile project(':database-config:test')
+    integrationTestCompile project(':application-config')
     integrationTestCompile project(':persistence-test-support')
     integrationTestCompile 'org.awaitility:awaitility:2.0.0'
 }

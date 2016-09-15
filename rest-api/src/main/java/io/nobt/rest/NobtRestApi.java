@@ -2,20 +2,21 @@ package io.nobt.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.nobt.application.BodyParser;
+import io.nobt.application.env.Config;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtRepository;
-import io.nobt.profiles.Profiles;
-import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.payloads.CreateExpenseInput;
 import io.nobt.rest.payloads.CreateNobtInput;
 import io.nobt.rest.payloads.NobtResource;
 import io.nobt.rest.payloads.SimpleViolation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
 import spark.Service;
@@ -28,14 +29,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static io.nobt.profiles.Profiles.ifProfile;
 import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
 
 public class NobtRestApi {
 
     private static final Logger LOGGER = LogManager.getLogger(NobtRestApi.class);
-    private static final Logger UNHANDLED_EXCEPTION_LOGGER = LogManager.getLogger("io.nobt.rest.NobtApplication.unhandledExceptions");
 
     private final Service http;
     private final NobtRepository nobtRepository;
@@ -65,8 +64,8 @@ public class NobtRestApi {
             response.body(e.getMessage());
         }));
 
-        handleValidationExceptions();
-        handleUnknownExceptions();
+        registerValidationErrorExceptionHandler();
+        registerUncaughtExceptionHandler();
     }
 
     private void registerApplicationRoutes() {
@@ -155,43 +154,47 @@ public class NobtRestApi {
         });
     }
 
-    private void handleValidationExceptions() {
-        http.exception(ConstraintViolationException.class, (e, request, response) -> {
+    private void registerValidationErrorExceptionHandler() {
+        http.exception(ConstraintViolationException.class, (ve, request, response) -> {
 
-            final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) e).getConstraintViolations();
+            final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) ve).getConstraintViolations();
             final List<SimpleViolation> simpleViolations = violations.stream().map(simpleViolationFactory::create).collect(toList());
 
             response.status(400);
 
             try {
                 response.body(objectMapper.writeValueAsString(simpleViolations));
-            } catch (JsonProcessingException e1) {
-                throw new IllegalStateException(e1);
+            } catch (JsonProcessingException e) {
+                throw new IllegalStateException(e);
             }
         });
     }
 
-    private void handleUnknownExceptions() {
-        http.exception(Exception.class, (e, request, response) -> {
-            UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
-            response.status(500);
-
-            ifProfile(Profiles::notCloud, () -> printStacktraceToResponse(e, response));
-        });
-
-        http.exception(RuntimeException.class, (e, request, response) -> {
-            UNHANDLED_EXCEPTION_LOGGER.error("Unhandled exception", e);
-            response.status(500);
-
-            ifProfile(Profiles::notCloud, () -> printStacktraceToResponse(e, response));
-        });
+    private void registerUncaughtExceptionHandler() {
+        http.exception(Exception.class, new UncaughtExceptionHandler());
+        http.exception(RuntimeException.class, new UncaughtExceptionHandler());
     }
 
-    private void printStacktraceToResponse(Exception uncaughtException, Response response) {
-        try {
-            uncaughtException.printStackTrace(new PrintStream(response.raw().getOutputStream()));
-        } catch (IOException e) {
-            LOGGER.error("Failed to write stacktrace to response", e);
+    private static class UncaughtExceptionHandler implements ExceptionHandler {
+
+        private static final Logger UNCAUGHT_EXCEPTIONS_LOGGER = LogManager.getLogger("io.nobt.rest.NobtRestApi.unhandledExceptions");
+
+        @Override
+        public void handle(Exception e, Request request, Response response) {
+
+            UNCAUGHT_EXCEPTIONS_LOGGER.error("Unhandled exception", e);
+            response.status(500);
+
+            // if the config value is not set, we are cautious and don't write the stacktrace
+            final Boolean writeStackTraceToResponse = Config.writeStacktraceToResponse().orElse(false);
+
+            if (writeStackTraceToResponse) {
+                try {
+                    e.printStackTrace(new PrintStream(response.raw().getOutputStream()));
+                } catch (IOException e1) {
+                    LOGGER.error("Failed to write stacktrace to response", e1);
+                }
+            }
         }
     }
 }

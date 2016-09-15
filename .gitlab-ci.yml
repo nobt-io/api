@@ -8,7 +8,7 @@ build_rest-api:
   services:
     - postgres:9
   variables:
-    TEST_POSTGRES_HOST: 'postgres' # this is the hostname of the docker container that is linked to our test container, needs to be set for our integration tests
+    DATABASE_CONNECTION_STRING: 'jdbc:postgresql://postgres:password@postgres:5432/postgres'
   script:
     - ./gradlew test -x integrationTest -Dorg.gradle.parallel=true # unit tests are fine to be run in parallel
     - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel

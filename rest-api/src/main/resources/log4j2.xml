@@ -9,7 +9,7 @@
         </GitLabIssueAppender>
     </Appenders>
     <Loggers>
-        <Logger name="io.nobt.rest.NobtApplication.unhandledExceptions" level="error">
+        <Logger name="io.nobt.rest.NobtRestApi.unhandledExceptions" level="error">
             <AppenderRef ref="GitlabIssues"/>
         </Logger>
 

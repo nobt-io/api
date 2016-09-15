@@ -1,13 +1,12 @@
 package io.nobt.logging;
 
-import io.nobt.profiles.Profile;
-import io.nobt.profiles.test.ActiveProfileEvaluatorMock;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.gitlab.api.GitlabAPI;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.mockito.internal.stubbing.defaultanswers.ReturnsMocks;
 
 import static org.mockito.Matchers.eq;
@@ -19,19 +18,16 @@ public class GitLabIssueAppenderTest {
     private GitLabIssueAppender sut;
     private GitlabAPI apiMock;
 
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
     @Before
     public void setUp() throws Exception {
 
-        ActiveProfileEvaluatorMock.setActiveProfile(Profile.CLOUD);
+        environmentVariables.set("REPORT_SERVER_ERRORS_AS_ISSUES", "true");
 
         apiMock = mock(GitlabAPI.class);
-
         sut = new GitLabIssueAppender("appender-test", PatternLayout.createDefaultLayout(), apiMock, 1208905);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ActiveProfileEvaluatorMock.clearActiveProfile();
     }
 
     @Test
