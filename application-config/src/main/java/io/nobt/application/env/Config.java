@@ -81,6 +81,7 @@ public final class Config {
 
     private static <T> T getEnv(Keys key, Function<String, T> mapper) {
         return Optional.ofNullable(System.getenv(key.name()))
+                .map(String::trim)
                 .map(mapper)
                 .map((value) -> {
                     LOGGER.info("{}: {}", key, value);
