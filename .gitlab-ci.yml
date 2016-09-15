@@ -27,6 +27,6 @@ deploy_on_development:
     - cf auth $CF_BUILD_USER $CF_BUILD_USER_PASSWORD
     - cf target -o nobt.io -s development
   script:
-    - cf push -n nobt-io-dev -p rest-api/build/distributions/*.zip
+    - cf push -n nobt-io-dev -p rest-api/build/distributions/*.zip -f rest-api/
   only:
     - master
