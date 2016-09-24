@@ -3,17 +3,17 @@
 application-layer:
 	- rest-api
 	- log4j-gitlab-issue-appender
-	- profiles
+	- application-config
 
 domain-layer:
 	- core
-	- test
-	- utils
+	- domain-test-support
+	- util
 
 infrastructure-layer:
 	- persistence
-		- production
-		- in-memory
-		- test
+		- persistence
+		- inmemory-persistence
+		- persistence-test-support
 		- hibernate-postgres-json-support
-		- migrations
+		- db-migrations
