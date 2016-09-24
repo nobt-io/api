@@ -4,9 +4,13 @@ import io.nobt.persistence.DatabaseConfig;
 
 import java.net.URI;
 
+/**
+ * Adapter class that is needed because cloudfoundry does not give us a proper connection-string.
+ */
 public class CFConnectionStringAdapter implements DatabaseConfig {
 
     private static final String JDBC_SCHEME = "jdbc:";
+    private static final String JDBC_URL_TEMPLATE = "jdbc:postgresql://%s:%s%s";
 
     private final String username;
     private final String password;
@@ -21,14 +25,10 @@ public class CFConnectionStringAdapter implements DatabaseConfig {
     public static DatabaseConfig parse(final String uriString) {
 
         final String normalizedURI = hasJdbcScheme(uriString) ? normalize(uriString) : uriString;
+        final URI uri = URI.create(normalizedURI);
 
-        URI uri1 = URI.create(normalizedURI);
-
-        final String[] userInfo = uri1.getUserInfo().split(":");
-
-        final String urlTemplate = "jdbc:postgresql://%s:%s%s";
-
-        final String jdbcConnectionURL = String.format(urlTemplate, uri1.getHost(), uri1.getPort(), uri1.getPath());
+        final String jdbcConnectionURL = String.format(JDBC_URL_TEMPLATE, uri.getHost(), uri.getPort(), uri.getPath());
+        final String[] userInfo = uri.getUserInfo().split(":");
 
         return new CFConnectionStringAdapter(userInfo[0], userInfo[1], jdbcConnectionURL);
     }
