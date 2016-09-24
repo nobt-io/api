@@ -1,4 +1,4 @@
-package io.nobt.util;
+package io.nobt.application.env;
 
 import org.apache.logging.log4j.util.Supplier;
 

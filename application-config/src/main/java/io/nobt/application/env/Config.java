@@ -1,13 +1,11 @@
 package io.nobt.application.env;
 
 import io.nobt.persistence.DatabaseConfig;
-import io.nobt.util.Lazy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static io.nobt.application.env.Config.Keys.*;
 
