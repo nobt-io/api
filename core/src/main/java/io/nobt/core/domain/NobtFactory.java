@@ -8,7 +8,7 @@ import static java.util.Collections.emptySet;
 
 public final class NobtFactory {
 
-    public Nobt create(String name, Set<Person> explicitParticipants) {
-        return new Nobt(null, name, explicitParticipants, emptySet(), LocalDateTime.now(ZoneOffset.UTC));
+    public Nobt create(String name, Set<Person> explicitParticipants, CurrencyKey currencyKey) {
+        return new Nobt(null, currencyKey, name, explicitParticipants, emptySet(), LocalDateTime.now(ZoneOffset.UTC));
     }
 }

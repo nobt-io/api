@@ -7,6 +7,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.nobt.core.domain.*;
 import io.nobt.rest.json.amount.AmountDeserializer;
 import io.nobt.rest.json.amount.AmountSerializer;
+import io.nobt.rest.json.currency.CurrencyKeyDeserializer;
+import io.nobt.rest.json.currency.CurrencyKeySerializer;
+import io.nobt.rest.json.expense.ConversionInformationMixin;
 import io.nobt.rest.json.expense.ExpenseMixin;
 import io.nobt.rest.json.nobt.NobtIdSerializer;
 import io.nobt.rest.json.nobt.NobtMixin;
@@ -25,9 +28,13 @@ public class CoreModule extends SimpleModule {
 
         addSerializer(NobtId.class, new NobtIdSerializer());
 
+        addSerializer(CurrencyKey.class, new CurrencyKeySerializer());
+        addDeserializer(CurrencyKey.class, new CurrencyKeyDeserializer());
+
         setMixInAnnotation(Share.class, ShareMixin.class);
         setMixInAnnotation(Nobt.class, NobtMixin.class);
         setMixInAnnotation(Expense.class, ExpenseMixin.class);
+        setMixInAnnotation(ConversionInformation.class, ConversionInformationMixin.class);
     }
 
     @Override

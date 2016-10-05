@@ -40,7 +40,7 @@ public class ExpenseTest {
     }
 
     private static Expense anExpense() {
-        return new Expense(null, "Billa", "DUMMY", thomas, Sets.newHashSet(
+        return new Expense(null, "Billa", "DUMMY", thomas, null, Sets.newHashSet(
                 new Share(david, amount(30)),
                 new Share(thomas, amount(10)),
                 new Share(lukas, amount(20))),

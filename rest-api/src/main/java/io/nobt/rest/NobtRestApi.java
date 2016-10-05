@@ -2,6 +2,7 @@ package io.nobt.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
@@ -25,8 +26,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -65,10 +64,15 @@ public class NobtRestApi {
 
         registerApplicationRoutes();
 
-        http.exception(UnknownNobtException.class, ((e, request, response) -> {
+        http.exception(UnknownNobtException.class, (e, request, response) -> {
             response.status(404);
             response.body(e.getMessage());
-        }));
+        });
+
+        http.exception(ConversionInformationInconsistentException.class, (e, request, response) -> {
+            response.status(400);
+            response.body(e.getMessage());
+        });
 
         handleValidationExceptions();
         handleUnknownExceptions();
@@ -87,9 +91,8 @@ public class NobtRestApi {
             final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
             final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
 
-
             final Nobt nobt = nobtRepository.getById(databaseId);
-            nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date);
+            nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date, input.conversionInformation);
             nobtRepository.save(nobt);
 
 
@@ -140,7 +143,7 @@ public class NobtRestApi {
             final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
 
 
-            final Nobt unpersistedNobt = nobtFactory.create(input.nobtName, input.explicitParticipants);
+            final Nobt unpersistedNobt = nobtFactory.create(input.nobtName, input.explicitParticipants, input.currencyKey);
             final NobtId id = nobtRepository.save(unpersistedNobt);
 
 
