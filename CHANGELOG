@@ -7,6 +7,20 @@ It is now possible to define a currency for a nobt. This allows the client to st
 - `POST /nobts/{id}`
     - `currency` field added.
 
+## Version 0.0.4:
+
+You can now delete expenses from a Nobt.
+
+## Version 0.0.3:
+
+When creating an expense, you now have to specify a date. This date indicates, when the user made the expense.
+Additionally, a timestamp is generated for nobts and expenses, as soon as they are persisted.
+
+### Breaking changes
+
+- `POST /nobts/{id}/expenses`
+    - `date` field was added.
+
 ## Version 0.0.2:
 
 The main change in this version is the introduction of `shares` per expense that allows the client to split an expense into arbitrary parts. Previously an expense was always evenly split among all participants. Due to this change, two endpoints required breaking changes.

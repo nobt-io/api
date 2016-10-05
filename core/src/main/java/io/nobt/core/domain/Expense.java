@@ -14,6 +14,7 @@ import static java.util.stream.Collectors.toSet;
  */
 public class Expense {
 
+    private final Long id;
     private final String name;
     private final Person debtee;
     private final String splitStrategy;
@@ -22,7 +23,8 @@ public class Expense {
     private final LocalDate date;
     private final LocalDateTime createdOn;
 
-    public Expense(String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, LocalDateTime createdOn) {
+    public Expense(Long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, LocalDateTime createdOn) {
+        this.id = id;
         this.name = name;
         this.splitStrategy = splitStrategy;
         this.debtee = debtee;
@@ -30,6 +32,10 @@ public class Expense {
         this.shares = shares;
         this.date = date;
         this.createdOn = createdOn;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {

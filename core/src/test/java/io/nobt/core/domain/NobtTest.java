@@ -4,7 +4,6 @@ import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.test.domain.factories.StaticPersonFactory;
 import io.nobt.test.domain.matchers.NobtMatchers;
 import io.nobt.util.Sets;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,12 +17,10 @@ import java.util.Collections;
 
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
-import static io.nobt.test.domain.matchers.NobtMatchers.*;
 import static java.util.Collections.*;
+import static io.nobt.test.domain.matchers.NobtMatchers.*;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.eq;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -101,5 +98,16 @@ public class NobtTest {
         final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
 
         nobt.addExpense(null, null, david, emptySet(), null, new ConversionInformation(new CurrencyKey("USD"), BigDecimal.TEN));
+    }
+
+    @Test
+    public void shouldRemoveExpenseById() throws Exception {
+
+        when(firstExpense.getId()).thenReturn(1L);
+        when(secondExpense.getId()).thenReturn(2L);
+
+        sut.removeExpense(1L);
+
+        assertThat(sut, hasExpenses(iterableWithSize(1)));
     }
 }

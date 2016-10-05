@@ -80,8 +80,12 @@ public class Nobt {
             throw new ConversionInformationInconsistentException(this);
         }
 
-        final Expense newExpense = new Expense(name, splitStrategy, debtee, conversionInformation, shares, date, LocalDateTime.now(ZoneOffset.UTC));
+        final Expense newExpense = new Expense(null, name, splitStrategy, debtee, conversionInformation, shares, date, LocalDateTime.now(ZoneOffset.UTC));
 
         expenses.add(newExpense);
+    }
+
+    public void removeExpense(Long expenseId) {
+        this.expenses.removeIf( e -> e.getId().equals(expenseId) );
     }
 }

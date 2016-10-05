@@ -143,4 +143,32 @@ public class NobtRepositoryIT {
                 ))
         );
     }
+
+    @Test
+    public void shouldRemoveOrphanExpense() throws Exception {
+
+        final Share thomasShare = ShareFactory.randomShare(thomas);
+        final Share matthiasShare = ShareFactory.randomShare(matthias);
+        final LocalDate expenseDate = LocalDate.now();
+
+        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet());
+        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate);
+
+        final NobtId id = sut.save(nobtToSave);
+
+
+        final Nobt retrievedNobt = sut.getById(id);
+        final Long idOfFirstExpense = retrievedNobt.getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
+
+        retrievedNobt.removeExpense(idOfFirstExpense);
+        
+        sut.save(retrievedNobt);
+
+
+        final Nobt nobtWithoutExpense = sut.getById(id);
+
+        assertThat(nobtWithoutExpense, hasExpenses(
+                iterableWithSize(0)
+        ));
+    }
 }

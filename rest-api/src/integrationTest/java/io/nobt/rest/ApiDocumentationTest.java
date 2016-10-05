@@ -16,8 +16,7 @@ import java.util.Set;
 import static com.jayway.restassured.RestAssured.given;
 import static io.nobt.test.domain.factories.ShareFactory.share;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
-import static org.hamcrest.Matchers.isEmptyOrNullString;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
@@ -154,13 +153,25 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                         document("get-nobt",
                                 preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
                                 responseFields(
-                                        fieldWithPath("id").description("The id of the nobt. Can be used to construct URIs to the various endpoints of the API."),
-                                        fieldWithPath("name").description("The name of the nobt."),
-                                        fieldWithPath("currency").description("The currency of this nobt."),
-                                        fieldWithPath("createdOn").description("An ISO6801-compliant timestamp when the nobt was created."),
-                                        fieldWithPath("expenses").description("All expenses associated with this nobt."),
-                                        fieldWithPath("participatingPersons").description("An array of persons participating in this nobt. Contains the explicit participants passed to the API on creation of the nobt and all persons that take part in this nobt either as debtee or as debtor. Each name is only contained once."),
-                                        fieldWithPath("transactions").description("Contains an array of transactions that need to be made so that all debts are paid.")
+                                        fieldWithPath("id").type(JsonFieldType.STRING).description("The id of the nobt. Can be used to construct URIs to the various endpoints of the API."),
+                                        fieldWithPath("name").type(JsonFieldType.STRING).description("The name of the nobt."),
+                                        fieldWithPath("currency").type(JsonFieldType.STRING).description("The currency of this nobt."),
+                                        fieldWithPath("createdOn").type(JsonFieldType.STRING).description("An ISO6801-compliant timestamp when the nobt was created."),
+                                        fieldWithPath("expenses").type(JsonFieldType.ARRAY).description("All expenses associated with this nobt."),
+                                        fieldWithPath("expenses[].id").type(JsonFieldType.NUMBER).description("The id of the expense."),
+                                        fieldWithPath("expenses[].createdOn").type(JsonFieldType.STRING).description("An ISO6801-compliant timestamp when the expense was created."),
+                                        fieldWithPath("expenses[].date").type(JsonFieldType.STRING).description("The given date of the expense."),
+                                        fieldWithPath("expenses[].name").type(JsonFieldType.STRING).description("The given name of the expense."),
+                                        fieldWithPath("expenses[].debtee").type(JsonFieldType.STRING).description("The debtee of the expense."),
+                                        fieldWithPath("expenses[].splitStrategy").type(JsonFieldType.STRING).description("The split strategy that was chosen for this expense."),
+                                        fieldWithPath("expenses[].shares").type(JsonFieldType.ARRAY).description("The array of shares this expense consists of."),
+                                        fieldWithPath("expenses[].shares[].debtor").type(JsonFieldType.STRING).description("The debtor of this share."),
+                                        fieldWithPath("expenses[].shares[].amount").type(JsonFieldType.NUMBER).description("The amount of this share."),
+                                        fieldWithPath("participatingPersons").type(JsonFieldType.ARRAY).description("An array of persons participating in this nobt. Contains the explicit participants passed to the API on creation of the nobt and all persons that take part in this nobt either as debtee or as debtor. Each name is only contained once."),
+                                        fieldWithPath("transactions").type(JsonFieldType.ARRAY).description("Contains an array of transactions that need to be made so that all debts are paid."),
+                                        fieldWithPath("transactions[].debtor").type(JsonFieldType.STRING).description("The person who has to pay / give money in this transaction."),
+                                        fieldWithPath("transactions[].amount").type(JsonFieldType.NUMBER).description("The amount the debtor has to pay."),
+                                        fieldWithPath("transactions[].debtee").type(JsonFieldType.STRING).description("The person who receives the money.")
                                 )
                         )
                 )
@@ -172,6 +183,66 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                 .then()
 
                 .statusCode(200);
+    }
+
+    @Test
+    public void shouldDeleteExpense() throws Exception {
+
+        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
+
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
+        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now());
+
+        final NobtId id = nobtRepository.save(nobt);
+        final Long idOfFirstExpense = nobtRepository.getById(id).getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
+
+        given(this.documentationSpec)
+                .port(ACTUAL_PORT)
+                .filter(
+                        document("delete-expense",
+                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT))
+                        )
+                )
+
+                .when()
+
+                .delete("/nobts/{nobtId}/expenses/{expenseId}", id.toExternalIdentifier(), idOfFirstExpense)
+
+                .then()
+
+                .statusCode(204);
+
+        given(this.documentationSpec)
+                .port(ACTUAL_PORT)
+
+                .when()
+
+                .get("/nobts/{nobtId}", id.toExternalIdentifier())
+
+                .then()
+
+                .statusCode(200)
+                .body("expenses", response -> hasSize(0));
+    }
+
+    @Test
+    public void deletingExpenseThatDoesNotExistRespondsWith204() throws Exception {
+
+        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
+
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
+        final NobtId id = nobtRepository.save(nobt);
+
+        given(this.documentationSpec)
+                .port(ACTUAL_PORT)
+
+                .when()
+
+                .delete("/nobts/{nobtId}/expenses/{expenseId}", id.toExternalIdentifier(), 104)
+
+                .then()
+
+                .statusCode(204);
     }
 
     @Test

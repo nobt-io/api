@@ -4,11 +4,12 @@ Thomas Eizinger;
 :icons: font
 :source-highlighter: highlightjs
 
-This document describes the API of Nobt.io. There are 3 requests that can be made at the moment:
+This document describes the API of Nobt.io. There are 4 requests that can be made at the moment:
 
 * Create a new nobt
 * Add an expense to a given nobt
 * Retrieve the nobt
+* Delete an expense
 
 == Domain glossary
 
@@ -82,3 +83,13 @@ This time, the response is way more interesting, as it includes transactions.
 
 include::{snippets}/get-nobt/http-response.adoc[]
 include::{snippets}/get-nobt/response-fields.adoc[]
+
+== Delete an expense
+
+Deleting an expense is as easy as sending a `DELETE` request to the `/expense` sub-resource with the appropriate id.
+
+include::{snippets}/delete-expense/http-request.adoc[]
+
+The response code is always `204 NO CONTENT`, even if there was no response with the specified ID.
+
+include::{snippets}/delete-expense/http-response.adoc[]
