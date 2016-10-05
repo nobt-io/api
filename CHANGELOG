@@ -1,3 +1,12 @@
+## Version 0.0.5:
+
+It is now possible to define a currency for a nobt. This allows the client to store expenses with different currencies.
+
+### Breaking changes
+
+- `POST /nobts/{id}`
+    - `currency` field added.
+
 ## Version 0.0.2:
 
 The main change in this version is the introduction of `shares` per expense that allows the client to split an expense into arbitrary parts. Previously an expense was always evenly split among all participants. Due to this change, two endpoints required breaking changes.

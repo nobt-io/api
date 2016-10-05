@@ -31,6 +31,8 @@ In addition to the information that was sent to the API, two arrays are returned
 
 == Add an expense to a nobt
 
+=== Shares
+
 Creating an expense requires some client logic as the API only accepts `shares` of an expense.
 The client must split the overall amount of the expense in shares consisting of the name of the debtor and the associated amount.
 The sum of all amounts of all shares forms the overall amount of the expense.
@@ -44,12 +46,18 @@ This design allows the client to present the user with several possibilities to 
 
 The client may store an identifier in the `splitStrategy` field for each expense that identifies the way the shares have been calculated.
 
+=== Currencies
+
+An expense may have been made in a different currency than the one specified when the nobt was created. E.g. the currency of the nobt may be `EUR`, but the expense that should be added to the nobt was made in `USD`.
+The request below shows the `conversionInformation` object which may define the currency of this expense and the conversion rate.
+The `conversionInformation` object is optional. If omitted, it defaults to the currency defined in the nobt with a conversion rate of `1`.
+
 Given the url in the `Location` header that was returned in the previous response, we can add an expense to this nobt if we post an expense to the `/expenses` sub-resource.
 
 include::{snippets}/create-expense/http-request.adoc[]
 include::{snippets}/create-expense/request-fields.adoc[]
 
-The request was successful if the server returns a status-code of 201. For convenience, the response includes the sent data.
+The request was successful if the server returns a status-code of 201.
 
 include::{snippets}/create-expense/http-response.adoc[]
 
