@@ -63,8 +63,12 @@ public class Nobt {
 
     public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date) {
 
-        final Expense newExpense = new Expense(name, splitStrategy, debtee, shares, date, LocalDateTime.now(ZoneOffset.UTC));
+        final Expense newExpense = new Expense(null, name, splitStrategy, debtee, shares, date, LocalDateTime.now(ZoneOffset.UTC));
 
         expenses.add(newExpense);
+    }
+
+    public void removeExpense(Long expenseId) {
+        this.expenses.removeIf( e -> e.getId().equals(expenseId) );
     }
 }

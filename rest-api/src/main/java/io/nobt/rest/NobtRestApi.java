@@ -78,6 +78,7 @@ public class NobtRestApi {
         registerCreateNobtRoute();
         registerRetrieveNobtRoute();
         registerCreateExpenseRoute();
+        registerDeleteExpenseRoute();
     }
 
     private void registerCreateExpenseRoute() {
@@ -93,6 +94,25 @@ public class NobtRestApi {
 
 
             resp.status(201);
+
+            return "";
+        });
+    }
+
+    private void registerDeleteExpenseRoute() {
+
+        http.delete("/nobts/:nobtId/expenses/:expenseId", (req, res) -> {
+
+            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
+            final Long expenseId = Long.parseLong(req.params(":expenseId"));
+
+
+            final Nobt nobt = nobtRepository.getById(databaseId);
+            nobt.removeExpense(expenseId);
+            nobtRepository.save(nobt);
+
+
+            res.status(204);
 
             return "";
         });

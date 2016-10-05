@@ -7,6 +7,7 @@ import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Person;
 import io.nobt.util.Sets;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,6 +22,7 @@ import java.util.Set;
 import static com.jayway.restassured.RestAssured.given;
 import static io.nobt.test.domain.factories.ShareFactory.share;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.isEmptyOrNullString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
@@ -167,6 +169,66 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                 .then()
 
                 .statusCode(200);
+    }
+
+    @Test
+    public void shouldDeleteExpense() throws Exception {
+
+        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
+
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
+        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now());
+
+        final NobtId id = nobtRepository.save(nobt);
+        final Long idOfFirstExpense = nobtRepository.getById(id).getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
+
+        given(this.documentationSpec)
+                .port(ACTUAL_PORT)
+                .filter(
+                        document("delete-expense",
+                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT))
+                        )
+                )
+
+                .when()
+
+                .delete("/nobts/{nobtId}/expenses/{expenseId}", id.toExternalIdentifier(), idOfFirstExpense)
+
+                .then()
+
+                .statusCode(204);
+
+        given(this.documentationSpec)
+                .port(ACTUAL_PORT)
+
+                .when()
+
+                .get("/nobts/{nobtId}", id.toExternalIdentifier())
+
+                .then()
+
+                .statusCode(200)
+                .body("expenses", response -> hasSize(0));
+    }
+
+    @Test
+    public void deletingExpenseThatDoesNotExistRespondsWith204() throws Exception {
+
+        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
+
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
+        final NobtId id = nobtRepository.save(nobt);
+
+        given(this.documentationSpec)
+                .port(ACTUAL_PORT)
+
+                .when()
+
+                .delete("/nobts/{nobtId}/expenses/{expenseId}", id.toExternalIdentifier(), 104)
+
+                .then()
+
+                .statusCode(204);
     }
 
     @Test
