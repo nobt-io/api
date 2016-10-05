@@ -26,7 +26,7 @@ public class ExpenseMapperTest {
     }
 
     @Test
-    public void shouldUseShareMapperToMapShareBytes() throws Exception {
+    public void shouldUseShareMapperToMapShares() throws Exception {
 
         final ExpenseEntity expenseEntity = new ExpenseEntity();
 

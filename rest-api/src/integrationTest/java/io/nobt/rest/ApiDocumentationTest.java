@@ -3,6 +3,7 @@ package io.nobt.rest;
 import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.specification.RequestSpecification;
 import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Person;
 import io.nobt.util.Sets;
@@ -11,7 +12,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.restdocs.JUnitRestDocumentation;
 
-import java.util.Arrays;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.Set;
 
@@ -34,12 +37,15 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
 
     protected RequestSpecification documentationSpec;
+    private NobtFactory nobtFactory;
 
     @Before
     public void setUp() throws Exception {
         this.documentationSpec = new RequestSpecBuilder()
                 .addFilter(documentationConfiguration(restDocumentation))
                 .build();
+
+        nobtFactory = new NobtFactory();
     }
 
     @Test
@@ -81,7 +87,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
 
-        final NobtId id = nobtRepository.save(new Nobt(null, "Grillfeier", explicitParticipants, Collections.emptySet()));
+        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants));
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -92,6 +98,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                                         fieldWithPath("name").description("Human readable description of the expense."),
                                         fieldWithPath("debtee").description("The name of the person who made the expense."),
                                         fieldWithPath("splitStrategy").description("A simple text field for storing an identifier that indicates which `strategy` the user picked to split the expense."),
+                                        fieldWithPath("date").description("The date on which the expense was spent. Takes any ISO6801-compliant string."),
                                         fieldWithPath("shares").description("All shares that form this expense. Note that, as in the example above, there is an extra share that mentions Thomas as the debtor, despite he is also the debtee of the expense. The above setup equals splitting the bill in three parts.")
                                 )
                         )
@@ -100,6 +107,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                         "  \"name\": \"Fleisch\",\n" +
                         "  \"debtee\": \"Thomas\",\n" +
                         "  \"splitStrategy\": \"EVENLY\",\n" +
+                        "  \"date\": \"2016-10-05\",\n" +
                         "  \"shares\": [\n" +
                         "    {\n" +
                         "      \"debtor\": \"David\",\n" +
@@ -131,8 +139,8 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
 
-        final Nobt nobt = new Nobt(null, "Grillfeier", explicitParticipants, Collections.emptySet());
-        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)));
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
+        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now());
 
         final NobtId id = nobtRepository.save(nobt);
 
@@ -144,6 +152,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                                 responseFields(
                                         fieldWithPath("id").description("The id of the nobt. Can be used to construct URIs to the various endpoints of the API."),
                                         fieldWithPath("name").description("The name of the nobt."),
+                                        fieldWithPath("createdOn").description("An ISO6801-compliant timestamp when the nobt was created."),
                                         fieldWithPath("expenses").description("All expenses associated with this nobt."),
                                         fieldWithPath("participatingPersons").description("An array of persons participating in this nobt. Contains the explicit participants passed to the API on creation of the nobt and all persons that take part in this nobt either as debtee or as debtor. Each name is only contained once."),
                                         fieldWithPath("transactions").description("Contains an array of transactions that need to be made so that all debts are paid.")
@@ -164,7 +173,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public void shouldRejectExpenseWithDuplicateDebtor() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final NobtId id = nobtRepository.save(new Nobt(null, "Burger essen!", explicitParticipants, Collections.emptySet()));
+        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants));
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -182,6 +191,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                         "  \"name\": \"Fleisch\",\n" +
                         "  \"debtee\": \"Thomas\",\n" +
                         "  \"splitStrategy\": \"EVENLY\",\n" +
+                        "  \"date\": \"2016-10-05\",\n" +
                         "  \"shares\": [\n" +
                         "    {\n" +
                         "      \"debtor\": \"Thomas\",\n" +

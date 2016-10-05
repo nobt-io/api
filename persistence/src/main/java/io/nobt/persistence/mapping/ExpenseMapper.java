@@ -6,7 +6,6 @@ import io.nobt.core.domain.Share;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.ShareEntity;
 
-import java.util.List;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
@@ -25,7 +24,14 @@ public class ExpenseMapper implements DomainModelMapper<ExpenseEntity, Expense> 
 
         final Set<Share> shares = databaseModel.getShares().stream().map(shareMapper::mapToDomainModel).collect(toSet());
 
-        return new Expense(databaseModel.getName(), databaseModel.getSplitStrategy(), Person.forName(databaseModel.getDebtee()), shares);
+        return new Expense(
+                databaseModel.getName(),
+                databaseModel.getSplitStrategy(),
+                Person.forName(databaseModel.getDebtee()),
+                shares,
+                databaseModel.getDate(),
+                databaseModel.getCreatedOn()
+        );
     }
 
     @Override
@@ -37,6 +43,8 @@ public class ExpenseMapper implements DomainModelMapper<ExpenseEntity, Expense> 
         expense.setDebtee(domainModel.getDebtee().getName());
         expense.setSplitStrategy(domainModel.getSplitStrategy());
         expense.setShares(domainModel.getShares().stream().map(shareMapper::mapToDatabaseModel).collect(toList()));
+        expense.setDate(domainModel.getDate());
+        expense.setCreatedOn(domainModel.getCreatedOn());
 
         return expense;
     }

@@ -1,5 +1,7 @@
 package io.nobt.core.domain;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -19,12 +21,16 @@ public class Expense {
     private final Person debtee;
     private final String splitStrategy;
     private final Set<Share> shares;
+    private final LocalDate date;
+    private final LocalDateTime createdOn;
 
-    public Expense(String name, String splitStrategy, Person debtee, Set<Share> shares) {
+    public Expense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date, LocalDateTime createdOn) {
         this.name = name;
         this.splitStrategy = splitStrategy;
         this.debtee = debtee;
         this.shares = shares;
+        this.date = date;
+        this.createdOn = createdOn;
     }
 
     public String getName() {
@@ -41,6 +47,14 @@ public class Expense {
 
     public Set<Share> getShares() {
         return Collections.unmodifiableSet(shares);
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
     }
 
     public Set<Person> getParticipants() {

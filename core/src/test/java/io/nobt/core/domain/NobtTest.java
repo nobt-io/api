@@ -7,6 +7,9 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static org.mockito.Mockito.verify;
@@ -26,7 +29,7 @@ public class NobtTest {
     @Before
     public void setUp() throws Exception {
 
-        sut = new Nobt(null, "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense));
+        sut = new Nobt(null, "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense), LocalDateTime.now(ZoneOffset.UTC));
 
         when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
                 randomShare(david),

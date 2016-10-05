@@ -7,6 +7,7 @@ import io.nobt.rest.constraints.CheckNoDuplicateDebtors;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
 public class CreateExpenseInput {
@@ -27,4 +28,7 @@ public class CreateExpenseInput {
     @CheckNoDuplicateDebtors
     @JsonProperty(value = "shares", required = true)
     public List<Share> shares;
+
+    @JsonProperty(value = "date", required = true)
+    public LocalDate date;
 }

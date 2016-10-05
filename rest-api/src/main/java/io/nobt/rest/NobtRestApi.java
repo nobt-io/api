@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtRepository;
@@ -24,6 +25,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,14 +46,16 @@ public class NobtRestApi {
     private final BodyParser bodyParser;
     private final ObjectMapper objectMapper;
     private final SimpleViolationFactory simpleViolationFactory;
+    private final NobtFactory nobtFactory;
 
-    public NobtRestApi(Service service, NobtRepository nobtRepository, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper) {
+    public NobtRestApi(Service service, NobtRepository nobtRepository, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper, NobtFactory nobtFactory) {
         this.http = service;
         this.nobtRepository = nobtRepository;
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
         this.objectMapper = objectMapper;
         this.simpleViolationFactory = new SimpleViolationFactory(objectMapper);
+        this.nobtFactory = nobtFactory;
     }
 
     public void run(int port) {
@@ -83,7 +88,7 @@ public class NobtRestApi {
 
 
             final Nobt nobt = nobtRepository.getById(databaseId);
-            nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares));
+            nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date);
             nobtRepository.save(nobt);
 
 
@@ -115,7 +120,7 @@ public class NobtRestApi {
             final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
 
 
-            final Nobt unpersistedNobt = new Nobt(null, input.nobtName, input.explicitParticipants, emptySet());
+            final Nobt unpersistedNobt = nobtFactory.create(input.nobtName, input.explicitParticipants);
             final NobtId id = nobtRepository.save(unpersistedNobt);
 
 
