@@ -1,5 +1,6 @@
 package io.nobt.test.domain.matchers;
 
+import io.nobt.core.domain.CurrencyKey;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.Person;
@@ -15,6 +16,15 @@ public final class NobtMatchers {
             @Override
             protected String featureValueOf(Nobt actual) {
                 return actual.getName();
+            }
+        };
+    }
+
+    public static Matcher<Nobt> hasCurrency(final Matcher<CurrencyKey> subMatcher) {
+        return new FeatureMatcher<Nobt, CurrencyKey>(subMatcher, "currency", "currency") {
+            @Override
+            protected CurrencyKey featureValueOf(Nobt actual) {
+                return actual.getCurrencyKey();
             }
         };
     }

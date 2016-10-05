@@ -3,6 +3,7 @@ package io.nobt.persistence.entity;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +28,12 @@ public class ExpenseEntity {
 
     @Column(name = "splitStrategy", nullable = false)
     private String splitStrategy;
+
+    @Column(name = "currency", nullable = false, length = 3)
+    private String currency;
+
+    @Column(name = "conversionRate", nullable = false)
+    private BigDecimal conversionRate;
 
     @ManyToOne
     @JoinColumn(name = "NOBT_ID", nullable = false)
@@ -68,6 +75,22 @@ public class ExpenseEntity {
 
     public void setSplitStrategy(String splitStrategy) {
         this.splitStrategy = splitStrategy;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public BigDecimal getConversionRate() {
+        return conversionRate;
+    }
+
+    public void setConversionRate(BigDecimal conversionRate) {
+        this.conversionRate = conversionRate;
     }
 
     public NobtEntity getNobt() {

@@ -1,8 +1,6 @@
 package io.nobt.persistence.mapping;
 
-import io.nobt.core.domain.Expense;
-import io.nobt.core.domain.Person;
-import io.nobt.core.domain.Share;
+import io.nobt.core.domain.*;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.ShareEntity;
 
@@ -28,6 +26,7 @@ public class ExpenseMapper implements DomainModelMapper<ExpenseEntity, Expense> 
                 databaseModel.getName(),
                 databaseModel.getSplitStrategy(),
                 Person.forName(databaseModel.getDebtee()),
+                new ConversionInformation(new CurrencyKey(databaseModel.getCurrency()), databaseModel.getConversionRate()),
                 shares,
                 databaseModel.getDate(),
                 databaseModel.getCreatedOn()
@@ -45,6 +44,8 @@ public class ExpenseMapper implements DomainModelMapper<ExpenseEntity, Expense> 
         expense.setShares(domainModel.getShares().stream().map(shareMapper::mapToDatabaseModel).collect(toList()));
         expense.setDate(domainModel.getDate());
         expense.setCreatedOn(domainModel.getCreatedOn());
+        expense.setCurrency(domainModel.getConversionInformation().getForeignCurrencyKey().getKey());
+        expense.setConversionRate(domainModel.getConversionInformation().getRate());
 
         return expense;
     }

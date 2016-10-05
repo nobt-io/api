@@ -29,9 +29,9 @@ public class ExpenseMapperTest {
     public void shouldUseShareMapperToMapShares() throws Exception {
 
         final ExpenseEntity expenseEntity = new ExpenseEntity();
+        expenseEntity.setCurrency("EUR");
 
         final ShareEntity share = new ShareEntity();
-
         expenseEntity.setShares(Collections.singletonList(share));
 
 

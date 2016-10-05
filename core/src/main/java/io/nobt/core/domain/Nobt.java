@@ -1,8 +1,9 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.ConversionInformationInconsistentException;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.HashSet;
@@ -14,21 +15,27 @@ import static java.util.stream.Collectors.toList;
 public class Nobt {
 
     private final NobtId id;
+    private final CurrencyKey currencyKey;
     private final String name;
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
     private final LocalDateTime createdOn;
 
-    public Nobt(NobtId id, String name, Set<Person> explicitParticipants, Set<Expense> expenses, LocalDateTime createdOn) {
+    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, LocalDateTime createdOn) {
         this.id = id;
+        this.currencyKey = currencyKey;
         this.name = name;
-        this.explicitParticipants = explicitParticipants;
+        this.explicitParticipants = new HashSet<>(explicitParticipants);
         this.expenses = new HashSet<>(expenses);
         this.createdOn = createdOn;
     }
 
     public NobtId getId() {
         return id;
+    }
+
+    public CurrencyKey getCurrencyKey() {
+        return currencyKey;
     }
 
     public String getName() {
@@ -61,9 +68,19 @@ public class Nobt {
         return createdOn;
     }
 
-    public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date) {
+    public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date, ConversionInformation conversionInformation) {
 
-        final Expense newExpense = new Expense(name, splitStrategy, debtee, shares, date, LocalDateTime.now(ZoneOffset.UTC));
+        if (conversionInformation == null) {
+            conversionInformation = ConversionInformation.sameCurrencyAs(this);
+        }
+
+        final boolean isSameCurrency = conversionInformation.getForeignCurrencyKey().equals(currencyKey);
+
+        if (isSameCurrency && !conversionInformation.hasDefaultRate()) {
+            throw new ConversionInformationInconsistentException(this);
+        }
+
+        final Expense newExpense = new Expense(name, splitStrategy, debtee, conversionInformation, shares, date, LocalDateTime.now(ZoneOffset.UTC));
 
         expenses.add(newExpense);
     }
