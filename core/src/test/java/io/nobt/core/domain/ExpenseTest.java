@@ -3,6 +3,8 @@ package io.nobt.core.domain;
 import io.nobt.util.Sets;
 import org.junit.Test;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +43,9 @@ public class ExpenseTest {
         return new Expense("Billa", "DUMMY", thomas, Sets.newHashSet(
                 new Share(david, amount(30)),
                 new Share(thomas, amount(10)),
-                new Share(lukas, amount(20))
-        ));
+                new Share(lukas, amount(20))),
+                LocalDate.now(),
+                LocalDateTime.now()
+        );
     }
 }

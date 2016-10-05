@@ -2,6 +2,7 @@ package io.nobt.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.core.NobtCalculator;
+import io.nobt.core.domain.NobtFactory;
 import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
@@ -71,7 +72,8 @@ public abstract class ApiIntegrationTestBase {
                 nobtRepository,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
-                objectMapper
+                objectMapper,
+                new NobtFactory()
         ).run(ACTUAL_PORT);
     }
 

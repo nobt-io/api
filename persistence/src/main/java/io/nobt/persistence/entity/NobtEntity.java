@@ -3,6 +3,7 @@ package io.nobt.persistence.entity;
 import io.nobt.util.Sets;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,6 +23,9 @@ public class NobtEntity {
 
     @Column(name = "explicitParticipants")
     private String explicitParticipants;
+
+    @Column(name = "createdOn", nullable = false)
+    private LocalDateTime createdOn;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL)
     private Set<ExpenseEntity> expenses = new HashSet<>();
@@ -64,5 +68,13 @@ public class NobtEntity {
 
     public Long getId() {
         return id;
+    }
+
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 }

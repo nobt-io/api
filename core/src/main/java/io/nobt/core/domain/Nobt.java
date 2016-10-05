@@ -1,5 +1,9 @@
 package io.nobt.core.domain;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -13,12 +17,14 @@ public class Nobt {
     private final String name;
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
+    private final LocalDateTime createdOn;
 
-    public Nobt(NobtId id, String name, Set<Person> explicitParticipants, Set<Expense> expenses) {
+    public Nobt(NobtId id, String name, Set<Person> explicitParticipants, Set<Expense> expenses, LocalDateTime createdOn) {
         this.id = id;
         this.name = name;
         this.explicitParticipants = explicitParticipants;
         this.expenses = new HashSet<>(expenses);
+        this.createdOn = createdOn;
     }
 
     public NobtId getId() {
@@ -51,9 +57,13 @@ public class Nobt {
                 .collect(toList());
     }
 
-    public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares) {
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
 
-        final Expense newExpense = new Expense(name, splitStrategy, debtee, shares);
+    public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date) {
+
+        final Expense newExpense = new Expense(name, splitStrategy, debtee, shares, date, LocalDateTime.now(ZoneOffset.UTC));
 
         expenses.add(newExpense);
     }

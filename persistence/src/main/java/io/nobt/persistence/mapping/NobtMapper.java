@@ -25,7 +25,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         final Set<Person> explicitParticipants = databaseModel.getExplicitParticipants().stream().map(Person::forName).collect(toSet());
         final Set<Expense> expenses = databaseModel.getExpenses().stream().map(expenseMapper::mapToDomainModel).collect(toSet());
 
-        return new Nobt(new NobtId(databaseModel.getId()), databaseModel.getName(), explicitParticipants, expenses);
+        return new Nobt(new NobtId(databaseModel.getId()), databaseModel.getName(), explicitParticipants, expenses, databaseModel.getCreatedOn());
     }
 
     @Override
@@ -38,6 +38,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         }
 
         nobtEntity.setName(domainModel.getName());
+        nobtEntity.setCreatedOn(domainModel.getCreatedOn());
 
         domainModel.getParticipatingPersons().stream().map(Person::getName).forEach(nobtEntity::addExplicitParticipant);
         domainModel.getExpenses().stream().map(expenseMapper::mapToDatabaseModel).forEach(nobtEntity::addExpense);

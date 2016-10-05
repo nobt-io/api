@@ -6,6 +6,7 @@ import io.nobt.core.domain.Share;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -17,6 +18,15 @@ public final class ExpenseMatchers {
             @Override
             protected Person featureValueOf(Expense actual) {
                 return actual.getDebtee();
+            }
+        };
+    }
+
+    public static Matcher<Expense> onDate(final Matcher<LocalDate> dateMatcher) {
+        return new FeatureMatcher<Expense, LocalDate>(dateMatcher, "date", "date") {
+            @Override
+            protected LocalDate featureValueOf(Expense actual) {
+                return actual.getDate();
             }
         };
     }

@@ -1,10 +1,7 @@
 package io.nobt.persistence.repository;
 
 import io.nobt.core.UnknownNobtException;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.NobtId;
-import io.nobt.core.domain.Person;
-import io.nobt.core.domain.Share;
+import io.nobt.core.domain.*;
 import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
@@ -22,11 +19,13 @@ import org.junit.rules.ExpectedException;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.time.LocalDate;
 import java.util.Collections;
 
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasDebtee;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasShares;
+import static io.nobt.test.domain.matchers.ExpenseMatchers.onDate;
 import static io.nobt.test.domain.matchers.NobtMatchers.*;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
@@ -43,6 +42,8 @@ public class NobtRepositoryIT {
 
     private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;
+
+    private NobtFactory nobtFactory;
 
     private NobtRepository sut;
 
@@ -76,6 +77,8 @@ public class NobtRepositoryIT {
         final NobtMapper nobtMapper = new NobtMapper(expenseMapper);
 
         sut = new NobtRepositoryImpl(entityManager, nobtMapper);
+
+        nobtFactory = new NobtFactory();
     }
 
     @After
@@ -90,7 +93,7 @@ public class NobtRepositoryIT {
         final String name = "Some name";
         final Person[] explicitParticipants = {thomas, david};
 
-        final Nobt nobtToSave = new Nobt(null, name, Sets.newHashSet(explicitParticipants), Collections.emptySet());
+        final Nobt nobtToSave = nobtFactory.create(name, Sets.newHashSet(explicitParticipants));
 
         final NobtId id = sut.save(nobtToSave);
 
@@ -118,9 +121,10 @@ public class NobtRepositoryIT {
 
         final Share thomasShare = ShareFactory.randomShare(thomas);
         final Share matthiasShare = ShareFactory.randomShare(matthias);
+        final LocalDate expenseDate = LocalDate.now();
 
-        final Nobt nobtToSave = new Nobt(null, "Some name", Collections.emptySet(), Collections.emptySet());
-        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare));
+        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet());
+        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate);
 
         final NobtId id = sut.save(nobtToSave);
 
@@ -132,7 +136,8 @@ public class NobtRepositoryIT {
                         hasItem(
                                 allOf(
                                         hasDebtee(equalTo(thomas)),
-                                        hasShares(containsInAnyOrder(thomasShare, matthiasShare))
+                                        hasShares(containsInAnyOrder(thomasShare, matthiasShare)),
+                                        onDate(equalTo(expenseDate))
                                 )
                         )
                 ))

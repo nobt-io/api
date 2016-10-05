@@ -3,6 +3,8 @@ package io.nobt.persistence.entity;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -33,6 +35,12 @@ public class ExpenseEntity {
     @Type(type = "io.nobt.persistence.JsonBinaryType")
     @Column(name = "shares")
     private List<ShareEntity> shares;
+
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
+
+    @Column(name = "createdOn", nullable = false)
+    private LocalDateTime createdOn;
 
     public long getId() {
         return id;
@@ -76,5 +84,21 @@ public class ExpenseEntity {
 
     public void setShares(List<ShareEntity> shares) {
         this.shares = shares;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 }

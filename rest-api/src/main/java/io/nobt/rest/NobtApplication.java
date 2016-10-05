@@ -3,6 +3,7 @@ package io.nobt.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.domain.Expense;
+import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.Share;
 import io.nobt.dbconfig.cloud.CloudDatabaseConfig;
 import io.nobt.dbconfig.local.LocalDatabaseConfig;
@@ -60,8 +61,8 @@ public class NobtApplication {
                 nobtRepository,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
-                objectMapper
-        );
+                objectMapper,
+                new NobtFactory());
 
         api.run(port);
     }
