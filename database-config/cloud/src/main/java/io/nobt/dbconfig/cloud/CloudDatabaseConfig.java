@@ -27,7 +27,7 @@ public class CloudDatabaseConfig implements DatabaseConfig {
 
     private static URI getUriToElephantSqlService(CloudFoundryEnvironment cloudFoundryEnvironment) {
         try {
-            return cloudFoundryEnvironment.getService("elephant-sql").getUri();
+            return cloudFoundryEnvironment.getService("database").getUri();
         } catch (URISyntaxException e) {
             throw new IllegalStateException(e);
         }

@@ -4,6 +4,6 @@ applications:
   memory: 256MB
   buildpack: java_buildpack
   services:
-    - elephant-sql
+    - database
   env:
     profile: CLOUD
