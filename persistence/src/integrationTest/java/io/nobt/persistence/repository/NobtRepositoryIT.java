@@ -151,8 +151,8 @@ public class NobtRepositoryIT {
         final Share matthiasShare = ShareFactory.randomShare(matthias);
         final LocalDate expenseDate = LocalDate.now();
 
-        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet());
-        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate);
+        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet(), new CurrencyKey("EUR"));
+        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate, null);
 
         final NobtId id = sut.save(nobtToSave);
 

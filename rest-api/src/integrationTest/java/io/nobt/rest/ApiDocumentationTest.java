@@ -190,8 +190,8 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
 
-        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
-        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now());
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR"));
+        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now(), null);
 
         final NobtId id = nobtRepository.save(nobt);
         final Long idOfFirstExpense = nobtRepository.getById(id).getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
@@ -230,7 +230,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
 
-        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR"));
         final NobtId id = nobtRepository.save(nobt);
 
         given(this.documentationSpec)
@@ -302,16 +302,6 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
-                .filter(
-                        document("duplicate-debtor",
-                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
-                                responseFields(
-                                        fieldWithPath("[].property").description("Describes the property in the request object which caused the validation to fail."),
-                                        fieldWithPath("[].value").description("The value of the property as received by the server."),
-                                        fieldWithPath("[].message").description("An error message that describes what went wrong.")
-                                )
-                        )
-                )
                 .body("{\n" +
                         "  \"name\": \"Fleisch\",\n" +
                         "  \"debtee\": \"Thomas\",\n" +
