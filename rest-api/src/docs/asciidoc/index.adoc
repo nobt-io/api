@@ -4,11 +4,12 @@ Thomas Eizinger;
 :icons: font
 :source-highlighter: highlightjs
 
-This document describes the API of Nobt.io. There are 3 requests that can be made at the moment:
+This document describes the API of Nobt.io. There are 4 requests that can be made at the moment:
 
 * Create a new nobt
 * Add an expense to a given nobt
 * Retrieve the nobt
+* Delete an expense
 
 == Domain glossary
 
