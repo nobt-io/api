@@ -38,5 +38,6 @@ public class CoreModule extends SimpleModule {
 
         owner.configure(SerializationFeature.INDENT_OUTPUT, true);
         owner.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        owner.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 }

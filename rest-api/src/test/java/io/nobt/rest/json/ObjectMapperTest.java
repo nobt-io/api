@@ -10,9 +10,6 @@ import java.time.LocalDateTime;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-/**
- * @author Thomas Eizinger, Senacor Technologies AG.
- */
 public class ObjectMapperTest {
 
     private ObjectMapper sut;
@@ -29,7 +26,7 @@ public class ObjectMapperTest {
 
         final String serializedLocalDate = sut.writeValueAsString(someDay);
 
-        assertThat(serializedLocalDate, is("2016-10-05"));
+        assertThat(serializedLocalDate, is("\"2016-10-05\""));
     }
 
     @Test
@@ -39,6 +36,6 @@ public class ObjectMapperTest {
 
         final String serializedLocalDate = sut.writeValueAsString(someDay);
 
-        assertThat(serializedLocalDate, is("2016-10-05T10:00:00"));
+        assertThat(serializedLocalDate, is("\"2016-10-05T10:00:00\""));
     }
 }
