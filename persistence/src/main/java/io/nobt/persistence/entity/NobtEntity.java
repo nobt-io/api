@@ -27,7 +27,7 @@ public class NobtEntity {
     @Column(name = "createdOn", nullable = false)
     private LocalDateTime createdOn;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ExpenseEntity> expenses = new HashSet<>();
 
     public String getName() {
