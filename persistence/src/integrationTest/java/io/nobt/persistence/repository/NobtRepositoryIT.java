@@ -93,7 +93,7 @@ public class NobtRepositoryIT {
         final String name = "Some name";
         final Person[] explicitParticipants = {thomas, david};
 
-        final Nobt nobtToSave = nobtFactory.create(name, Sets.newHashSet(explicitParticipants));
+        final Nobt nobtToSave = nobtFactory.create(name, Sets.newHashSet(explicitParticipants), new CurrencyKey("EUR"));
 
         final NobtId id = sut.save(nobtToSave);
 
@@ -123,8 +123,8 @@ public class NobtRepositoryIT {
         final Share matthiasShare = ShareFactory.randomShare(matthias);
         final LocalDate expenseDate = LocalDate.now();
 
-        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet());
-        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate);
+        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet(), new CurrencyKey("EUR"));
+        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate, null);
 
         final NobtId id = sut.save(nobtToSave);
 
@@ -151,8 +151,8 @@ public class NobtRepositoryIT {
         final Share matthiasShare = ShareFactory.randomShare(matthias);
         final LocalDate expenseDate = LocalDate.now();
 
-        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet());
-        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate);
+        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet(), new CurrencyKey("EUR"));
+        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate, null);
 
         final NobtId id = sut.save(nobtToSave);
 

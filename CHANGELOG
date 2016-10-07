@@ -1,3 +1,12 @@
+## Version 0.0.5:
+
+It is now possible to define a currency for a nobt. This allows the client to store expenses with different currencies.
+
+### Breaking changes
+
+- `POST /nobts/{id}`
+    - `currency` field added.
+
 ## Version 0.0.4:
 
 You can now delete expenses from a Nobt.

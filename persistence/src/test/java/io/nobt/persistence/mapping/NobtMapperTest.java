@@ -31,6 +31,7 @@ public class NobtMapperTest {
         final ExpenseEntity secondExpense = new ExpenseEntity();
 
         final NobtEntity entity = new NobtEntity();
+        entity.setCurrency("EUR");
 
         entity.setId(123L);
         entity.addExpense(firstExpense);

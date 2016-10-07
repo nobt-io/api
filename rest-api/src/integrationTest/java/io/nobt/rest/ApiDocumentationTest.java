@@ -2,10 +2,7 @@ package io.nobt.rest;
 
 import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.specification.RequestSpecification;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.NobtFactory;
-import io.nobt.core.domain.NobtId;
-import io.nobt.core.domain.Person;
+import io.nobt.core.domain.*;
 import io.nobt.util.Sets;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,12 +52,14 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                                 preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
                                 requestFields(
                                         fieldWithPath("nobtName").description("The name of the nobt."),
+                                        fieldWithPath("currency").description("The currency of this nobt."),
                                         fieldWithPath("explicitParticipants").optional().description("An array of people that should always be listed as participants, no matter if they ever participate as debtee / debtor or not.")
                                 )
                         )
                 )
                 .body("{\n" +
                         "  \"nobtName\": \"Grillfeier\",\n" +
+                        "  \"currency\": \"EUR\",\n" +
                         "  \"explicitParticipants\": [\n" +
                         "    \"Thomas\",\n" +
                         "    \"Martin\",\n" +
@@ -84,7 +83,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
 
-        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants));
+        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR")));
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -94,6 +93,9 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                                 requestFields(
                                         fieldWithPath("name").description("Human readable description of the expense."),
                                         fieldWithPath("debtee").description("The name of the person who made the expense."),
+                                        fieldWithPath("currencyInformation").optional().type(JsonFieldType.OBJECT).description("An object defining the conversion information to the currency of the associated nobt. If this object is present, the amounts of this expense are to be interpreted in the given currency. If this object is not present, it is assumed that the currency of this expense is equal to the currency of the nobt, hence the conversion rate is 1."),
+                                        fieldWithPath("currencyInformation.foreignCurrency").type(JsonFieldType.STRING).description("The ISO-4217 code of the currency."),
+                                        fieldWithPath("currencyInformation.rate").type(JsonFieldType.NUMBER).description("The conversion rate for converting the amounts of this expense into the currency of the associated nobt."),
                                         fieldWithPath("splitStrategy").description("A simple text field for storing an identifier that indicates which `strategy` the user picked to split the expense."),
                                         fieldWithPath("date").description("The date on which the expense was spent. Takes any ISO6801-compliant string."),
                                         fieldWithPath("shares").description("All shares that form this expense. Note that, as in the example above, there is an extra share that mentions Thomas as the debtor, despite he is also the debtee of the expense. The above setup equals splitting the bill in three parts.")
@@ -104,6 +106,10 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                         "  \"name\": \"Fleisch\",\n" +
                         "  \"debtee\": \"Thomas\",\n" +
                         "  \"splitStrategy\": \"EVENLY\",\n" +
+                        "  \"currencyInformation\": {\n" +
+                        "    \"foreignCurrency\": \"USD\",\n" +
+                        "    \"rate\": 1.15\n" +
+                        "  },\n" +
                         "  \"date\": \"2016-10-05\",\n" +
                         "  \"shares\": [\n" +
                         "    {\n" +
@@ -136,8 +142,8 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
 
-        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
-        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now());
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR"));
+        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now(), null);
 
         final NobtId id = nobtRepository.save(nobt);
 
@@ -149,6 +155,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                                 responseFields(
                                         fieldWithPath("id").type(JsonFieldType.STRING).description("The id of the nobt. Can be used to construct URIs to the various endpoints of the API."),
                                         fieldWithPath("name").type(JsonFieldType.STRING).description("The name of the nobt."),
+                                        fieldWithPath("currency").type(JsonFieldType.STRING).description("The currency of this nobt."),
                                         fieldWithPath("createdOn").type(JsonFieldType.STRING).description("An ISO6801-compliant timestamp when the nobt was created."),
                                         fieldWithPath("expenses").type(JsonFieldType.ARRAY).description("All expenses associated with this nobt."),
                                         fieldWithPath("expenses[].id").type(JsonFieldType.NUMBER).description("The id of the expense."),
@@ -183,8 +190,8 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
 
-        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
-        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now());
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR"));
+        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now(), null);
 
         final NobtId id = nobtRepository.save(nobt);
         final Long idOfFirstExpense = nobtRepository.getById(id).getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
@@ -223,7 +230,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
 
-        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants);
+        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR"));
         final NobtId id = nobtRepository.save(nobt);
 
         given(this.documentationSpec)
@@ -242,7 +249,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public void shouldRejectExpenseWithDuplicateDebtor() throws Exception {
 
         final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants));
+        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR")));
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -285,5 +292,49 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                 .then()
 
                 .statusCode(400);
+    }
+
+    @Test
+    public void shouldRejectExpenseWithInvalidConversionInformation() throws Exception {
+
+        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
+        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR")));
+
+        given(this.documentationSpec)
+                .port(ACTUAL_PORT)
+                .body("{\n" +
+                        "  \"name\": \"Fleisch\",\n" +
+                        "  \"debtee\": \"Thomas\",\n" +
+                        "  \"splitStrategy\": \"EVENLY\",\n" +
+                        "  \"conversionInformation\": {\n" +
+                        "    \"foreignCurrency\": \"EUR\",\n" +
+                        "    \"rate\": 1.5\n" +
+                        "  },\n" +
+                        "  \"date\": \"2016-10-05\",\n" +
+                        "  \"shares\": [\n" +
+                        "    {\n" +
+                        "      \"debtor\": \"Thomas\",\n" +
+                        "      \"amount\": 2\n" +
+                        "    },\n" +
+                        "    {\n" +
+                        "      \"debtor\": \"Thomas\",\n" +
+                        "      \"amount\": 2\n" +
+                        "    },\n" +
+                        "    {\n" +
+                        "      \"debtor\": \"Matthias\",\n" +
+                        "      \"amount\": 4\n" +
+                        "    }\n" +
+                        "  ]\n" +
+                        "}")
+                .contentType("application/json")
+
+                .when()
+
+                .post("/nobts/{nobtId}/expenses", id.toExternalIdentifier())
+
+                .then()
+
+                .statusCode(400);
+
     }
 }
