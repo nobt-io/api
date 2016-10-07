@@ -97,12 +97,9 @@ public class NobtRestApi {
 
             transactionService.runInTx( (em) -> {
                 final Nobt nobt = nobtRepository.getById(databaseId);
-                nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date);
+                nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date, input.conversionInformation);
                 nobtRepository.save(nobt);
             });
-            final Nobt nobt = nobtRepository.getById(databaseId);
-            nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date, input.conversionInformation);
-            nobtRepository.save(nobt);
 
 
             resp.status(201);
@@ -155,11 +152,9 @@ public class NobtRestApi {
 
 
             final NobtId id = transactionService.runInTx((et) -> {
-                final Nobt unpersistedNobt = nobtFactory.create(input.nobtName, input.explicitParticipants);
+                final Nobt unpersistedNobt = nobtFactory.create(input.nobtName, input.explicitParticipants, input.currencyKey);
                 return nobtRepository.save(unpersistedNobt);
             });
-            final Nobt unpersistedNobt = nobtFactory.create(input.nobtName, input.explicitParticipants, input.currencyKey);
-            final NobtId id = nobtRepository.save(unpersistedNobt);
 
 
             res.status(201);
