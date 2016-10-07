@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
-import io.nobt.persistence.DatabaseConfig;
-import io.nobt.persistence.EntityManagerFactoryProvider;
-import io.nobt.persistence.NobtRepository;
-import io.nobt.persistence.NobtRepositoryImpl;
+import io.nobt.persistence.*;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
@@ -69,6 +66,7 @@ public abstract class ApiIntegrationTestBase {
 
         new NobtRestApi(
                 http,
+                new TransactionService(entityManager),
                 nobtRepository,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),

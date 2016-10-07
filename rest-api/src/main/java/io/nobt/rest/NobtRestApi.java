@@ -9,6 +9,7 @@ import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtRepository;
+import io.nobt.persistence.TransactionService;
 import io.nobt.profiles.Profiles;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.payloads.CreateExpenseInput;
@@ -41,6 +42,7 @@ public class NobtRestApi {
     private static final Logger UNHANDLED_EXCEPTION_LOGGER = LogManager.getLogger("io.nobt.rest.NobtApplication.unhandledExceptions");
 
     private final Service http;
+    private final TransactionService transactionService;
     private final NobtRepository nobtRepository;
     private final NobtCalculator nobtCalculator;
     private final BodyParser bodyParser;
@@ -48,8 +50,9 @@ public class NobtRestApi {
     private final SimpleViolationFactory simpleViolationFactory;
     private final NobtFactory nobtFactory;
 
-    public NobtRestApi(Service service, NobtRepository nobtRepository, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper, NobtFactory nobtFactory) {
+    public NobtRestApi(Service service, TransactionService transactionService, NobtRepository nobtRepository, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper, NobtFactory nobtFactory) {
         this.http = service;
+        this.transactionService = transactionService;
         this.nobtRepository = nobtRepository;
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
@@ -88,9 +91,11 @@ public class NobtRestApi {
             final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
 
 
-            final Nobt nobt = nobtRepository.getById(databaseId);
-            nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date);
-            nobtRepository.save(nobt);
+            transactionService.runInTx( (em) -> {
+                final Nobt nobt = nobtRepository.getById(databaseId);
+                nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date);
+                nobtRepository.save(nobt);
+            });
 
 
             resp.status(201);
@@ -107,9 +112,11 @@ public class NobtRestApi {
             final Long expenseId = Long.parseLong(req.params(":expenseId"));
 
 
-            final Nobt nobt = nobtRepository.getById(databaseId);
-            nobt.removeExpense(expenseId);
-            nobtRepository.save(nobt);
+            transactionService.runInTx( (em) -> {
+                final Nobt nobt = nobtRepository.getById(databaseId);
+                nobt.removeExpense(expenseId);
+                nobtRepository.save(nobt);
+            });
 
 
             res.status(204);
@@ -140,8 +147,10 @@ public class NobtRestApi {
             final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
 
 
-            final Nobt unpersistedNobt = nobtFactory.create(input.nobtName, input.explicitParticipants);
-            final NobtId id = nobtRepository.save(unpersistedNobt);
+            final NobtId id = transactionService.runInTx((et) -> {
+                final Nobt unpersistedNobt = nobtFactory.create(input.nobtName, input.explicitParticipants);
+                return nobtRepository.save(unpersistedNobt);
+            });
 
 
             res.status(201);

@@ -44,10 +44,12 @@ public class NobtApplication {
         final ObjectMapper objectMapper = new ObjectMapperFactory().create();
         final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
+        final EntityManager entityManager = new EntityManagerFactoryProvider().create(databaseConfig).createEntityManager();
+
         final NobtRepository nobtRepository = CURRENT_PROFILE.getProfileDependentValue(
                 InMemoryNobtRepository::new,
-                NobtApplication::createSqlBackedDao,
-                NobtApplication::createSqlBackedDao
+                () -> createSqlBackedDao(entityManager),
+                () -> createSqlBackedDao(entityManager)
         );
 
         final int port = CURRENT_PROFILE.getProfileDependentValue(
@@ -58,6 +60,7 @@ public class NobtApplication {
 
         final NobtRestApi api = new NobtRestApi(
                 Service.ignite(),
+                new TransactionService(entityManager),
                 nobtRepository,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
@@ -72,9 +75,7 @@ public class NobtApplication {
         migrationService.migrate();
     }
 
-    private static NobtRepository createSqlBackedDao() {
-        final DatabaseConfig databaseConfig = getDatabaseConfig();
-        final EntityManager entityManager = new EntityManagerFactoryProvider().create(databaseConfig).createEntityManager();
+    private static NobtRepository createSqlBackedDao(EntityManager entityManager) {
 
         final DomainModelMapper<ShareEntity, Share> shareMapper = new ShareMapper();
         final DomainModelMapper<ExpenseEntity, Expense> expenseMapper = new ExpenseMapper(shareMapper);
