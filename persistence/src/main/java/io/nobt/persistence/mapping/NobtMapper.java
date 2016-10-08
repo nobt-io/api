@@ -1,9 +1,6 @@
 package io.nobt.persistence.mapping;
 
-import io.nobt.core.domain.Expense;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.NobtId;
-import io.nobt.core.domain.Person;
+import io.nobt.core.domain.*;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
 
@@ -25,7 +22,14 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         final Set<Person> explicitParticipants = databaseModel.getExplicitParticipants().stream().map(Person::forName).collect(toSet());
         final Set<Expense> expenses = databaseModel.getExpenses().stream().map(expenseMapper::mapToDomainModel).collect(toSet());
 
-        return new Nobt(new NobtId(databaseModel.getId()), databaseModel.getName(), explicitParticipants, expenses);
+        return new Nobt(
+                new NobtId(databaseModel.getId()),
+                new CurrencyKey(databaseModel.getCurrency()),
+                databaseModel.getName(),
+                explicitParticipants,
+                expenses,
+                databaseModel.getCreatedOn()
+        );
     }
 
     @Override
@@ -38,6 +42,8 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         }
 
         nobtEntity.setName(domainModel.getName());
+        nobtEntity.setCurrency(domainModel.getCurrencyKey().getKey());
+        nobtEntity.setCreatedOn(domainModel.getCreatedOn());
 
         domainModel.getParticipatingPersons().stream().map(Person::getName).forEach(nobtEntity::addExplicitParticipant);
         domainModel.getExpenses().stream().map(expenseMapper::mapToDatabaseModel).forEach(nobtEntity::addExpense);

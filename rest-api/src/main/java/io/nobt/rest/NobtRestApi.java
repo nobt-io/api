@@ -2,12 +2,15 @@ package io.nobt.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtRepository;
+import io.nobt.persistence.TransactionService;
 import io.nobt.profiles.Profiles;
 import io.nobt.rest.json.BodyParser;
 import io.nobt.rest.payloads.CreateExpenseInput;
@@ -38,19 +41,23 @@ public class NobtRestApi {
     private static final Logger UNHANDLED_EXCEPTION_LOGGER = LogManager.getLogger("io.nobt.rest.NobtApplication.unhandledExceptions");
 
     private final Service http;
+    private final TransactionService transactionService;
     private final NobtRepository nobtRepository;
     private final NobtCalculator nobtCalculator;
     private final BodyParser bodyParser;
     private final ObjectMapper objectMapper;
     private final SimpleViolationFactory simpleViolationFactory;
+    private final NobtFactory nobtFactory;
 
-    public NobtRestApi(Service service, NobtRepository nobtRepository, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper) {
+    public NobtRestApi(Service service, TransactionService transactionService, NobtRepository nobtRepository, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper, NobtFactory nobtFactory) {
         this.http = service;
+        this.transactionService = transactionService;
         this.nobtRepository = nobtRepository;
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
         this.objectMapper = objectMapper;
         this.simpleViolationFactory = new SimpleViolationFactory(objectMapper);
+        this.nobtFactory = nobtFactory;
     }
 
     public void run(int port) {
@@ -60,10 +67,15 @@ public class NobtRestApi {
 
         registerApplicationRoutes();
 
-        http.exception(UnknownNobtException.class, ((e, request, response) -> {
+        http.exception(UnknownNobtException.class, (e, request, response) -> {
             response.status(404);
             response.body(e.getMessage());
-        }));
+        });
+
+        http.exception(ConversionInformationInconsistentException.class, (e, request, response) -> {
+            response.status(400);
+            response.body(e.getMessage());
+        });
 
         handleValidationExceptions();
         handleUnknownExceptions();
@@ -73,6 +85,7 @@ public class NobtRestApi {
         registerCreateNobtRoute();
         registerRetrieveNobtRoute();
         registerCreateExpenseRoute();
+        registerDeleteExpenseRoute();
     }
 
     private void registerCreateExpenseRoute() {
@@ -82,12 +95,35 @@ public class NobtRestApi {
             final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
 
 
-            final Nobt nobt = nobtRepository.getById(databaseId);
-            nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares));
-            nobtRepository.save(nobt);
+            transactionService.runInTx( (em) -> {
+                final Nobt nobt = nobtRepository.getById(databaseId);
+                nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date, input.conversionInformation);
+                nobtRepository.save(nobt);
+            });
 
 
             resp.status(201);
+
+            return "";
+        });
+    }
+
+    private void registerDeleteExpenseRoute() {
+
+        http.delete("/nobts/:nobtId/expenses/:expenseId", (req, res) -> {
+
+            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
+            final Long expenseId = Long.parseLong(req.params(":expenseId"));
+
+
+            transactionService.runInTx( (em) -> {
+                final Nobt nobt = nobtRepository.getById(databaseId);
+                nobt.removeExpense(expenseId);
+                nobtRepository.save(nobt);
+            });
+
+
+            res.status(204);
 
             return "";
         });
@@ -115,8 +151,10 @@ public class NobtRestApi {
             final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
 
 
-            final Nobt unpersistedNobt = new Nobt(null, input.nobtName, input.explicitParticipants, emptySet());
-            final NobtId id = nobtRepository.save(unpersistedNobt);
+            final NobtId id = transactionService.runInTx((et) -> {
+                final Nobt unpersistedNobt = nobtFactory.create(input.nobtName, input.explicitParticipants, input.currencyKey);
+                return nobtRepository.save(unpersistedNobt);
+            });
 
 
             res.status(201);

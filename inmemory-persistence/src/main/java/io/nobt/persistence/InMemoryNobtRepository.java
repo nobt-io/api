@@ -19,7 +19,7 @@ public class InMemoryNobtRepository implements NobtRepository {
 
         final NobtId id = new NobtId(idGenerator.getAndIncrement());
 
-        final Nobt copy = new Nobt(id, nobt.getName(), nobt.getParticipatingPersons(), nobt.getExpenses());
+        final Nobt copy = new Nobt(id, nobt.getCurrencyKey(), nobt.getName(), nobt.getParticipatingPersons(), nobt.getExpenses(), nobt.getCreatedOn());
 
         nobtDatabase.put(id, copy);
 
