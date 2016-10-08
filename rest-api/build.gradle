@@ -30,8 +30,9 @@ dependencies {
     compile project(':profiles')
     compile project(':persistence')
     compile project(':inmemory-persistence')
-    compile project(':log4j2-gitlab-issue-appender')
     compile project(':db-migrations')
+
+    compile 'com.getsentry.raven:raven-log4j2:7.7.0'
 
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.1.0.Final'
 
