@@ -2,7 +2,6 @@ package io.nobt.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
