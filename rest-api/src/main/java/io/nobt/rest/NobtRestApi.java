@@ -66,6 +66,7 @@ public class NobtRestApi {
         setupCORS();
 
         registerApplicationRoutes();
+        registerTestFailRoute();
 
         http.exception(UnknownNobtException.class, (e, request, response) -> {
             response.status(404);
@@ -165,6 +166,12 @@ public class NobtRestApi {
 
             return new NobtResource(nobt, emptySet());
         }, objectMapper::writeValueAsString);
+    }
+
+    private void registerTestFailRoute() {
+        http.get("/fail", (req, res) -> {
+            throw new RuntimeException("This should go wrong.");
+        });
     }
 
     private static NobtId decodeNobtIdentifierToDatabaseId(Request req) {
