@@ -2,6 +2,7 @@ package io.nobt.rest;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.RuntimeJsonMappingException;
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
@@ -66,6 +67,7 @@ public class NobtRestApi {
         setupCORS();
 
         registerApplicationRoutes();
+        registerTestFailRoute();
 
         http.exception(UnknownNobtException.class, (e, request, response) -> {
             response.status(404);
@@ -165,6 +167,12 @@ public class NobtRestApi {
 
             return new NobtResource(nobt, emptySet());
         }, objectMapper::writeValueAsString);
+    }
+
+    private void registerTestFailRoute() {
+        http.get("/fail", (req, res) -> {
+            throw new RuntimeException("This should go wrong.");
+        });
     }
 
     private static NobtId decodeNobtIdentifierToDatabaseId(Request req) {
