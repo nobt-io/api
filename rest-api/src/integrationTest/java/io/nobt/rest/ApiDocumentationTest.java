@@ -2,20 +2,17 @@ package io.nobt.rest;
 
 import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.specification.RequestSpecification;
-import io.nobt.core.domain.*;
-import io.nobt.util.Sets;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-import java.time.LocalDate;
-import java.util.Set;
+import java.io.InputStream;
+import java.util.stream.IntStream;
 
 import static com.jayway.restassured.RestAssured.given;
-import static io.nobt.test.domain.factories.ShareFactory.share;
-import static io.nobt.test.domain.factories.StaticPersonFactory.*;
+import static com.jayway.restassured.RestAssured.post;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -31,7 +28,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
 
     protected RequestSpecification documentationSpec;
-    private NobtFactory nobtFactory;
+    private Client client;
 
     @Before
     public void setUp() throws Exception {
@@ -39,7 +36,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                 .addFilter(documentationConfiguration(restDocumentation))
                 .build();
 
-        nobtFactory = new NobtFactory();
+        client = new Client(ACTUAL_PORT);
     }
 
     @Test
@@ -81,9 +78,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     @Test
     public void shouldAddNewExpense() throws Exception {
 
-        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-
-        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR")));
+        final String nobtId = client.createGrillfeierNobt();
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -130,7 +125,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
                 .when()
 
-                .post("/nobts/{nobtId}/expenses", id.toExternalIdentifier())
+                .post("/nobts/{nobtId}/expenses", nobtId)
 
                 .then()
 
@@ -140,12 +135,8 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     @Test
     public void shouldGetCompleteNobt() throws Exception {
 
-        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-
-        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR"));
-        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now(), null);
-
-        final NobtId id = nobtRepository.save(nobt);
+        final String nobtId = client.createGrillfeierNobt();
+        client.addFleischExpense(nobtId);
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -178,7 +169,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
                 .when()
 
-                .get("/nobts/{nobtId}", id.toExternalIdentifier())
+                .get("/nobts/{nobtId}", nobtId)
 
                 .then()
 
@@ -188,13 +179,11 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     @Test
     public void shouldDeleteExpense() throws Exception {
 
-        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
+        final String nobtId = client.createGrillfeierNobt();
+        client.addFleischExpense(nobtId);
 
-        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR"));
-        nobt.addExpense("Fleisch", "EVENLY", thomas, Sets.newHashSet(share(matthias, 3), share(lukas, 2), share(martin, 3), share(thomas, 3)), LocalDate.now(), null);
+        final Long idOfFirstExpense = client.getNobt(nobtId).jsonPath().getLong("expenses[0].id");
 
-        final NobtId id = nobtRepository.save(nobt);
-        final Long idOfFirstExpense = nobtRepository.getById(id).getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -206,39 +195,31 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
                 .when()
 
-                .delete("/nobts/{nobtId}/expenses/{expenseId}", id.toExternalIdentifier(), idOfFirstExpense)
+                .delete("/nobts/{nobtId}/expenses/{expenseId}", nobtId, idOfFirstExpense)
 
                 .then()
 
                 .statusCode(204);
 
-        given(this.documentationSpec)
-                .port(ACTUAL_PORT)
 
-                .when()
 
-                .get("/nobts/{nobtId}", id.toExternalIdentifier())
-
+        client.getNobt(nobtId)
                 .then()
-
-                .statusCode(200)
                 .body("expenses", response -> hasSize(0));
     }
 
     @Test
     public void deletingExpenseThatDoesNotExistRespondsWith204() throws Exception {
 
-        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-
-        final Nobt nobt = nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR"));
-        final NobtId id = nobtRepository.save(nobt);
+        final String nobtId = client.createGrillfeierNobt();
+        client.addFleischExpense(nobtId);
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
 
                 .when()
 
-                .delete("/nobts/{nobtId}/expenses/{expenseId}", id.toExternalIdentifier(), 104)
+                .delete("/nobts/{nobtId}/expenses/{expenseId}", nobtId, 104)
 
                 .then()
 
@@ -248,8 +229,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     @Test
     public void shouldRejectExpenseWithDuplicateDebtor() throws Exception {
 
-        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR")));
+        final String nobtId = client.createGrillfeierNobt();
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -287,7 +267,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
                 .when()
 
-                .post("/nobts/{nobtId}/expenses", id.toExternalIdentifier())
+                .post("/nobts/{nobtId}/expenses", nobtId)
 
                 .then()
 
@@ -297,8 +277,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
     @Test
     public void shouldRejectExpenseWithInvalidConversionInformation() throws Exception {
 
-        final Set<Person> explicitParticipants = Sets.newHashSet(thomas, martin, lukas);
-        final NobtId id = nobtRepository.save(nobtFactory.create("Grillfeier", explicitParticipants, new CurrencyKey("EUR")));
+        final String nobtId = client.createGrillfeierNobt();
 
         given(this.documentationSpec)
                 .port(ACTUAL_PORT)
@@ -330,11 +309,20 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
                 .when()
 
-                .post("/nobts/{nobtId}/expenses", id.toExternalIdentifier())
+                .post("/nobts/{nobtId}/expenses", nobtId)
 
                 .then()
 
                 .statusCode(400);
+    }
 
+    @Test
+    public void shouldAddALotOfExpenses() throws Exception {
+
+        final String nobtId = client.createGrillfeierNobt();
+
+        IntStream.range(1, 100).forEach( i -> client.addFleischExpense(nobtId) );
+
+        client.getNobt(nobtId).then().body("expenses", response -> hasSize(99));
     }
 }

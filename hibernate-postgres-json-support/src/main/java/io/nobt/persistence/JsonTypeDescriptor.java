@@ -7,6 +7,7 @@ import org.hibernate.type.descriptor.java.MutableMutabilityPlan;
 import org.hibernate.usertype.DynamicParameterizedType;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.Properties;
 
 /**
@@ -18,9 +19,29 @@ public class JsonTypeDescriptor extends AbstractTypeDescriptor<Object> implement
 
     @Override
     public void setParameterValues(Properties parameters) {
-        Class fieldClass = ((ParameterType) parameters.get(PARAMETER_TYPE)).getReturnedClass();
 
-        fieldType = JacksonUtil.OBJECT_MAPPER.constructType(fieldClass);
+        final Class entityType = resolveEntityClass(parameters);
+        final String property = (String) parameters.get(DynamicParameterizedType.PROPERTY);
+
+        final Type genericType = getActualType(entityType, property);
+
+        fieldType = JacksonUtil.OBJECT_MAPPER.constructType(genericType);
+    }
+
+    private Class<?> resolveEntityClass(Properties parameters) {
+        try {
+            return Class.forName((String) parameters.get(DynamicParameterizedType.ENTITY));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Type getActualType(Class entityType, String property) {
+        try {
+            return entityType.getDeclaredField(property).getGenericType();
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public JsonTypeDescriptor() {
