@@ -1,1 +1,0 @@
-export DATABASE_CONNECTION_STRING=$(echo $VCAP_SERVICES | ./lib/jq '.elephantsql[0].credentials.uri' | cut -d "\"" -f 2)

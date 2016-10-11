@@ -10,7 +10,7 @@ build_rest-api:
   variables:
     DATABASE_CONNECTION_STRING: 'jdbc:postgresql://postgres:password@postgres:5432/postgres'
   script:
-    - ./gradlew test -x integrationTest -Dorg.gradle.parallel=true # unit tests are fine to be run in parallel
+    - ./gradlew test -Dorg.gradle.parallel=true # unit tests are fine to be run in parallel
     - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel
     - ./gradlew :rest-api:distZip
   artifacts:
@@ -23,11 +23,10 @@ deploy_on_development:
   image: governmentpaas/cf-cli
   stage: deploy
   before_script:
-    - cf api https://api.run.pivotal.io
-    - cf auth $CF_BUILD_USER $CF_BUILD_USER_PASSWORD
-    - cf target -o nobt.io -s development
+    - .bin/login.sh development
+    - .bin/prepareEnv.sh c86700fd-b167-46f5-bd97-f133d808b521
   script:
-    - cf push -n nobt-io-dev -p rest-api/build/distributions/*.zip
+    - .bin/deploy.sh nobt-io-dev
   environment: development
   only:
     - master
@@ -36,11 +35,9 @@ deploy_on_beta:
   image: governmentpaas/cf-cli
   stage: deploy
   before_script:
-      - cf api https://api.run.pivotal.io
-      - cf auth $CF_BUILD_USER $CF_BUILD_USER_PASSWORD
-      - cf target -o nobt.io -s beta
+    - .bin/login.sh beta
   script:
-      - cf push -n nobt-io-beta -p rest-api/build/distributions/*.zip
+    - .bin/deploy.sh nobt-io-beta
   environment: beta
   when: manual
 
@@ -48,10 +45,8 @@ deploy_on_production:
   image: governmentpaas/cf-cli
   stage: deploy
   before_script:
-      - cf api https://api.run.pivotal.io
-      - cf auth $CF_BUILD_USER $CF_BUILD_USER_PASSWORD
-      - cf target -o nobt.io -s production
+    - .bin/login.sh production
   script:
-      - cf push -n nobt-io -p rest-api/build/distributions/*.zip
+    - .bin/deploy.sh nobt-io
   environment: production
   when: manual

@@ -3,8 +3,9 @@ package io.nobt.application;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.application.env.Config;
 import io.nobt.core.NobtCalculator;
+import io.nobt.core.domain.NobtFactory;
 import io.nobt.persistence.DatabaseConfig;
-import io.nobt.persistence.NobtRepository;
+import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.rest.NobtRestApi;
 import io.nobt.sql.flyway.MigrationService;
 import spark.Service;
@@ -19,12 +20,12 @@ import static io.nobt.application.env.MissingConfigurationException.missingConfi
 
 public class NobtApplication {
 
-    private final NobtRepositoryFactory nobtRepositoryFactory;
+    private final NobtRepositoryCommandInvokerFactory nobtRepositoryCommandInvokerFactory;
     private final ObjectMapperFactory objectMapperFactory;
     private final ValidatorFactory validatorFactory;
 
-    public NobtApplication(NobtRepositoryFactory nobtRepositoryFactory, ObjectMapperFactory objectMapperFactory, ValidatorFactory validatorFactory) {
-        this.nobtRepositoryFactory = nobtRepositoryFactory;
+    public NobtApplication(NobtRepositoryCommandInvokerFactory nobtRepositoryCommandInvokerFactory, ObjectMapperFactory objectMapperFactory, ValidatorFactory validatorFactory) {
+        this.nobtRepositoryCommandInvokerFactory = nobtRepositoryCommandInvokerFactory;
         this.objectMapperFactory = objectMapperFactory;
         this.validatorFactory = validatorFactory;
     }
@@ -32,7 +33,7 @@ public class NobtApplication {
     public static void main(String[] args) {
 
         final NobtApplication application = new NobtApplication(
-                new NobtRepositoryFactory(),
+                new NobtRepositoryCommandInvokerFactory(),
                 new ObjectMapperFactory(),
                 Validation.buildDefaultValidatorFactory()
         );
@@ -46,25 +47,26 @@ public class NobtApplication {
             migrateDatabase();
         }
 
-        final NobtRepository nobtRepository = nobtRepositoryFactory.create();
+        final NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker = nobtRepositoryCommandInvokerFactory.create();
         final ObjectMapper objectMapper = objectMapperFactory.create();
         final Validator validator = validatorFactory.getValidator();
 
         final NobtRestApi api = new NobtRestApi(
                 Service.ignite(),
-                nobtRepository,
+                nobtRepositoryCommandInvoker,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
-                objectMapper
+                objectMapper,
+                new NobtFactory()
         );
 
-        final int httpPort = Config.port().orElseThrow( missingConfigurationException(PORT) );
+        final int httpPort = Config.port().orElseThrow(missingConfigurationException(PORT));
 
         api.run(httpPort);
     }
 
     private void migrateDatabase() {
-        final DatabaseConfig databaseConfig = Config.database().orElseThrow( missingConfigurationException(DATABASE_CONNECTION_STRING) );
+        final DatabaseConfig databaseConfig = Config.database().orElseThrow(missingConfigurationException(DATABASE_CONNECTION_STRING));
 
         final MigrationService migrationService = new MigrationService(databaseConfig);
         migrationService.migrate();

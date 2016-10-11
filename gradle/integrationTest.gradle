@@ -1,10 +1,10 @@
 // Add integration test source sets
 sourceSets {
-    integrationTest { sourceSet ->
-        ["java"].each {
-            if (!sourceSet.hasProperty(it)) return
-            sourceSet."$it".srcDir file("src/integrationTest/${it}")
-        }
+    integrationTest {
+        java.srcDir 'src/integrationTest/java'
+        resources.srcDir 'src/integrationTest/resources'
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
     }
 }
 

@@ -19,7 +19,6 @@ public final class Config {
     public enum Keys {
         PORT,
         DATABASE_CONNECTION_STRING,
-        REPORT_SERVER_ERRORS_AS_ISSUES,
         USE_IN_MEMORY_DATABASE,
         WRITE_STACKTRACE_TO_RESPONSE,
         MIGRATE_DATABASE_AT_STARTUP
@@ -31,7 +30,6 @@ public final class Config {
 
     private Integer port;
     private Boolean shouldWriteStacktraceToResponse;
-    private Boolean shouldReportServerErrorsAsIssues;
     private Boolean shouldUseInMemoryDatabase;
     private Boolean migrateDatabaseAtStartUp;
     private Lazy<DatabaseConfig> databaseConnectionString;
@@ -42,10 +40,6 @@ public final class Config {
 
     public static Optional<Boolean> writeStacktraceToResponse() {
         return Optional.ofNullable(getInstance().shouldWriteStacktraceToResponse);
-    }
-
-    public static Optional<Boolean> reportServerErrorsAsIssues() {
-        return Optional.ofNullable(getInstance().shouldReportServerErrorsAsIssues);
     }
 
     public static Optional<Boolean> useInMemoryDatabase() {
@@ -67,7 +61,6 @@ public final class Config {
             instance = new Config();
 
             instance.port = getEnv(PORT, Integer::parseInt);
-            instance.shouldReportServerErrorsAsIssues = getEnv(REPORT_SERVER_ERRORS_AS_ISSUES, Boolean::parseBoolean);
             instance.shouldUseInMemoryDatabase = getEnv(USE_IN_MEMORY_DATABASE, Boolean::parseBoolean);
             instance.shouldWriteStacktraceToResponse = getEnv(WRITE_STACKTRACE_TO_RESPONSE, Boolean::parseBoolean);
             instance.migrateDatabaseAtStartUp = getEnv(MIGRATE_DATABASE_AT_STARTUP, Boolean::parseBoolean);

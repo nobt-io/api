@@ -2,15 +2,13 @@ package io.nobt.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.application.BodyParser;
-import io.nobt.application.NobtRepositoryFactory;
+import io.nobt.application.NobtRepositoryCommandInvokerFactory;
 import io.nobt.application.ObjectMapperFactory;
 import io.nobt.application.env.Config;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.domain.NobtFactory;
-import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
 import io.nobt.persistence.DatabaseConfig;
-import io.nobt.rest.json.BodyParser;
-import io.nobt.rest.json.ObjectMapperFactory;
+import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.persistence.DatabaseAvailabilityCheck;
 import org.junit.AfterClass;
@@ -46,12 +44,13 @@ public abstract class ApiIntegrationTestBase {
 
         final ObjectMapper objectMapper = new ObjectMapperFactory().create();
         final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        final NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker = new NobtRepositoryCommandInvokerFactory().create();
 
         http = Service.ignite();
 
         new NobtRestApi(
                 http,
-                NobtRepositoryCommandInvokerFactory.transactional(databaseConfig),
+                nobtRepositoryCommandInvoker,
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
                 objectMapper,
