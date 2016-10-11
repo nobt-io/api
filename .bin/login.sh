@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 [ -z "$1" ] && echo "Space not given." && exit 1
 

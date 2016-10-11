@@ -14,10 +14,9 @@ Available configuration values:
 | NAME | TYPE | DESCRIPTION | DEFAULT VALUE |
 |------|------|-------------|---------------|
 |PORT|integer|Defines the port the API will try to listen on.| - |
-|REPORT_SERVER_ERRORS_AS_ISSUES|bool|Reports uncaught exceptions (e.g. those resulting in an 500) as issues to our [issue-tracker](gitlab.com/nobt-io/api/issues).|false|
 |WRITE_STACKTRACE_TO_RESPONSE|bool|Prints the stacktrace to the response.|true|
 |USE_IN_MEMORY_DATABASE|bool|Subtitutes the actual datastore with a non-persistent hashtable.|false|
-|MIGRATE_DATABASE_AT_STARTUP|bool|Migrates the defines database to the latest version. Incompatible with `USE_IN_MEMORY_DATABASE`.|false|
+|MIGRATE_DATABASE_AT_STARTUP|bool|Migrates the defined database to the latest version. Incompatible with `USE_IN_MEMORY_DATABASE`.|false|
 |DATABASE_CONNECTION_STRING|string|The connection string the application should use to connect to a database.|-|
 
 # Documentation
