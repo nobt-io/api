@@ -1,11 +1,12 @@
-# Download & run
+# Download
 
-You can grab the pre-built package by clicked on the green `passed` button of the build status right above this documentation.
+The latest pre-built package is available [here](https://gitlab.com/nobt-io/api/builds/artifacts/master/file/rest-api/build/distributions/rest-api-0.0.6.zip?job=build_rest-api).
 
-Once you extract the downloaded `artifacts.zip`, navigate down the folder structure and extract the `rest-api-{VERSION}.zip` file.
+# Run
+
 To run the API, simply run either the `run-minimal` Batch- or Shell-Skript in the `bin/` folder.
 
-## The application can be configured with a number of switches:
+# Configuration
 
 All configuration values have to be set as environment variables. Take a look at the `run-minimal`-scripts on how to do that.
 
@@ -14,7 +15,7 @@ Available configuration values:
 | NAME | TYPE | DESCRIPTION | DEFAULT VALUE |
 |------|------|-------------|---------------|
 |PORT|integer|Defines the port the API will try to listen on.| - |
-|WRITE_STACKTRACE_TO_RESPONSE|bool|Prints the stacktrace to the response.|true|
+|WRITE_STACKTRACE_TO_RESPONSE|bool|Prints the stacktrace to the response.|false|
 |USE_IN_MEMORY_DATABASE|bool|Subtitutes the actual datastore with a non-persistent hashtable.|false|
 |MIGRATE_DATABASE_AT_STARTUP|bool|Migrates the defined database to the latest version. Incompatible with `USE_IN_MEMORY_DATABASE`.|false|
 |DATABASE_CONNECTION_STRING|string|The connection string the application should use to connect to a database.|-|
