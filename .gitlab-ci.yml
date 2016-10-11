@@ -26,7 +26,7 @@ deploy_on_development:
     - .bin/login.sh development
     - .bin/prepareEnv.sh c86700fd-b167-46f5-bd97-f133d808b521
   script:
-    - .bin/deploy.sh nobt-io-dev
+    - .bin/push.sh nobt-io-dev
   environment: development
   only:
     - master
@@ -37,7 +37,7 @@ deploy_on_beta:
   before_script:
     - .bin/login.sh beta
   script:
-    - .bin/deploy.sh nobt-io-beta
+    - .bin/push.sh nobt-io-beta
   environment: beta
   when: manual
 
@@ -47,6 +47,6 @@ deploy_on_production:
   before_script:
     - .bin/login.sh production
   script:
-    - .bin/deploy.sh nobt-io
+    - .bin/push.sh nobt-io
   environment: production
   when: manual

@@ -3,7 +3,7 @@
 This version drops the support for profiles and instead introduces specific environment variables for configuration.
 This allows for a more fine-grained configuration of the API.
 
-For backwards-compatiblity reasons, a shell and a bash-script are located under the `bin/` folder that configure the application in the same way the `STANDALONE` profile did before.
+For backwards-compatibility reasons, a shell and a batch-script are located under the `bin/` folder that configure the application in the same way the `STANDALONE` profile did before.
 
 ## Version 0.0.5:
 
