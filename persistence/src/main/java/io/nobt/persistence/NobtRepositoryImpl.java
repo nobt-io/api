@@ -46,7 +46,7 @@ public class NobtRepositoryImpl implements NobtRepository, Closeable {
 
         final Optional<NobtEntity> nobt = Optional.ofNullable(em.find(NobtEntity.class, id.getId()));
 
-        return nobt.map(nobtMapper::mapToDomainModel).orElseThrow(() -> new UnknownNobtException(id));
+        return nobt.map(nobtMapper::mapToDomainModel).orElseThrow(UnknownNobtException::new);
     }
 
     @Override
