@@ -1,3 +1,8 @@
+## Version 0.0.7:
+
+- Correctly respond with a 404 if a nobt is requested whose identifier could not be decoded to a database id. ([Issue 30](https://gitlab.com/nobt-io/api/issues/30))
+- Do not leak the decoded database ID to the outside world if a nobt with a given ID could not be found in the database. ([Issue 31](https://gitlab.com/nobt-io/api/issues/31))
+
 ## Version 0.0.6:
 
 This version drops the support for profiles and instead introduces specific environment variables for configuration.
