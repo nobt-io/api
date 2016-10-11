@@ -28,6 +28,6 @@ public class InMemoryNobtRepository implements NobtRepository {
 
     @Override
     public Nobt getById(NobtId id) {
-        return Optional.ofNullable(nobtDatabase.get(id)).orElseThrow(() -> new UnknownNobtException(id));
+        return Optional.ofNullable(nobtDatabase.get(id)).orElseThrow(UnknownNobtException::new);
     }
 }
