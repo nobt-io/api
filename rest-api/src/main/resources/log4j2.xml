@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO" packages="io.nobt.logging">
+<Configuration status="INFO" packages="org.apache.logging.log4j.core,com.getsentry.raven.log4j2">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
         </Console>
-        <GitLabIssueAppender name="GitlabIssues" host="https://gitlab.com" username="nobt-io-bot" password="xmjmRRRanOcCiTPeYm9F" projectId="1208905">
-            <PatternLayout pattern="%d{HH:mm:ss} %msg%n" alwaysWriteExceptions="false"/>
-        </GitLabIssueAppender>
+        <Raven name="Sentry">
+            <!-- sentry is configured via env variables in CF -->
+        </Raven>
     </Appenders>
     <Loggers>
-        <Logger name="io.nobt.rest.NobtRestApi.unhandledExceptions" level="error">
-            <AppenderRef ref="GitlabIssues"/>
+        <Logger name="io.nobt.rest.NobtApplication.unhandledExceptions" level="ERROR">
+            <AppenderRef ref="Sentry"/>
         </Logger>
 
         <Root level="INFO">

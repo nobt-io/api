@@ -6,9 +6,11 @@ import io.nobt.application.NobtRepositoryFactory;
 import io.nobt.application.ObjectMapperFactory;
 import io.nobt.application.env.Config;
 import io.nobt.core.NobtCalculator;
+import io.nobt.core.domain.NobtFactory;
+import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
 import io.nobt.persistence.DatabaseConfig;
-import io.nobt.persistence.NobtRepository;
-import io.nobt.persistence.NobtRepositoryImpl;
+import io.nobt.rest.json.BodyParser;
+import io.nobt.rest.json.ObjectMapperFactory;
 import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.persistence.DatabaseAvailabilityCheck;
 import org.junit.AfterClass;
@@ -30,8 +32,6 @@ public abstract class ApiIntegrationTestBase {
     private static MigrationService migrationService;
     private static Service http;
 
-    protected static NobtRepository nobtRepository;
-
     @BeforeClass
     public static void setupEnvironment() {
 
@@ -47,25 +47,21 @@ public abstract class ApiIntegrationTestBase {
         final ObjectMapper objectMapper = new ObjectMapperFactory().create();
         final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
-        nobtRepository = new NobtRepositoryFactory().create();
-
         http = Service.ignite();
 
         new NobtRestApi(
                 http,
-                nobtRepository,
+                NobtRepositoryCommandInvokerFactory.transactional(databaseConfig),
                 new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
-                objectMapper
+                objectMapper,
+                new NobtFactory()
         ).run(ACTUAL_PORT);
     }
 
     @AfterClass
     public static void cleanupEnvironment() throws IOException {
         http.stop();
-
-        ((NobtRepositoryImpl) nobtRepository).close();
-
         migrationService.clean();
     }
 }

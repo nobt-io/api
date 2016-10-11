@@ -1,8 +1,13 @@
 package io.nobt.persistence.entity;
 
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -26,6 +31,12 @@ public class ExpenseEntity {
     @Column(name = "splitStrategy", nullable = false)
     private String splitStrategy;
 
+    @Column(name = "currency", nullable = false, length = 3)
+    private String currency;
+
+    @Column(name = "conversionRate", nullable = false)
+    private BigDecimal conversionRate;
+
     @ManyToOne
     @JoinColumn(name = "NOBT_ID", nullable = false)
     private NobtEntity nobt;
@@ -34,8 +45,18 @@ public class ExpenseEntity {
     @Column(name = "shares")
     private List<ShareEntity> shares;
 
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
+
+    @Column(name = "createdOn", nullable = false)
+    private LocalDateTime createdOn;
+
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -62,6 +83,22 @@ public class ExpenseEntity {
         this.splitStrategy = splitStrategy;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public BigDecimal getConversionRate() {
+        return conversionRate;
+    }
+
+    public void setConversionRate(BigDecimal conversionRate) {
+        this.conversionRate = conversionRate;
+    }
+
     public NobtEntity getNobt() {
         return nobt;
     }
@@ -76,5 +113,21 @@ public class ExpenseEntity {
 
     public void setShares(List<ShareEntity> shares) {
         this.shares = shares;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public LocalDateTime getCreatedOn() {
+        return createdOn;
+    }
+
+    public void setCreatedOn(LocalDateTime createdOn) {
+        this.createdOn = createdOn;
     }
 }

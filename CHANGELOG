@@ -1,9 +1,32 @@
-## Version 0.0.3:
+## Version 0.0.6:
 
-This version drops the support for profiles and instead introduces specific environment variables for configuration. 
+This version drops the support for profiles and instead introduces specific environment variables for configuration.
 This allows for a more fine-grained configuration of the API.
 
 For backwards-compatiblity reasons, a shell and a bash-script are located under the `bin/` folder that configure the application in the same way the `STANDALONE` profile did before.
+
+## Version 0.0.5:
+
+It is now possible to define a currency for a nobt. This allows the client to store expenses with different currencies.
+
+### Breaking changes
+
+- `POST /nobts/{id}`
+    - `currency` field added.
+
+## Version 0.0.4:
+
+You can now delete expenses from a Nobt.
+
+## Version 0.0.3:
+
+When creating an expense, you now have to specify a date. This date indicates, when the user made the expense.
+Additionally, a timestamp is generated for nobts and expenses, as soon as they are persisted.
+
+### Breaking changes
+
+- `POST /nobts/{id}/expenses`
+    - `date` field was added.
 
 ## Version 0.0.2:
 
