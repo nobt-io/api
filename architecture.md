@@ -1,19 +1,18 @@
 # Structure
 
 application-layer:
-	- rest-api
-	- log4j-gitlab-issue-appender
-	- profiles
+- rest-api
+- application-config
 
 domain-layer:
-	- core
-	- test
-	- utils
+- core
+- domain-test-support
+- util
 
 infrastructure-layer:
+- persistence
 	- persistence
-		- production
-		- in-memory
-		- test
-		- hibernate-postgres-json-support
-		- migrations
+	- inmemory-persistence
+	- persistence-test-support
+	- hibernate-postgres-json-support
+	- db-migrations

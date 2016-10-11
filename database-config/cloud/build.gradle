@@ -1,5 +1,0 @@
-dependencies {
-    compile (group: 'io.pivotal.labs', name: 'cf-env', version: '0.0.1') {
-        exclude group: 'com.fasterxml.jackson.core'
-    }
-}

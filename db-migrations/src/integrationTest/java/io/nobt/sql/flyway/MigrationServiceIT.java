@@ -1,6 +1,7 @@
 package io.nobt.sql.flyway;
 
-import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
+import io.nobt.application.env.Config;
+import io.nobt.application.env.MissingConfigurationException;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.test.persistence.DatabaseAvailabilityCheck;
 import org.junit.After;
@@ -8,6 +9,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static io.nobt.application.env.Config.Keys.DATABASE_CONNECTION_STRING;
+import static io.nobt.application.env.MissingConfigurationException.missingConfigurationException;
 import static org.awaitility.Awaitility.await;
 
 public class MigrationServiceIT {
@@ -19,7 +22,7 @@ public class MigrationServiceIT {
     @BeforeClass
     public static void setupEnvironment() {
 
-        databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
+        databaseConfig = Config.database().orElseThrow( missingConfigurationException(DATABASE_CONNECTION_STRING));
 
         final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
         await().until(availabilityCheck::isDatabaseUp);

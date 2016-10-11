@@ -1,8 +1,8 @@
 package io.nobt.persistence.repository;
 
+import io.nobt.application.env.Config;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
-import io.nobt.dbconfig.test.ConfigurablePostgresTestDatabaseConfig;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
@@ -22,10 +22,10 @@ import javax.persistence.EntityManagerFactory;
 import java.time.LocalDate;
 import java.util.Collections;
 
+import static io.nobt.application.env.Config.Keys.DATABASE_CONNECTION_STRING;
+import static io.nobt.application.env.MissingConfigurationException.missingConfigurationException;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
-import static io.nobt.test.domain.matchers.ExpenseMatchers.hasDebtee;
-import static io.nobt.test.domain.matchers.ExpenseMatchers.hasShares;
-import static io.nobt.test.domain.matchers.ExpenseMatchers.onDate;
+import static io.nobt.test.domain.matchers.ExpenseMatchers.*;
 import static io.nobt.test.domain.matchers.NobtMatchers.*;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
@@ -50,7 +50,7 @@ public class NobtRepositoryIT {
     @BeforeClass
     public static void setupEnvironment() {
 
-        databaseConfig = ConfigurablePostgresTestDatabaseConfig.parse(System::getenv);
+        databaseConfig = Config.database().orElseThrow(missingConfigurationException(DATABASE_CONNECTION_STRING));
         migrationService = new MigrationService(databaseConfig);
 
         DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
@@ -161,7 +161,7 @@ public class NobtRepositoryIT {
         final Long idOfFirstExpense = retrievedNobt.getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
 
         retrievedNobt.removeExpense(idOfFirstExpense);
-        
+
         sut.save(retrievedNobt);
 
 

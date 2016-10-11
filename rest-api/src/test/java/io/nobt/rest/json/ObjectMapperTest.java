@@ -1,6 +1,7 @@
 package io.nobt.rest.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.nobt.application.ObjectMapperFactory;
 import org.junit.Before;
 import org.junit.Test;
 
