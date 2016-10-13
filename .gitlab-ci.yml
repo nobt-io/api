@@ -1,9 +1,10 @@
+image: registry.gitlab.com/nobt-io-public/api-build-image:1.0.2
+
 stages:
   - build
   - deploy
 
 build_rest-api:
-  image: openjdk:8 # TODO we should use a slimmer image here, only need java and bash
   stage: build
   services:
     - postgres:9
@@ -20,7 +21,6 @@ build_rest-api:
       - '*/build/reports/*'
 
 deploy_on_development:
-  image: governmentpaas/cf-cli
   stage: deploy
   before_script:
     - .bin/login.sh development
@@ -32,7 +32,6 @@ deploy_on_development:
     - master
 
 deploy_on_beta:
-  image: governmentpaas/cf-cli
   stage: deploy
   before_script:
     - .bin/login.sh beta
@@ -42,7 +41,6 @@ deploy_on_beta:
   when: manual
 
 deploy_on_production:
-  image: governmentpaas/cf-cli
   stage: deploy
   before_script:
     - .bin/login.sh production
