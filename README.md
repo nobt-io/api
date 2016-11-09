@@ -1,6 +1,6 @@
 # Download
 
-The latest pre-built package is available [here](https://gitlab.com/nobt-io/api/builds/artifacts/master/file/rest-api/build/distributions/rest-api-0.0.7.zip?job=build_rest-api).
+The latest pre-built package is available [here](https://gitlab.com/nobt-io/api/builds/artifacts/master/file/rest-api/build/distributions/rest-api-0.0.8.zip?job=build_rest-api).
 
 # Run
 
