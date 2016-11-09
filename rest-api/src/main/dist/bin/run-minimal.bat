@@ -1,1 +1,1 @@
-cmd /C "set USE_IN_MEMORY_DATABASE=true && set MIGRATE_DATABASE_AT_STARTUP=false && set PORT=8080 && set WRITE_STACKTRACE_TO_RESPONSE=true && call rest-api.bat"
+cmd /C "set USE_IN_MEMORY_DATABASE=true && set MIGRATE_DATABASE_AT_STARTUP=false && set PORT=8080 && call rest-api.bat"

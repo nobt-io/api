@@ -1,6 +1,6 @@
 # Download
 
-The latest pre-built package is available [here](https://gitlab.com/nobt-io/api/builds/artifacts/master/file/rest-api/build/distributions/rest-api-0.0.7.zip?job=build_rest-api).
+The latest pre-built package is available [here](https://gitlab.com/nobt-io/api/builds/artifacts/master/file/rest-api/build/distributions/rest-api-0.0.8.zip?job=build_rest-api).
 
 # Run
 
@@ -15,7 +15,6 @@ Available configuration values:
 | NAME | TYPE | DESCRIPTION | DEFAULT VALUE |
 |------|------|-------------|---------------|
 |PORT|integer|Defines the port the API will try to listen on.| - |
-|WRITE_STACKTRACE_TO_RESPONSE|bool|Prints the stacktrace to the response.|false|
 |USE_IN_MEMORY_DATABASE|bool|Subtitutes the actual datastore with a non-persistent hashtable.|false|
 |MIGRATE_DATABASE_AT_STARTUP|bool|Migrates the defined database to the latest version. Incompatible with `USE_IN_MEMORY_DATABASE`.|false|
 |DATABASE_CONNECTION_STRING|string|The connection string the application should use to connect to a database.|-|

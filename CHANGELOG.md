@@ -1,3 +1,12 @@
+## Version 0.0.8:
+
+- Do not response with a 404 for "route not found" if the request caused an error. The response status is now correctly 500.
+- Provide unique IDs for nobt and expenses when using the In-Memory database.
+
+### Breaking changes
+
+- `WRITE_STACKTRACE_TO_RESPONSE` config value has been removed.
+
 ## Version 0.0.7:
 
 - Correctly respond with a 404 if a nobt is requested whose identifier could not be decoded to a database id. ([Issue 30](https://gitlab.com/nobt-io/api/issues/30))
