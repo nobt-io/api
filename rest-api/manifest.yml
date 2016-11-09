@@ -7,5 +7,4 @@ applications:
     - database
   env:
     USE_IN_MEMORY_DATABASE: false
-    WRITE_STACKTRACE_TO_RESPONSE: false
     MIGRATE_DATABASE_AT_STARTUP: true
