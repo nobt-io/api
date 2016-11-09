@@ -8,6 +8,8 @@ import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.rest.NobtRestApi;
 import io.nobt.sql.flyway.MigrationService;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import spark.Service;
 
 import javax.validation.Validation;
@@ -19,6 +21,8 @@ import static io.nobt.application.env.Config.Keys.PORT;
 import static io.nobt.application.env.MissingConfigurationException.missingConfigurationException;
 
 public class NobtApplication {
+
+    public static final Marker SENTRY = MarkerManager.getMarker("SENTRY");
 
     private final NobtRepositoryCommandInvokerFactory nobtRepositoryCommandInvokerFactory;
     private final ObjectMapperFactory objectMapperFactory;

@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="INFO" packages="org.apache.logging.log4j.core,com.getsentry.raven.log4j2">
+<Configuration status="WARN" packages="org.apache.logging.log4j.core,com.getsentry.raven.log4j2">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
         </Console>
         <Raven name="Sentry">
-            <!-- sentry is configured via env variables in CF -->
+            <!-- sentry is configured via env variables -->
+            <Filters>
+                <MarkerFilter marker="SENTRY" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
         </Raven>
     </Appenders>
     <Loggers>
-        <Logger name="io.nobt.rest.NobtApplication.unhandledExceptions" level="ERROR">
-            <AppenderRef ref="Sentry"/>
-        </Logger>
-
+        <Logger name="com.getsentry.raven" level="OFF"/>
         <Root level="INFO">
             <AppenderRef ref="Console" />
+            <AppenderRef ref="Sentry" />
         </Root>
     </Loggers>
 </Configuration>
