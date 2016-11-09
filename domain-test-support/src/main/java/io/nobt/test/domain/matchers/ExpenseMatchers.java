@@ -13,6 +13,15 @@ import static java.util.stream.Collectors.toSet;
 
 public final class ExpenseMatchers {
 
+    public static Matcher<Expense> hasId(final Matcher<Long> subMatcher) {
+        return new FeatureMatcher<Expense, Long>(subMatcher, "id", "id") {
+            @Override
+            protected Long featureValueOf(Expense actual) {
+                return actual.getId();
+            }
+        };
+    }
+
     public static Matcher<Expense> hasDebtee(final Matcher<Person> subMatcher) {
         return new FeatureMatcher<Expense, Person>(subMatcher, "debtee", "debtee") {
             @Override
