@@ -1,15 +1,21 @@
 package io.nobt.test.domain.matchers;
 
-import io.nobt.core.domain.CurrencyKey;
-import io.nobt.core.domain.Expense;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.Person;
+import io.nobt.core.domain.*;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
 import java.util.Set;
 
 public final class NobtMatchers {
+
+    public static Matcher<Nobt> hasId(final Matcher<NobtId> subMatcher) {
+        return new FeatureMatcher<Nobt, NobtId>(subMatcher, "id", "id") {
+            @Override
+            protected NobtId featureValueOf(Nobt actual) {
+                return actual.getId();
+            }
+        };
+    }
 
     public static Matcher<Nobt> hasName(final Matcher<String> subMatcher) {
         return new FeatureMatcher<Nobt, String>(subMatcher, "name", "name") {
