@@ -20,7 +20,6 @@ public final class Config {
         PORT,
         DATABASE_CONNECTION_STRING,
         USE_IN_MEMORY_DATABASE,
-        WRITE_STACKTRACE_TO_RESPONSE,
         MIGRATE_DATABASE_AT_STARTUP
     }
 
@@ -36,10 +35,6 @@ public final class Config {
 
     public static Optional<Integer> port() {
         return Optional.ofNullable(getInstance().port);
-    }
-
-    public static Optional<Boolean> writeStacktraceToResponse() {
-        return Optional.ofNullable(getInstance().shouldWriteStacktraceToResponse);
     }
 
     public static Optional<Boolean> useInMemoryDatabase() {
@@ -62,7 +57,6 @@ public final class Config {
 
             instance.port = getEnv(PORT, Integer::parseInt);
             instance.shouldUseInMemoryDatabase = getEnv(USE_IN_MEMORY_DATABASE, Boolean::parseBoolean);
-            instance.shouldWriteStacktraceToResponse = getEnv(WRITE_STACKTRACE_TO_RESPONSE, Boolean::parseBoolean);
             instance.migrateDatabaseAtStartUp = getEnv(MIGRATE_DATABASE_AT_STARTUP, Boolean::parseBoolean);
             instance.databaseConnectionString = new Lazy<>(() -> getEnv(DATABASE_CONNECTION_STRING, CFConnectionStringAdapter::parse));
         }

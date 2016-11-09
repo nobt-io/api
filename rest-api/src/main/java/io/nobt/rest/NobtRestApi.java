@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.application.BodyParser;
 import io.nobt.application.NobtApplication;
-import io.nobt.application.env.Config;
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
@@ -28,8 +27,6 @@ import spark.Service;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.io.IOException;
-import java.io.PrintStream;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -242,17 +239,6 @@ public class NobtRestApi {
 
             response.status(500);
             response.body("");
-
-            // if the config value is not set, we are cautious and don't write the stacktrace
-            final Boolean writeStackTraceToResponse = Config.writeStacktraceToResponse().orElse(false);
-
-            if (writeStackTraceToResponse) {
-                try {
-                    e.printStackTrace(new PrintStream(response.raw().getOutputStream()));
-                } catch (IOException e1) {
-                    LOGGER.error("Failed to write stacktrace to response", e1);
-                }
-            }
         }
     }
 }
