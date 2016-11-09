@@ -3,6 +3,7 @@ package io.nobt.rest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.application.BodyParser;
+import io.nobt.application.NobtApplication;
 import io.nobt.application.env.Config;
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.NobtCalculator;
@@ -234,13 +235,13 @@ public class NobtRestApi {
 
     private static class UncaughtExceptionHandler implements ExceptionHandler {
 
-        private static final Logger UNCAUGHT_EXCEPTIONS_LOGGER = LogManager.getLogger("io.nobt.rest.NobtRestApi.unhandledExceptions");
-
         @Override
         public void handle(Exception e, Request request, Response response) {
 
-            UNCAUGHT_EXCEPTIONS_LOGGER.error("Unhandled exception", e);
+            LOGGER.error(NobtApplication.SENTRY, "Unhandled exception.", e);
+
             response.status(500);
+            response.body("");
 
             // if the config value is not set, we are cautious and don't write the stacktrace
             final Boolean writeStackTraceToResponse = Config.writeStacktraceToResponse().orElse(false);
