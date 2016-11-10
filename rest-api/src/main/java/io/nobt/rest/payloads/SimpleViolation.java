@@ -7,11 +7,11 @@ public class SimpleViolation {
     @JsonProperty("property")
     private final String property;
 
-    @JsonProperty("message")
-    private final String message;
+    @JsonProperty("reason")
+    private final String reason;
 
-    public SimpleViolation(String property, String message) {
+    public SimpleViolation(String property, String reason) {
         this.property = property;
-        this.message = message;
+        this.reason = reason;
     }
 }

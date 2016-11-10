@@ -3,6 +3,7 @@ package io.nobt.rest;
 import io.nobt.rest.payloads.SimpleViolation;
 import org.zalando.problem.Problem;
 
+import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -24,6 +25,12 @@ public class ValidationProblem implements Problem {
     @Override
     public String getTitle() {
         return "The sent request was not valid.";
+    }
+
+    @Nullable
+    @Override
+    public String getDetail() {
+        return "At least one element in the sent request is invalid. Please refer to the list of errors below.";
     }
 
     @Override

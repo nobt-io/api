@@ -20,10 +20,9 @@ public class CheckNoDuplicateDebtorsValidator implements ConstraintValidator<Che
     @Override
     public boolean isValid(List<Share> shares, ConstraintValidatorContext constraintValidatorContext) {
 
-        constraintValidatorContext.disableDefaultConstraintViolation();
-
         if (shares == null) {
-            constraintValidatorContext.buildConstraintViolationWithTemplate("must not be null");
+            constraintValidatorContext.disableDefaultConstraintViolation();
+            constraintValidatorContext.buildConstraintViolationWithTemplate("must not be null").addConstraintViolation();
             return false;
         }
 
