@@ -1,3 +1,11 @@
+## Version 0.0.9:
+
+- The application now uses the [application/problem+json](https://tools.ietf.org/html/rfc7807) mediatype to communicate errors to the client.
+
+### Breaking changes
+
+- All error responses have changed and now provide more descriptive response.
+
 ## Version 0.0.8:
 
 - Do not response with a 404 for "route not found" if the request caused an error. The response status is now correctly 500.

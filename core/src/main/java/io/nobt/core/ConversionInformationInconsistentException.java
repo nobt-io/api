@@ -1,17 +1,24 @@
 package io.nobt.core;
 
+import io.nobt.core.domain.ConversionInformation;
+import io.nobt.core.domain.CurrencyKey;
 import io.nobt.core.domain.Nobt;
 
 public class ConversionInformationInconsistentException extends RuntimeException {
 
     private final Nobt nobt;
+    private final ConversionInformation foreignCurrencyKey;
 
-    public ConversionInformationInconsistentException(Nobt nobt) {
+    public ConversionInformationInconsistentException(Nobt nobt, ConversionInformation foreignCurrencyKey) {
         this.nobt = nobt;
+        this.foreignCurrencyKey = foreignCurrencyKey;
     }
 
-    @Override
-    public String getMessage() {
-        return String.format("Conversion information is not consistent with currency stored in nobt. Either supply a currency different from the nobt currency !(%s) or a rate of 1.", nobt.getCurrencyKey().getKey());
+    public CurrencyKey getNobtCurrencyKey() {
+        return nobt.getCurrencyKey();
+    }
+
+    public ConversionInformation getForeignCurrencyKey() {
+        return foreignCurrencyKey;
     }
 }

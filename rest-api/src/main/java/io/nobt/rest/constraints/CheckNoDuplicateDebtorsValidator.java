@@ -7,7 +7,6 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
@@ -21,10 +20,29 @@ public class CheckNoDuplicateDebtorsValidator implements ConstraintValidator<Che
     @Override
     public boolean isValid(List<Share> shares, ConstraintValidatorContext constraintValidatorContext) {
 
+        if (shares == null) {
+            constraintValidatorContext.disableDefaultConstraintViolation();
+            constraintValidatorContext.buildConstraintViolationWithTemplate("must not be null").addConstraintViolation();
+            return false;
+        }
+
         final List<Person> allDebtors = shares.stream().map(Share::getDebtor).collect(toList());
 
-        final Set<Person> allUniqueDebtors = new HashSet<>(allDebtors);
+        final HashSet<Person> visitedDebtors = new HashSet<>();
 
-        return allDebtors.size() == allUniqueDebtors.size();
+        for (int i = 0; i < allDebtors.size(); i++) {
+            Person debtor = allDebtors.get(i);
+            if (visitedDebtors.contains(debtor)) {
+                constraintValidatorContext
+                        .buildConstraintViolationWithTemplate("Debtors must only occur once across all shares.")
+                        .addPropertyNode("debtor")
+                            .inIterable().atIndex(i)
+                        .addConstraintViolation();
+            }
+
+            visitedDebtors.add(debtor);
+        }
+
+        return visitedDebtors.size() == allDebtors.size();
     }
 }

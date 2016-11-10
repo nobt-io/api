@@ -237,9 +237,11 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                         document("duplicate-debtor",
                                 preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
                                 responseFields(
-                                        fieldWithPath("[].property").description("Describes the property in the request object which caused the validation to fail."),
-                                        fieldWithPath("[].value").description("The value of the property as received by the server."),
-                                        fieldWithPath("[].message").description("An error message that describes what went wrong.")
+                                        fieldWithPath("title").description("A short description of the error."),
+                                        fieldWithPath("status").description("The status code for this error."),
+                                        fieldWithPath("detail").description("A more detailed message concerning this error."),
+                                        fieldWithPath("errors[].property").description("A simple path expression for the property that caused the validation error."),
+                                        fieldWithPath("errors[].reason").description("The reason why the supplied value is invalid.")
                                 )
                         )
                 )

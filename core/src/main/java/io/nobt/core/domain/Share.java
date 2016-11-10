@@ -1,10 +1,18 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.validation.Positive;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public final class Share {
 
+    @Valid
+    @NotNull
     private final Person debtor;
+
+    @Positive
     private final Amount amount;
 
     public Share(Person debtor, Amount amount) {

@@ -17,9 +17,10 @@ import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.rest.payloads.CreateExpenseInput;
 import io.nobt.rest.payloads.CreateNobtInput;
 import io.nobt.rest.payloads.NobtResource;
-import io.nobt.rest.payloads.SimpleViolation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.zalando.problem.Problem;
+import org.zalando.problem.ThrowableProblem;
 import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
@@ -28,11 +29,10 @@ import spark.Service;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
+import static javax.ws.rs.core.Response.Status.*;
 
 public class NobtRestApi {
 
@@ -43,7 +43,6 @@ public class NobtRestApi {
     private final NobtCalculator nobtCalculator;
     private final BodyParser bodyParser;
     private final ObjectMapper objectMapper;
-    private final SimpleViolationFactory simpleViolationFactory;
     private final NobtFactory nobtFactory;
 
     public NobtRestApi(Service service, NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper, NobtFactory nobtFactory) {
@@ -52,7 +51,6 @@ public class NobtRestApi {
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
         this.objectMapper = objectMapper;
-        this.simpleViolationFactory = new SimpleViolationFactory(objectMapper);
         this.nobtFactory = nobtFactory;
     }
 
@@ -65,13 +63,29 @@ public class NobtRestApi {
         registerTestFailRoute();
 
         http.exception(UnknownNobtException.class, (e, request, response) -> {
-            response.status(404);
-            response.body(e.getMessage());
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(NOT_FOUND)
+                    .withDetail("The nobt you are looking for cannot be found.")
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
         });
 
         http.exception(ConversionInformationInconsistentException.class, (e, request, response) -> {
-            response.status(400);
-            response.body(e.getMessage());
+
+            final ConversionInformationInconsistentException exception = (ConversionInformationInconsistentException) e;
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(BAD_REQUEST)
+                    .withTitle("The supplied conversion information is inconsistent.")
+                    .withDetail("Either supply a foreign currency different from the nobt-currency or a rate of 1.")
+                    .with("nobtCurrency", exception.getNobtCurrencyKey())
+                    .with("foreignCurrency", exception.getForeignCurrencyKey().getForeignCurrencyKey())
+                    .with("foreignCurrencyRate", exception.getForeignCurrencyKey().getRate())
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
         });
 
         registerValidationErrorExceptionHandler();
@@ -213,15 +227,8 @@ public class NobtRestApi {
         http.exception(ConstraintViolationException.class, (ve, request, response) -> {
 
             final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) ve).getConstraintViolations();
-            final List<SimpleViolation> simpleViolations = violations.stream().map(simpleViolationFactory::create).collect(toList());
 
-            response.status(400);
-
-            try {
-                response.body(objectMapper.writeValueAsString(simpleViolations));
-            } catch (JsonProcessingException e) {
-                throw new IllegalStateException(e);
-            }
+            writeProblemAsJsonToResponse(response, new ValidationProblem(violations));
         });
     }
 
@@ -230,15 +237,31 @@ public class NobtRestApi {
         http.exception(RuntimeException.class, new UncaughtExceptionHandler());
     }
 
-    private static class UncaughtExceptionHandler implements ExceptionHandler {
+    private class UncaughtExceptionHandler implements ExceptionHandler {
 
         @Override
         public void handle(Exception e, Request request, Response response) {
 
             LOGGER.error(NobtApplication.SENTRY, "Unhandled exception.", e);
 
-            response.status(500);
-            response.body("");
+            final ThrowableProblem internalProblem = Problem
+                    .builder()
+                    .withTitle("Internal error")
+                    .withStatus(INTERNAL_SERVER_ERROR)
+                    .withDetail("An unexpected internal error occurred. The problem has been reported.")
+                    .build();
+
+            writeProblemAsJsonToResponse(response, internalProblem);
+        }
+    }
+
+    private void writeProblemAsJsonToResponse(Response response, Problem problem) {
+        try {
+            response.status(problem.getStatus().getStatusCode());
+            response.body(objectMapper.writeValueAsString(problem));
+            response.header("Content-Type", "application/problem+json");
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
         }
     }
 }
