@@ -27,7 +27,7 @@ There is a general documentation about the API which describes the endpoints and
 
 ## Postman
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/cc9f923156ac3d4105f3#?env%5BLocal%5D=W3sidHlwZSI6InRleHQiLCJlbmFibGVkIjp0cnVlLCJrZXkiOiJiYXNlIiwidmFsdWUiOiJodHRwOi8vbG9jYWxob3N0OjgwODAifV0=)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/e290f490661a932c81e9#?env%5BLocal%5D=W3sia2V5IjoiYmFzZSIsInR5cGUiOiJ0ZXh0IiwidmFsdWUiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJlbmFibGVkIjp0cnVlfSx7ImtleSI6ImN1cnJlbnRfbm9idF9sb2NhdGlvbiIsInR5cGUiOiJ0ZXh0IiwidmFsdWUiOiJodHRwOi8vbG9jYWxob3N0OjgwODAvbm9idHMvM1h0QzhNUjJwNlJCIiwiZW5hYmxlZCI6dHJ1ZX1d)
 
 The collection is always up-to-date with the current version of the master branch. (Which is usually up-to-date with the version deployed at the dev-space.)  
 It comes with a preconfigured __environment__ (named __Local__) that already defines the necessary properties for testing a locally running API instance. 
