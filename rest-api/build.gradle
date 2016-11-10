@@ -31,6 +31,9 @@ dependencies {
 
     compile 'com.getsentry.raven:raven-log4j2:7.7.0'
 
+    compile 'org.zalando:problem:0.11.0'
+    compile 'org.zalando:jackson-datatype-problem:0.11.0'
+
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.1.0.Final'
 
     compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'

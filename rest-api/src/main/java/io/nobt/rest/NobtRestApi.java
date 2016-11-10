@@ -17,7 +17,6 @@ import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.rest.payloads.CreateExpenseInput;
 import io.nobt.rest.payloads.CreateNobtInput;
 import io.nobt.rest.payloads.NobtResource;
-import io.nobt.rest.payloads.SimpleViolation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import spark.ExceptionHandler;
@@ -28,11 +27,9 @@ import spark.Service;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toList;
 
 public class NobtRestApi {
 
@@ -43,7 +40,6 @@ public class NobtRestApi {
     private final NobtCalculator nobtCalculator;
     private final BodyParser bodyParser;
     private final ObjectMapper objectMapper;
-    private final SimpleViolationFactory simpleViolationFactory;
     private final NobtFactory nobtFactory;
 
     public NobtRestApi(Service service, NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper, NobtFactory nobtFactory) {
@@ -52,7 +48,6 @@ public class NobtRestApi {
         this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
         this.objectMapper = objectMapper;
-        this.simpleViolationFactory = new SimpleViolationFactory(objectMapper);
         this.nobtFactory = nobtFactory;
     }
 
@@ -213,12 +208,12 @@ public class NobtRestApi {
         http.exception(ConstraintViolationException.class, (ve, request, response) -> {
 
             final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) ve).getConstraintViolations();
-            final List<SimpleViolation> simpleViolations = violations.stream().map(simpleViolationFactory::create).collect(toList());
 
+            response.header("Content-Type", "application/problem+json");
             response.status(400);
 
             try {
-                response.body(objectMapper.writeValueAsString(simpleViolations));
+                response.body(objectMapper.writeValueAsString(new ValidationProblem(violations)));
             } catch (JsonProcessingException e) {
                 throw new IllegalStateException(e);
             }
