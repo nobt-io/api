@@ -67,6 +67,14 @@ distributions {
     }
 }
 
+test {
+    useJUnit {
+        if (project.hasProperty("includeSlowTests")) {
+            includeCategories 'io.nobt.rest.Slow'
+        }
+    }
+}
+
 distTar {
     enabled = false
 }
