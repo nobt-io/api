@@ -77,7 +77,7 @@ public class Nobt {
         final boolean isSameCurrency = conversionInformation.getForeignCurrencyKey().equals(currencyKey);
 
         if (isSameCurrency && !conversionInformation.hasDefaultRate()) {
-            throw new ConversionInformationInconsistentException(this);
+            throw new ConversionInformationInconsistentException(this, conversionInformation);
         }
 
         final Expense newExpense = new Expense(null, name, splitStrategy, debtee, conversionInformation, shares, date, LocalDateTime.now(ZoneOffset.UTC));

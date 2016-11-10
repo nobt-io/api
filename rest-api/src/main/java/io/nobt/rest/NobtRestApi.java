@@ -19,6 +19,8 @@ import io.nobt.rest.payloads.CreateNobtInput;
 import io.nobt.rest.payloads.NobtResource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.zalando.problem.Problem;
+import org.zalando.problem.ThrowableProblem;
 import spark.ExceptionHandler;
 import spark.Request;
 import spark.Response;
@@ -30,6 +32,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 
 public class NobtRestApi {
 
@@ -60,13 +65,29 @@ public class NobtRestApi {
         registerTestFailRoute();
 
         http.exception(UnknownNobtException.class, (e, request, response) -> {
-            response.status(404);
-            response.body(e.getMessage());
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(NOT_FOUND)
+                    .withDetail("The nobt you are looking for cannot be found.")
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
         });
 
         http.exception(ConversionInformationInconsistentException.class, (e, request, response) -> {
-            response.status(400);
-            response.body(e.getMessage());
+
+            final ConversionInformationInconsistentException exception = (ConversionInformationInconsistentException) e;
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(BAD_REQUEST)
+                    .withTitle("The supplied conversion information is inconsistent.")
+                    .withDetail("Either supply a foreign currency different from the nobt-currency or a rate of 1.")
+                    .with("nobtCurrency", exception.getNobtCurrencyKey())
+                    .with("foreignCurrency", exception.getForeignCurrencyKey().getForeignCurrencyKey())
+                    .with("foreignCurrencyRate", exception.getForeignCurrencyKey().getRate())
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
         });
 
         registerValidationErrorExceptionHandler();
@@ -209,14 +230,7 @@ public class NobtRestApi {
 
             final Set<ConstraintViolation<?>> violations = ((ConstraintViolationException) ve).getConstraintViolations();
 
-            response.header("Content-Type", "application/problem+json");
-            response.status(400);
-
-            try {
-                response.body(objectMapper.writeValueAsString(new ValidationProblem(violations)));
-            } catch (JsonProcessingException e) {
-                throw new IllegalStateException(e);
-            }
+            writeProblemAsJsonToResponse(response, new ValidationProblem(violations));
         });
     }
 
@@ -225,15 +239,31 @@ public class NobtRestApi {
         http.exception(RuntimeException.class, new UncaughtExceptionHandler());
     }
 
-    private static class UncaughtExceptionHandler implements ExceptionHandler {
+    private class UncaughtExceptionHandler implements ExceptionHandler {
 
         @Override
         public void handle(Exception e, Request request, Response response) {
 
             LOGGER.error(NobtApplication.SENTRY, "Unhandled exception.", e);
 
-            response.status(500);
-            response.body("");
+            final ThrowableProblem internalProblem = Problem
+                    .builder()
+                    .withTitle("Internal error")
+                    .withStatus(INTERNAL_SERVER_ERROR)
+                    .withDetail("An unexpected internal error occurred. The problem has been reported.")
+                    .build();
+
+            writeProblemAsJsonToResponse(response, internalProblem);
+        }
+    }
+
+    private void writeProblemAsJsonToResponse(Response response, Problem problem) {
+        try {
+            response.status(problem.getStatus().getStatusCode());
+            response.body(objectMapper.writeValueAsString(problem));
+            response.header("Content-Type", "application/problem+json");
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(e);
         }
     }
 }
