@@ -1,4 +1,5 @@
 apply from: rootProject.rootDir.path + '/gradle/integrationTest.gradle'
+apply from: rootProject.rootDir.path + '/gradle/testSupport.gradle'
 
 dependencies {
     compile project(':core')
@@ -10,12 +11,12 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1208'
 
 
-    testCompile project(':domain-test-support')
+    testCompile project(path: ':core', configuration: 'testSupportCompile')
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     integrationTestCompile project(':db-migrations')
     integrationTestCompile project(':application-config')
-    integrationTestCompile project(':persistence-test-support')
+    integrationTestCompile project(path: ':persistence', configuration: 'testSupportCompile')
     integrationTestCompile 'org.awaitility:awaitility:2.0.0'
 }

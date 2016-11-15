@@ -1,0 +1,20 @@
+configurations {
+    testSupportCompile.extendsFrom compile
+    testSupportRuntime.extendsFrom runtime
+}
+
+sourceSets {
+    testSupport {
+        compileClasspath += sourceSets.main.output + configurations.testSupportCompile
+        runtimeClasspath  += compileClasspath + configurations.testSupportRuntime
+    }
+}
+
+task testSupportJar(type: Jar) {
+    from sourceSets.testSupport.output
+    classifier 'testSupport'
+}
+
+artifacts {
+    testSupportCompile testSupportJar
+}
