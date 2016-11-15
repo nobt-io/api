@@ -11,7 +11,8 @@ build_rest-api:
   variables:
     DATABASE_CONNECTION_STRING: 'jdbc:postgresql://postgres:password@postgres:5432/postgres'
   script:
-    - ./gradlew test -Dorg.gradle.parallel=true # unit tests are fine to be run in parallel
+    - ./gradlew clean
+    - ./gradlew test
     - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel
     - ./gradlew :rest-api:distZip
   artifacts:
