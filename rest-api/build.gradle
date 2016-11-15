@@ -69,8 +69,8 @@ distributions {
 
 test {
     useJUnit {
-        if (project.hasProperty("includeSlowTests")) {
-            includeCategories 'io.nobt.rest.Slow'
+        if (!project.hasProperty("includeSlowTests")) {
+            excludeCategories 'io.nobt.rest.Slow'
         }
     }
 }
