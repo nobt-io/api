@@ -5,9 +5,7 @@ allprojects {
     version = '0.0.9'
 
     repositories {
-        mavenLocal()
         mavenCentral()
-        jcenter()
     }
 }
 
