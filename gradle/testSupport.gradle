@@ -1,0 +1,23 @@
+configurations {
+    // Create the configuration we will use to refer to our sources.
+    testSupport.extendsFrom compile
+}
+
+sourceSets {
+    // Creates two configurations (testSupportCompile, testSupportRuntime) we will ignore.
+    testSupport {
+        // We will at least need access to our main sourceSet and all dependencies that are declared for our configuration.
+        compileClasspath += sourceSets.main.output + configurations.testSupport
+    }
+}
+
+// Define a task to create a jar out of our sources.
+task testSupportJar(type: Jar) {
+    from sourceSets.testSupport.output
+    classifier 'testSupport'
+}
+
+artifacts {
+    // Expose the output of our Jar-Task as an artifact so other project can depend on it.
+    testSupport testSupportJar
+}

@@ -10,8 +10,9 @@ dependencies {
     compile group: 'org.postgresql', name: 'postgresql', version: '9.4.1208'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version:'2.5'
 
+    testCompile project(path: ':persistence', configuration: 'testSupport')
+
     integrationTestCompile project(':application-config')
-    integrationTestCompile project(':persistence-test-support')
     integrationTestCompile 'org.awaitility:awaitility:2.0.0'
     integrationTestCompile group: 'junit', name: 'junit', version: '4.12'
 }
