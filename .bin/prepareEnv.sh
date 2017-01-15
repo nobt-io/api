@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 
+cf create-service elephantsql turtle database # Make sure the database service exists. Doesn't error if it already exists.
 
 cf set-env \
 nobt-io \
