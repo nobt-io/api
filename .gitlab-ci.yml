@@ -1,4 +1,4 @@
-image: registry.gitlab.com/nobt-io-public/api-build-image:1.0.2
+image: registry.gitlab.com/nobt-io-public/api-build-image:1.0.3
 
 stages:
   - build
@@ -25,7 +25,7 @@ deploy_on_development:
   stage: deploy
   before_script:
     - .bin/login.sh development
-    - .bin/prepareEnv.sh c86700fd-b167-46f5-bd97-f133d808b521
+    - .bin/prepareEnv.sh
   script:
     - .bin/push.sh nobt-io-dev
   environment: development
