@@ -48,6 +48,7 @@ deploy_on_beta:
 
 deploy_on_production:
   stage: deploy
+  before_script:
     - .cf/login production
     - .cf/ensureDatabase
   script:
