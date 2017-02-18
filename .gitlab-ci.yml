@@ -36,6 +36,7 @@ deploy_on_beta:
   stage: deploy
   before_script:
     - .bin/login.sh beta
+    - .bin/prepareEnv.sh
   script:
     - .bin/push.sh nobt-io-beta
   environment: beta
@@ -45,6 +46,7 @@ deploy_on_production:
   stage: deploy
   before_script:
     - .bin/login.sh production
+    - .bin/prepareEnv.sh
   script:
     - .bin/push.sh nobt-io
   environment: production
