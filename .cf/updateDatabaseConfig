@@ -1,6 +1,4 @@
-#!/usr/bin/env sh
-
-cf create-service elephantsql turtle database # Make sure the database service exists. Doesn't error if it already exists.
+#!/usr/bin/env bash
 
 cf set-env \
 nobt-io \
@@ -12,3 +10,5 @@ cf set-env \
 nobt-io \
 SENTRY_RELEASE \
 ${CI_BUILD_REF}
+
+cf restart nobt-io

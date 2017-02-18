@@ -24,10 +24,12 @@ build_rest-api:
 deploy_on_development:
   stage: deploy
   before_script:
-    - .bin/login.sh development
-    - .bin/prepareEnv.sh
+    - .cf/login development
+    - .cf/ensureDatabase
   script:
-    - .bin/push.sh nobt-io-dev
+    - .cf/push nobt-io-dev
+  after_script:
+    - .cf/updateDatabaseConfig
   environment: development
   only:
     - master
@@ -35,19 +37,22 @@ deploy_on_development:
 deploy_on_beta:
   stage: deploy
   before_script:
-    - .bin/login.sh beta
-    - .bin/prepareEnv.sh
+    - .cf/login beta
+    - .cf/ensureDatabase
   script:
-    - .bin/push.sh nobt-io-beta
+    - .cf/push nobt-io-beta
+  after_script:
+    - .cf/updateDatabaseConfig
   environment: beta
   when: manual
 
 deploy_on_production:
   stage: deploy
-  before_script:
-    - .bin/login.sh production
-    - .bin/prepareEnv.sh
+    - .cf/login production
+    - .cf/ensureDatabase
   script:
-    - .bin/push.sh nobt-io
+    - .cf/push nobt-io
+  after_script:
+    - .cf/updateDatabaseConfig
   environment: production
   when: manual
