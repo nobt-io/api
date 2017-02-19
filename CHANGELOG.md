@@ -1,3 +1,7 @@
+## Version 0.0.10
+
+- The createdOn timestamp of nobts and expenses is now returned with timezone information. These timestamps are always in UTC but until now, this was not reflected in the returned value. According to the ISO6801 standard, the returned value now contains the timezone offset. ('Z' for UTC)
+
 ## Version 0.0.9:
 
 - The application now uses the [application/problem+json](https://tools.ietf.org/html/rfc7807) mediatype to communicate errors to the client.
