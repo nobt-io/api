@@ -8,6 +8,7 @@ import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -49,7 +50,7 @@ public class ExpenseEntity {
     private LocalDate date;
 
     @Column(name = "createdOn", nullable = false)
-    private LocalDateTime createdOn;
+    private ZonedDateTime createdOn;
 
     public long getId() {
         return id;
@@ -123,11 +124,11 @@ public class ExpenseEntity {
         this.date = date;
     }
 
-    public LocalDateTime getCreatedOn() {
+    public ZonedDateTime getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(LocalDateTime createdOn) {
+    public void setCreatedOn(ZonedDateTime createdOn) {
         this.createdOn = createdOn;
     }
 }

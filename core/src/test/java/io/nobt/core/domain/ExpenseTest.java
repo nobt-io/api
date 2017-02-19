@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -45,7 +46,7 @@ public class ExpenseTest {
                 new Share(thomas, amount(10)),
                 new Share(lukas, amount(20))),
                 LocalDate.now(),
-                LocalDateTime.now()
+                ZonedDateTime.now()
         );
     }
 }

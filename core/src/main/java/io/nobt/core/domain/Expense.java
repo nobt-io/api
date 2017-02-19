@@ -1,8 +1,11 @@
 package io.nobt.core.domain;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static io.nobt.core.domain.Transaction.transaction;
 import static java.util.stream.Collectors.toList;
@@ -21,9 +24,9 @@ public class Expense {
     private final ConversionInformation conversionInformation;
     private final Set<Share> shares;
     private final LocalDate date;
-    private final LocalDateTime createdOn;
+    private final ZonedDateTime createdOn;
 
-    public Expense(Long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, LocalDateTime createdOn) {
+    public Expense(Long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, ZonedDateTime createdOn) {
         this.id = id;
         this.name = name;
         this.splitStrategy = splitStrategy;
@@ -58,7 +61,7 @@ public class Expense {
         return date;
     }
 
-    public LocalDateTime getCreatedOn() {
+    public ZonedDateTime getCreatedOn() {
         return createdOn;
     }
 

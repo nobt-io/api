@@ -20,10 +20,13 @@ import org.junit.rules.ExpectedException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 
 import static io.nobt.application.env.Config.Keys.DATABASE_CONNECTION_STRING;
 import static io.nobt.application.env.MissingConfigurationException.missingConfigurationException;
+import static io.nobt.test.domain.Currencies.EUR;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.*;
 import static io.nobt.test.domain.matchers.NobtMatchers.*;
@@ -170,5 +173,22 @@ public class NobtRepositoryIT {
         assertThat(nobtWithoutExpense, hasExpenses(
                 iterableWithSize(0)
         ));
+    }
+
+    @Test
+    public void shouldCorrectlyHandleTimezones() throws Exception {
+
+        final ZonedDateTime firstOf2017 = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
+
+        final Nobt nobtToSave = new Nobt(null, EUR, "Test", Collections.emptySet(), Collections.emptySet(), firstOf2017);
+
+        final NobtId id = sut.save(nobtToSave);
+
+        final Nobt loadedNobt = sut.getById(id);
+        final ZonedDateTime persistedTimestamp = loadedNobt.getCreatedOn();
+
+        final ZonedDateTime expected = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
+
+        assertThat(persistedTimestamp, is(expected));
     }
 }

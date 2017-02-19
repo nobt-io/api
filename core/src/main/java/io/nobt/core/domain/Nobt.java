@@ -3,8 +3,8 @@ package io.nobt.core.domain;
 import io.nobt.core.ConversionInformationInconsistentException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -19,9 +19,9 @@ public class Nobt {
     private final String name;
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
-    private final LocalDateTime createdOn;
+    private final ZonedDateTime createdOn;
 
-    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, LocalDateTime createdOn) {
+    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn) {
         this.id = id;
         this.currencyKey = currencyKey;
         this.name = name;
@@ -64,7 +64,7 @@ public class Nobt {
                 .collect(toList());
     }
 
-    public LocalDateTime getCreatedOn() {
+    public ZonedDateTime getCreatedOn() {
         return createdOn;
     }
 
@@ -80,7 +80,7 @@ public class Nobt {
             throw new ConversionInformationInconsistentException(this, conversionInformation);
         }
 
-        final Expense newExpense = new Expense(null, name, splitStrategy, debtee, conversionInformation, shares, date, LocalDateTime.now(ZoneOffset.UTC));
+        final Expense newExpense = new Expense(null, name, splitStrategy, debtee, conversionInformation, shares, date, ZonedDateTime.now(ZoneOffset.UTC));
 
         expenses.add(newExpense);
     }

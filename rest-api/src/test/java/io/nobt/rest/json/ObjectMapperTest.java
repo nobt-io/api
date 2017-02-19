@@ -7,7 +7,9 @@ import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
+import static java.time.ZoneOffset.UTC;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -33,10 +35,10 @@ public class ObjectMapperTest {
     @Test
     public void shouldSerializeLocalDateTimeAsISO6801Timestamp() throws Exception {
 
-        final LocalDateTime someDay = LocalDateTime.of(2016, 10, 5, 10, 0, 0);
+        final ZonedDateTime someDay = ZonedDateTime.of(2016, 10, 5, 10, 0, 0, 0, UTC);
 
         final String serializedLocalDate = sut.writeValueAsString(someDay);
 
-        assertThat(serializedLocalDate, is("\"2016-10-05T10:00:00\""));
+        assertThat(serializedLocalDate, is("\"2016-10-05T10:00:00Z\""));
     }
 }
