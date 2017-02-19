@@ -9,8 +9,8 @@ public class ObjectMapperFactory {
 
     public ObjectMapper create() {
         return new ObjectMapper()
-                .registerModules(new CoreModule())
                 .registerModule(new JavaTimeModule())
-                .registerModule(new ProblemModule());
+                .registerModule(new ProblemModule())
+                .registerModules(new CoreModule());
     }
 }

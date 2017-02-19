@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.nobt.core.domain.*;
 import io.nobt.rest.json.amount.AmountDeserializer;
 import io.nobt.rest.json.amount.AmountSerializer;
@@ -16,6 +18,9 @@ import io.nobt.rest.json.nobt.NobtMixin;
 import io.nobt.rest.json.person.PersonDeserializer;
 import io.nobt.rest.json.person.PersonSerializer;
 import io.nobt.rest.json.share.ShareMixin;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class CoreModule extends SimpleModule {
 
@@ -30,6 +35,9 @@ public class CoreModule extends SimpleModule {
 
         addSerializer(CurrencyKey.class, new CurrencyKeySerializer());
         addDeserializer(CurrencyKey.class, new CurrencyKeyDeserializer());
+
+        addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
 
         setMixInAnnotation(Share.class, ShareMixin.class);
         setMixInAnnotation(Nobt.class, NobtMixin.class);
