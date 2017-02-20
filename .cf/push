@@ -1,5 +1,7 @@
 #!/usr/bin/env sh
 
+set -e # Quit on any error.
+
 [ -z "$1" ] && echo "Route not given." && exit 1
 
 # Push the app with the default configuration.
