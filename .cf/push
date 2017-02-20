@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+
+set -e # Quit on any error.
+
+[ -z "$1" ] && echo "Route not given." && exit 1
+
+# Push the app with the default configuration.
+cf push -n $1 -p rest-api/build/distributions/*.zip -f rest-api/manifest.yml
+
+
+# Extract the connection string to the configured database.
+cf set-env \
+nobt-io \
+DATABASE_CONNECTION_STRING \
+$(cf get-env nobt-io ".system_env_json.VCAP_SERVICES.elephantsql[0].credentials.uri" | cut -f 1)
+
+cf set-env nobt-io USE_IN_MEMORY_DATABASE false # Disable the in memory database.
+cf set-env nobt-io MIGRATE_DATABASE_AT_STARTUP true # Migrate the specified database.
+cf set-env nobt-io SENTRY_RELEASE ${CI_BUILD_REF}  # this script is only run on gitlab CI through .gitlab-ci.yml which means we can rely on global variables (CI_BUILD_REF)
+
+cf restage nobt-io # Restage the app in order for the changes to take effect.

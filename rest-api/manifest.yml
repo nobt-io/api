@@ -6,5 +6,8 @@ applications:
   services:
     - database
   env:
-    USE_IN_MEMORY_DATABASE: false
-    MIGRATE_DATABASE_AT_STARTUP: true
+    # We default to the in-memory database in order to avoid startup failure if the app is pushed the first time. (The actual connection string is set after the app is uploaded.)
+    USE_IN_MEMORY_DATABASE: true
+
+    # We must not try to migrate the database if we run against the in-memory database.
+    MIGRATE_DATABASE_AT_STARTUP: false

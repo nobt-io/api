@@ -24,10 +24,9 @@ build_rest-api:
 deploy_on_development:
   stage: deploy
   before_script:
-    - .bin/login.sh development
-    - .bin/prepareEnv.sh
+    - .cf/login development
   script:
-    - .bin/push.sh nobt-io-dev
+    - .cf/push nobt-io-dev
   environment: development
   only:
     - master
@@ -35,19 +34,17 @@ deploy_on_development:
 deploy_on_beta:
   stage: deploy
   before_script:
-    - .bin/login.sh beta
-    - .bin/prepareEnv.sh
+    - .cf/login beta
   script:
-    - .bin/push.sh nobt-io-beta
+    - .cf/push nobt-io-beta
   environment: beta
   when: manual
 
 deploy_on_production:
   stage: deploy
   before_script:
-    - .bin/login.sh production
-    - .bin/prepareEnv.sh
+    - .cf/login production
   script:
-    - .bin/push.sh nobt-io
+    - .cf/push nobt-io
   environment: production
   when: manual
