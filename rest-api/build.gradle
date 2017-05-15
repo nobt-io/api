@@ -80,6 +80,7 @@ distTar {
 }
 
 distZip {
+    archiveName = "${project.name}.zip"
     dependsOn asciidoctor
 }
 
