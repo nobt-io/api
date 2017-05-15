@@ -7,7 +7,7 @@ import java.net.URI;
 /**
  * Adapter class that is needed because cloudfoundry does not give us a proper connection-string.
  */
-public class CFConnectionStringAdapter implements DatabaseConfig {
+public class ConnectionStringAdapter implements DatabaseConfig {
 
     private static final String JDBC_SCHEME = "jdbc:";
     private static final String JDBC_URL_TEMPLATE = "jdbc:postgresql://%s:%s%s";
@@ -16,7 +16,7 @@ public class CFConnectionStringAdapter implements DatabaseConfig {
     private final String password;
     private final String url;
 
-    private CFConnectionStringAdapter(String username, String password, String url) {
+    private ConnectionStringAdapter(String username, String password, String url) {
         this.username = username;
         this.password = password;
         this.url = url;
@@ -30,7 +30,7 @@ public class CFConnectionStringAdapter implements DatabaseConfig {
         final String jdbcConnectionURL = String.format(JDBC_URL_TEMPLATE, uri.getHost(), uri.getPort(), uri.getPath());
         final String[] userInfo = uri.getUserInfo().split(":");
 
-        return new CFConnectionStringAdapter(userInfo[0], userInfo[1], jdbcConnectionURL);
+        return new ConnectionStringAdapter(userInfo[0], userInfo[1], jdbcConnectionURL);
     }
 
     private static boolean hasJdbcScheme(final String uri) {
