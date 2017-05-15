@@ -135,8 +135,3 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 *.class
-
-# Elastic Beanstalk Files
-.elasticbeanstalk/*
-!.elasticbeanstalk/*.cfg.yml
-!.elasticbeanstalk/*.global.yml

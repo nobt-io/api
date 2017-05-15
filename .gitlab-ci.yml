@@ -1,4 +1,4 @@
-image: registry.gitlab.com/nobt-io-public/api-build-image:1.0.3
+image: registry.gitlab.com/nobt-io-public/api-build-image:2.0.0
 
 stages:
   - build
@@ -23,28 +23,7 @@ build_rest-api:
 
 deploy_on_development:
   stage: deploy
-  before_script:
-    - .cf/login development
   script:
-    - .cf/push nobt-io-dev
-  environment: development
+    - .aws/deploy api-dev
   only:
     - master
-
-deploy_on_beta:
-  stage: deploy
-  before_script:
-    - .cf/login beta
-  script:
-    - .cf/push nobt-io-beta
-  environment: beta
-  when: manual
-
-deploy_on_production:
-  stage: deploy
-  before_script:
-    - .cf/login production
-  script:
-    - .cf/push nobt-io
-  environment: production
-  when: manual
