@@ -5,14 +5,14 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
-public class CFConnectionStringAdapterTest {
+public class ConnectionStringAdapterTest {
 
     @Test
     public void shouldParseGivenConnection() throws Exception {
 
         final String connectionUriAsGivenByCF = "postgres://vpasdipa:aGm32nh2Q2gOE8KjoNvE0w2jYi-b9k4n@pellefant-02.db.elephantsql.com:5432/vpasdipa";
 
-        final DatabaseConfig config = CFConnectionStringAdapter.parse(connectionUriAsGivenByCF);
+        final DatabaseConfig config = ConnectionStringAdapter.parse(connectionUriAsGivenByCF);
 
         assertEquals("vpasdipa", config.username());
         assertEquals("aGm32nh2Q2gOE8KjoNvE0w2jYi-b9k4n", config.password());
@@ -24,7 +24,7 @@ public class CFConnectionStringAdapterTest {
 
         final String validConnectionString = "jdbc:postgresql://postgres:password@postgres:5432/postgres";
 
-        final DatabaseConfig config = CFConnectionStringAdapter.parse(validConnectionString);
+        final DatabaseConfig config = ConnectionStringAdapter.parse(validConnectionString);
 
         assertEquals("postgres", config.username());
         assertEquals("password", config.password());

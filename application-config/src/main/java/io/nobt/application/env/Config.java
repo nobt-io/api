@@ -28,7 +28,6 @@ public final class Config {
     private static Config instance;
 
     private Integer port;
-    private Boolean shouldWriteStacktraceToResponse;
     private Boolean shouldUseInMemoryDatabase;
     private Boolean migrateDatabaseAtStartUp;
     private Lazy<DatabaseConfig> databaseConnectionString;
@@ -58,7 +57,7 @@ public final class Config {
             instance.port = getEnv(PORT, Integer::parseInt);
             instance.shouldUseInMemoryDatabase = getEnv(USE_IN_MEMORY_DATABASE, Boolean::parseBoolean);
             instance.migrateDatabaseAtStartUp = getEnv(MIGRATE_DATABASE_AT_STARTUP, Boolean::parseBoolean);
-            instance.databaseConnectionString = new Lazy<>(() -> getEnv(DATABASE_CONNECTION_STRING, CFConnectionStringAdapter::parse));
+            instance.databaseConnectionString = new Lazy<>(() -> getEnv(DATABASE_CONNECTION_STRING, ConnectionStringAdapter::parse));
         }
 
         return instance;
@@ -67,11 +66,11 @@ public final class Config {
     private static <T> T getEnv(Keys key, Function<String, T> mapper) {
         return Optional.ofNullable(System.getenv(key.name()))
                 .map(String::trim)
-                .map(mapper)
                 .map((value) -> {
                     LOGGER.info("{}: {}", key, value);
                     return value;
                 })
+                .map(mapper)
                 .orElse(null);
     }
 }
