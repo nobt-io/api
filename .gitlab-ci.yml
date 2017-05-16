@@ -1,4 +1,4 @@
-image: registry.gitlab.com/nobt-io-public/api-build-image:2.1.0-SNAPSHOT-b5135d
+image: registry.gitlab.com/nobt-io-public/api-build-image:2.1.0
 
 stages:
   - build
@@ -25,5 +25,5 @@ deploy_on_development:
   stage: deploy
   script:
     - .aws/deploy api-dev
-  # only:
-    # - master
+   only:
+     - master
