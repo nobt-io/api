@@ -25,5 +25,5 @@ deploy_on_development:
   stage: deploy
   script:
     - .aws/deploy api-dev
-  only:
-    - master
+  # only:
+    # - master
