@@ -1,4 +1,4 @@
-image: registry.gitlab.com/nobt-io-public/api-build-image:2.0.0
+image: registry.gitlab.com/nobt-io-public/api-build-image:2.1.0
 
 stages:
   - build
