@@ -24,6 +24,6 @@ build_rest-api:
 deploy_on_development:
   stage: deploy
   script:
-    - .aws/deploy api-dev
+    - .aws/deploy api-prod
   only:
     - master
