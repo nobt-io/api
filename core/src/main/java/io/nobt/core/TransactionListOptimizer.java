@@ -2,9 +2,9 @@ package io.nobt.core;
 
 import io.nobt.core.domain.Transaction;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import static java.util.Comparator.*;
 
 public class TransactionListOptimizer {
 
@@ -12,8 +12,8 @@ public class TransactionListOptimizer {
 	private boolean needsFurtherOptimization;
 
 	public TransactionListOptimizer(List<Transaction> transactions) {
-		super();
-		this.transactions = transactions;
+		this.transactions = new ArrayList<>(transactions);
+		this.transactions.sort(comparingInt(Transaction::hashCode));
 	}
 
 	public List<Transaction> getOptimalTransactions() {
