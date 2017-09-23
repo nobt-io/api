@@ -1,6 +1,6 @@
 package io.nobt.persistence.entity;
 
-import io.nobt.core.optimizer.OptimizerVersion;
+import io.nobt.core.optimizer.Optimizer;
 import io.nobt.util.Sets;
 
 import javax.persistence.*;
@@ -33,9 +33,9 @@ public class NobtEntity {
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ExpenseEntity> expenses = new HashSet<>();
 
-    @Column(name = "optimizerVersion")
+    @Column(name = "optimizer")
     @Enumerated(EnumType.STRING)
-    private OptimizerVersion optimizerVersion;
+    private Optimizer optimizer;
 
     public String getName() {
         return name;
@@ -93,11 +93,11 @@ public class NobtEntity {
         this.createdOn = createdOn;
     }
 
-	public OptimizerVersion getOptimizerVersion() {
-		return optimizerVersion;
+	public Optimizer getOptimizer() {
+		return optimizer;
 	}
 
-	public void setOptimizerVersion(OptimizerVersion optimizerVersion) {
-		this.optimizerVersion = optimizerVersion;
+	public void setOptimizer(Optimizer optimizer) {
+		this.optimizer = optimizer;
 	}
 }

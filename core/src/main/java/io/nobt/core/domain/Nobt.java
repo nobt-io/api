@@ -1,8 +1,7 @@
 package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
-import io.nobt.core.optimizer.OptimizerStrategy;
-import io.nobt.core.optimizer.OptimizerVersion;
+import io.nobt.core.optimizer.Optimizer;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -22,16 +21,16 @@ public class Nobt {
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
     private final ZonedDateTime createdOn;
-    private final OptimizerVersion optimizerVersion;
+    private final Optimizer optimizer;
 
-    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn, OptimizerVersion optimizerVersion) {
+    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn, Optimizer optimizer) {
         this.id = id;
         this.currencyKey = currencyKey;
         this.name = name;
         this.explicitParticipants = new HashSet<>(explicitParticipants);
         this.expenses = new HashSet<>(expenses);
         this.createdOn = createdOn;
-	    this.optimizerVersion = optimizerVersion;
+	    this.optimizer = optimizer;
     }
 
     public NobtId getId() {
@@ -46,8 +45,8 @@ public class Nobt {
         return name;
     }
 
-	public OptimizerVersion getOptimizerVersion() {
-		return optimizerVersion;
+	public Optimizer getOptimizer() {
+		return optimizer;
 	}
 
 	public Set<Expense> getExpenses() {
@@ -66,10 +65,7 @@ public class Nobt {
     }
 
     public List<Transaction> getOptimalTransactions() {
-
-        final OptimizerStrategy optimizerStrategy = optimizerVersion.getStrategy();
-
-        return optimizerStrategy.optimize(getAllTransactions());
+        return optimizer.apply(getAllTransactions());
     }
 
 	private List<Transaction> getAllTransactions() {

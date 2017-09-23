@@ -3,7 +3,6 @@ package io.nobt.persistence.repository;
 import io.nobt.application.env.Config;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
-import io.nobt.core.optimizer.OptimizerVersion;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;

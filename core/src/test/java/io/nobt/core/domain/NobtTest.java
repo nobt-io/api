@@ -1,7 +1,6 @@
 package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
-import io.nobt.core.optimizer.OptimizerVersion;
 import io.nobt.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
