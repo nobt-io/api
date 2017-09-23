@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.application.BodyParser;
 import io.nobt.application.NobtApplication;
 import io.nobt.core.ConversionInformationInconsistentException;
-import io.nobt.core.NobtCalculator;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtFactory;
@@ -29,6 +28,7 @@ import spark.Service;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Collections.emptySet;
@@ -40,15 +40,13 @@ public class NobtRestApi {
 
     private final Service http;
     private final NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker;
-    private final NobtCalculator nobtCalculator;
     private final BodyParser bodyParser;
     private final ObjectMapper objectMapper;
     private final NobtFactory nobtFactory;
 
-    public NobtRestApi(Service service, NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker, NobtCalculator nobtCalculator, BodyParser bodyParser, ObjectMapper objectMapper, NobtFactory nobtFactory) {
+    public NobtRestApi(Service service, NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker, BodyParser bodyParser, ObjectMapper objectMapper, NobtFactory nobtFactory) {
         this.http = service;
         this.nobtRepositoryCommandInvoker = nobtRepositoryCommandInvoker;
-        this.nobtCalculator = nobtCalculator;
         this.bodyParser = bodyParser;
         this.objectMapper = objectMapper;
         this.nobtFactory = nobtFactory;
@@ -159,7 +157,10 @@ public class NobtRestApi {
 
 
             final Nobt nobt = nobtRepositoryCommandInvoker.invoke(repository -> repository.getById(databaseId));
-            final Set<Transaction> transactions = nobtCalculator.calculate(nobt);
+
+            final List<Transaction> optimalTransactions = nobt.getOptimalTransactions();
+
+            final Set<Transaction> transactions = new HashSet<>(optimalTransactions);
 
 
             res.header("Content-Type", "application/json");

@@ -1,6 +1,7 @@
 package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
+import io.nobt.core.optimizer.OptimizerStrategy;
 import io.nobt.core.optimizer.OptimizerVersion;
 
 import java.time.LocalDate;
@@ -63,7 +64,14 @@ public class Nobt {
         return allPersons;
     }
 
-	public List<Transaction> getAllTransactions() {
+    public List<Transaction> getOptimalTransactions() {
+
+        final OptimizerStrategy optimizerStrategy = optimizerVersion.getStrategy();
+
+        return optimizerStrategy.optimize(getAllTransactions());
+    }
+
+	private List<Transaction> getAllTransactions() {
 		return expenses
 				.stream()
 				.flatMap(expense -> expense.getTransactions().stream())

@@ -5,7 +5,6 @@ import io.nobt.application.BodyParser;
 import io.nobt.application.NobtRepositoryCommandInvokerFactory;
 import io.nobt.application.ObjectMapperFactory;
 import io.nobt.application.env.Config;
-import io.nobt.core.NobtCalculator;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
@@ -51,7 +50,6 @@ public abstract class ApiIntegrationTestBase {
         new NobtRestApi(
                 http,
                 nobtRepositoryCommandInvoker,
-                new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
                 objectMapper,
                 new NobtFactory()

@@ -2,7 +2,6 @@ package io.nobt.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.application.env.Config;
-import io.nobt.core.NobtCalculator;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
@@ -58,7 +57,6 @@ public class NobtApplication {
         final NobtRestApi api = new NobtRestApi(
                 Service.ignite(),
                 nobtRepositoryCommandInvoker,
-                new NobtCalculator(),
                 new BodyParser(objectMapper, validator),
                 objectMapper,
                 new NobtFactory()
