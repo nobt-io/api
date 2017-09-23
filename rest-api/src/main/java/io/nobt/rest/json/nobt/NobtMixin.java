@@ -23,6 +23,7 @@ public abstract class NobtMixin extends Nobt {
 	@Override
 	public abstract OptimizerVersion getOptimizerVersion();
 
+    @Override
 	@JsonProperty("currency")
     public abstract CurrencyKey getCurrencyKey();
 }
