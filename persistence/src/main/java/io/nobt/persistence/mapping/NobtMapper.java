@@ -28,7 +28,8 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
                 databaseModel.getName(),
                 explicitParticipants,
                 expenses,
-                databaseModel.getCreatedOn()
+                databaseModel.getCreatedOn(),
+                databaseModel.getOptimizerVersion()
         );
     }
 
@@ -44,6 +45,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         nobtEntity.setName(domainModel.getName());
         nobtEntity.setCurrency(domainModel.getCurrencyKey().getKey());
         nobtEntity.setCreatedOn(domainModel.getCreatedOn());
+        nobtEntity.setOptimizerVersion(domainModel.getOptimizerVersion());
 
         domainModel.getParticipatingPersons().stream().map(Person::getName).forEach(nobtEntity::addExplicitParticipant);
         domainModel.getExpenses().stream().map(expenseMapper::mapToDatabaseModel).forEach(nobtEntity::addExpense);

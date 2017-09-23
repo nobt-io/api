@@ -1,14 +1,13 @@
 package io.nobt.persistence.entity;
 
+import io.nobt.core.optimizer.OptimizerVersion;
 import io.nobt.util.Sets;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.StringJoiner;
 
 @Table(name = "nobts")
 @Entity
@@ -33,6 +32,10 @@ public class NobtEntity {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ExpenseEntity> expenses = new HashSet<>();
+
+    @Column(name = "optimizerVersion")
+    @Enumerated(EnumType.STRING)
+    private OptimizerVersion optimizerVersion;
 
     public String getName() {
         return name;
@@ -89,4 +92,12 @@ public class NobtEntity {
     public void setCreatedOn(ZonedDateTime createdOn) {
         this.createdOn = createdOn;
     }
+
+	public OptimizerVersion getOptimizerVersion() {
+		return optimizerVersion;
+	}
+
+	public void setOptimizerVersion(OptimizerVersion optimizerVersion) {
+		this.optimizerVersion = optimizerVersion;
+	}
 }

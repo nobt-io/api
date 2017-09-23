@@ -9,13 +9,11 @@ import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
-import io.nobt.core.domain.Transaction;
 import io.nobt.persistence.NobtRepository;
 import io.nobt.persistence.NobtRepositoryCommand;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.rest.payloads.CreateExpenseInput;
 import io.nobt.rest.payloads.CreateNobtInput;
-import io.nobt.rest.payloads.NobtResource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.zalando.problem.Problem;
@@ -28,10 +26,8 @@ import spark.Service;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import static java.util.Collections.emptySet;
 import static javax.ws.rs.core.Response.Status.*;
 
 public class NobtRestApi {
@@ -158,14 +154,10 @@ public class NobtRestApi {
 
             final Nobt nobt = nobtRepositoryCommandInvoker.invoke(repository -> repository.getById(databaseId));
 
-            final List<Transaction> optimalTransactions = nobt.getOptimalTransactions();
-
-            final Set<Transaction> transactions = new HashSet<>(optimalTransactions);
-
 
             res.header("Content-Type", "application/json");
 
-            return new NobtResource(nobt, transactions);
+            return nobt;
         }, objectMapper::writeValueAsString);
     }
 
@@ -188,7 +180,7 @@ public class NobtRestApi {
             res.header("Location", req.url() + "/" + nobt.getId().toExternalIdentifier());
             res.header("Content-Type", "application/json");
 
-            return new NobtResource(nobt, emptySet());
+            return nobt;
         }, objectMapper::writeValueAsString);
     }
 

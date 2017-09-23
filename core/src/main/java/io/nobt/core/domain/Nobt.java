@@ -22,15 +22,16 @@ public class Nobt {
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
     private final ZonedDateTime createdOn;
-    private final OptimizerVersion optimizerVersion = OptimizerVersion.V1;
+    private final OptimizerVersion optimizerVersion;
 
-    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn) {
+    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn, OptimizerVersion optimizerVersion) {
         this.id = id;
         this.currencyKey = currencyKey;
         this.name = name;
         this.explicitParticipants = new HashSet<>(explicitParticipants);
         this.expenses = new HashSet<>(expenses);
         this.createdOn = createdOn;
+	    this.optimizerVersion = optimizerVersion;
     }
 
     public NobtId getId() {

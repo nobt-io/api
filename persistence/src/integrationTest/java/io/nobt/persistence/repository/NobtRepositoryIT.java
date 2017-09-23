@@ -3,6 +3,7 @@ package io.nobt.persistence.repository;
 import io.nobt.application.env.Config;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
+import io.nobt.core.optimizer.OptimizerVersion;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
@@ -180,7 +181,7 @@ public class NobtRepositoryIT {
 
         final ZonedDateTime firstOf2017 = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
 
-        final Nobt nobtToSave = new Nobt(null, EUR, "Test", Collections.emptySet(), Collections.emptySet(), firstOf2017);
+        final Nobt nobtToSave = new Nobt(null, EUR, "Test", Collections.emptySet(), Collections.emptySet(), firstOf2017, OptimizerVersion.V1);
 
         final NobtId id = sut.save(nobtToSave);
 

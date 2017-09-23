@@ -1,8 +1,7 @@
 package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
-import io.nobt.test.domain.factories.StaticPersonFactory;
-import io.nobt.test.domain.matchers.NobtMatchers;
+import io.nobt.core.optimizer.OptimizerVersion;
 import io.nobt.util.Sets;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,10 +10,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
@@ -41,7 +38,7 @@ public class NobtTest {
     @Before
     public void setUp() throws Exception {
 
-        sut = new Nobt(null, new CurrencyKey("EUR"), "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense), ZonedDateTime.now(ZoneOffset.UTC));
+        sut = new Nobt(null, new CurrencyKey("EUR"), "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense), ZonedDateTime.now(ZoneOffset.UTC), OptimizerVersion.V1);
 
         when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
                 randomShare(david),
