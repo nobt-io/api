@@ -1,6 +1,7 @@
 package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
+import io.nobt.core.optimizer.OptimizerVersion;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -20,6 +21,7 @@ public class Nobt {
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
     private final ZonedDateTime createdOn;
+    private final OptimizerVersion optimizerVersion = OptimizerVersion.V1;
 
     public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn) {
         this.id = id;
@@ -42,7 +44,11 @@ public class Nobt {
         return name;
     }
 
-    public Set<Expense> getExpenses() {
+	public OptimizerVersion getOptimizerVersion() {
+		return optimizerVersion;
+	}
+
+	public Set<Expense> getExpenses() {
         return Collections.unmodifiableSet(expenses);
     }
 
@@ -57,12 +63,12 @@ public class Nobt {
         return allPersons;
     }
 
-    public List<Transaction> getAllTransactions() {
-        return expenses
-                .stream()
-                .flatMap(expense -> expense.getTransactions().stream())
-                .collect(toList());
-    }
+	public List<Transaction> getAllTransactions() {
+		return expenses
+				.stream()
+				.flatMap(expense -> expense.getTransactions().stream())
+				.collect(toList());
+	}
 
     public ZonedDateTime getCreatedOn() {
         return createdOn;

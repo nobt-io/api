@@ -55,15 +55,6 @@ public class NobtTest {
     }
 
     @Test
-    public void shouldBuildListOfTransactionsFromEveryExpense() throws Exception {
-
-        sut.getAllTransactions();
-
-        verify(firstExpense).getTransactions();
-        verify(secondExpense).getTransactions();
-    }
-
-    @Test
     public void shouldBuildListOfPersonsFromEveryExpense() throws Exception {
 
         sut.getParticipatingPersons();
