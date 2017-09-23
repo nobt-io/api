@@ -1,7 +1,6 @@
-package io.nobt.core.optimizer.v1;
+package io.nobt.core.optimizer;
 
 import io.nobt.core.domain.Transaction;
-import io.nobt.core.optimizer.SelfSortingOptimizerStrategy;
 import org.junit.Before;
 import org.junit.Test;
 
