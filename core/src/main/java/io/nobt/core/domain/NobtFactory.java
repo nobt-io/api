@@ -11,6 +11,6 @@ import static java.util.Collections.emptySet;
 public final class NobtFactory {
 
     public Nobt create(String name, Set<Person> explicitParticipants, CurrencyKey currencyKey) {
-        return new Nobt(null, currencyKey, name, explicitParticipants, emptySet(), ZonedDateTime.now(ZoneOffset.UTC), Optimizer.MINIMAL_AMOUNT_V1);
+        return new Nobt(null, currencyKey, name, explicitParticipants, emptySet(), ZonedDateTime.now(ZoneOffset.UTC), Optimizer.defaultOptimizer());
     }
 }

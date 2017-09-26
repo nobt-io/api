@@ -17,4 +17,8 @@ public enum Optimizer {
 	public List<Transaction> apply(List<Transaction> unoptimizedTransactions) {
 		return strategy.optimize(unoptimizedTransactions);
 	}
+
+	public static Optimizer defaultOptimizer() {
+		return MINIMAL_AMOUNT_V1;
+	}
 }
