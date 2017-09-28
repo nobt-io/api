@@ -1,5 +1,11 @@
+apply from: "../gradle/testSupport.gradle"
+
 dependencies {
     compile project(':persistence')
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
+    testCompile group: 'pl.pragmatists', name: 'JUnitParams', version: '1.0.4'
+    testCompile project(path: ':application-config', configuration: 'testSupport')
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
 }

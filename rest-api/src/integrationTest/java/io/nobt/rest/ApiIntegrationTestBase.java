@@ -5,6 +5,7 @@ import io.nobt.application.BodyParser;
 import io.nobt.application.NobtRepositoryCommandInvokerFactory;
 import io.nobt.application.ObjectMapperFactory;
 import io.nobt.application.env.Config;
+import io.nobt.application.env.RealEnvironment;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
@@ -18,21 +19,21 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import java.io.IOException;
 
-import static io.nobt.application.env.Config.Keys.DATABASE_CONNECTION_STRING;
-import static io.nobt.application.env.MissingConfigurationException.missingConfigurationException;
 import static org.awaitility.Awaitility.await;
 
 public abstract class ApiIntegrationTestBase {
 
-    protected static final int ACTUAL_PORT = 18080;
-
     private static MigrationService migrationService;
     private static Service http;
+
+    protected static Config config;
 
     @BeforeClass
     public static void setupEnvironment() {
 
-        DatabaseConfig databaseConfig = Config.database().orElseThrow(missingConfigurationException(DATABASE_CONNECTION_STRING));
+        config = Config.from(new RealEnvironment());
+
+        DatabaseConfig databaseConfig = config.database();
 
         migrationService = new MigrationService(databaseConfig);
 
@@ -43,7 +44,7 @@ public abstract class ApiIntegrationTestBase {
 
         final ObjectMapper objectMapper = new ObjectMapperFactory().create();
         final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        final NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker = new NobtRepositoryCommandInvokerFactory().create();
+        final NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker = new NobtRepositoryCommandInvokerFactory(config).create();
 
         http = Service.ignite();
 
@@ -53,7 +54,7 @@ public abstract class ApiIntegrationTestBase {
                 new BodyParser(objectMapper, validator),
                 objectMapper,
                 new NobtFactory()
-        ).run(ACTUAL_PORT);
+        ).run(config.port());
     }
 
     @AfterClass

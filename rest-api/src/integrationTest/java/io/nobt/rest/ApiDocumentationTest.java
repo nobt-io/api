@@ -8,11 +8,9 @@ import org.junit.Test;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.payload.JsonFieldType;
 
-import java.io.InputStream;
 import java.util.stream.IntStream;
 
 import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.RestAssured.post;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -36,14 +34,14 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                 .addFilter(documentationConfiguration(restDocumentation))
                 .build();
 
-        client = new Client(ACTUAL_PORT);
+        client = new Client(config.port());
     }
 
     @Test
     public void shouldCreateNewNobt() throws Exception {
 
         given(this.documentationSpec)
-                .port(ACTUAL_PORT)
+                .port(config.port())
                 .filter(
                         document("create-nobt",
                                 preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
@@ -81,7 +79,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
         final String nobtId = client.createGrillfeierNobt();
 
         given(this.documentationSpec)
-                .port(ACTUAL_PORT)
+                .port(config.port())
                 .filter(
                         document("create-expense",
                                 preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
@@ -139,7 +137,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
         client.addFleischExpense(nobtId);
 
         given(this.documentationSpec)
-                .port(ACTUAL_PORT)
+                .port(config.port())
                 .filter(
                         document("get-nobt",
                                 preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
@@ -186,7 +184,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
 
         given(this.documentationSpec)
-                .port(ACTUAL_PORT)
+                .port(config.port())
                 .filter(
                         document("delete-expense",
                                 preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT))
@@ -215,7 +213,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
         client.addFleischExpense(nobtId);
 
         given(this.documentationSpec)
-                .port(ACTUAL_PORT)
+                .port(config.port())
 
                 .when()
 
@@ -232,7 +230,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
         final String nobtId = client.createGrillfeierNobt();
 
         given(this.documentationSpec)
-                .port(ACTUAL_PORT)
+                .port(config.port())
                 .filter(
                         document("duplicate-debtor",
                                 preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
@@ -282,7 +280,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
         final String nobtId = client.createGrillfeierNobt();
 
         given(this.documentationSpec)
-                .port(ACTUAL_PORT)
+                .port(config.port())
                 .body("{\n" +
                         "  \"name\": \"Fleisch\",\n" +
                         "  \"debtee\": \"Thomas\",\n" +
