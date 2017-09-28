@@ -46,7 +46,7 @@ public class NobtApplication {
 
     public void start() {
 
-        if (Config.migrateDatabaseAtStartUp().orElse(false)) {
+        if (Config.migrateDatabaseAtStartUp().orElse(true)) {
             migrateDatabase();
         }
 
