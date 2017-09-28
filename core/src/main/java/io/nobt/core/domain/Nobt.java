@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 
 public class Nobt {
 
@@ -64,13 +64,11 @@ public class Nobt {
 
     public Set<Person> getParticipatingPersons() {
 
-        final HashSet<Person> allPersons = new HashSet<>(explicitParticipants);
+        final Set<Person> participantsFromExpenses = expenses.stream().map(Expense::getParticipants).flatMap(Collection::stream).collect(toSet());
 
-        expenses.stream()
-                .flatMap(expense -> expense.getParticipants().stream())
-                .forEach(allPersons::add);
-
-        return allPersons;
+        return Stream.of(explicitParticipants, participantsFromExpenses)
+                .flatMap(Collection::stream)
+                .collect(toCollection(HashSet::new));
     }
 
     public List<Debt> getOptimizedDebts() {
@@ -82,14 +80,21 @@ public class Nobt {
                 .of(expenses, payments)
                 .flatMap(Collection::stream)
                 .sorted(comparing(CashFlow::getCreatedOn))
+                .map(CashFlow::calculateAccruingDebts)
                 .sequential()
-                .flatMap(cashFlow -> cashFlow.calculateAccruingDebts().stream())
+                .flatMap(Collection::stream)
                 .collect(toList());
     }
 
-
     public ZonedDateTime getCreatedOn() {
         return createdOn;
+    }
+
+    public void addPayment(Person sender, Amount amount, Person recipient, String description) {
+
+        if (!getParticipatingPersons().contains(sender) || !getParticipatingPersons().contains(recipient)) {
+            // not allowed TODO
+        }
     }
 
     public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date, ConversionInformation conversionInformation) {
