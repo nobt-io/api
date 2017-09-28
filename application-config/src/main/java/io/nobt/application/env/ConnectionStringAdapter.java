@@ -3,6 +3,7 @@ package io.nobt.application.env;
 import io.nobt.persistence.DatabaseConfig;
 
 import java.net.URI;
+import java.util.Objects;
 
 /**
  * Adapter class that is needed because cloudfoundry does not give us a proper connection-string.
@@ -54,5 +55,20 @@ public class ConnectionStringAdapter implements DatabaseConfig {
     @Override
     public String password() {
         return password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ConnectionStringAdapter that = (ConnectionStringAdapter) o;
+        return Objects.equals(username, that.username) &&
+                Objects.equals(password, that.password) &&
+                Objects.equals(url, that.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(username, password, url);
     }
 }

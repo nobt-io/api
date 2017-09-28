@@ -1,6 +1,7 @@
 package io.nobt.persistence.repository;
 
 import io.nobt.application.env.Config;
+import io.nobt.application.env.RealEnvironment;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
 import io.nobt.persistence.DatabaseConfig;
@@ -24,8 +25,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 
-import static io.nobt.application.env.Config.Keys.DATABASE_CONNECTION_STRING;
-import static io.nobt.application.env.MissingConfigurationException.missingConfigurationException;
 import static io.nobt.test.domain.Currencies.EUR;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.*;
@@ -53,7 +52,8 @@ public class NobtRepositoryIT {
     @BeforeClass
     public static void setupEnvironment() {
 
-        databaseConfig = Config.database();
+        final Config config = Config.from(new RealEnvironment());
+        databaseConfig = config.database();
         migrationService = new MigrationService(databaseConfig);
 
         DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);

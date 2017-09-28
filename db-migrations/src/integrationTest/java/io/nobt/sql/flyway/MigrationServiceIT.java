@@ -1,6 +1,7 @@
 package io.nobt.sql.flyway;
 
 import io.nobt.application.env.Config;
+import io.nobt.application.env.RealEnvironment;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.test.persistence.DatabaseAvailabilityCheck;
 import org.junit.After;
@@ -19,7 +20,9 @@ public class MigrationServiceIT {
     @BeforeClass
     public static void setupEnvironment() {
 
-        databaseConfig = Config.database();
+        final Config config = Config.from(new RealEnvironment());
+
+        databaseConfig = config.database();
 
         final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
         await().until(availabilityCheck::isDatabaseUp);
