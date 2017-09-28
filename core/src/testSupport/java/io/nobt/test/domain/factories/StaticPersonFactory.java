@@ -2,6 +2,9 @@ package io.nobt.test.domain.factories;
 
 import io.nobt.core.domain.Person;
 
+import java.util.Arrays;
+import java.util.List;
+
 public final class StaticPersonFactory {
 
 	public static Person thomas = Person.forName("Thomas");
@@ -13,6 +16,10 @@ public final class StaticPersonFactory {
 	public static Person david = Person.forName("David");
 	public static Person harald = Person.forName("Harald");
 	public static Person martin = Person.forName("Martin");
+
+	public static List<Person> ALL = Arrays.asList(
+			thomas, matthias, simon, lukas, thomasB, jacqueline, david, harald, martin
+	);
 
 	private StaticPersonFactory() { }
 }

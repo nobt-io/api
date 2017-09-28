@@ -6,7 +6,6 @@ import io.nobt.core.domain.*;
 import io.nobt.core.optimizer.Optimizer;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Set;
 
 public abstract class NobtMixin extends Nobt {
@@ -17,7 +16,7 @@ public abstract class NobtMixin extends Nobt {
 
     @Override
     @JsonProperty("transactions")
-    public abstract List<Transaction> getOptimalTransactions();
+    public abstract SuggestedTransactions getSuggestedTransactions();
 
     @JsonIgnore
 	@Override

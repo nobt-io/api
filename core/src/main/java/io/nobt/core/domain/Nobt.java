@@ -6,11 +6,10 @@ import io.nobt.core.optimizer.Optimizer;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Stream;
 
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.toList;
 
 public class Nobt {
@@ -20,17 +19,23 @@ public class Nobt {
     private final String name;
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
+    private final List<Payment> payments;
     private final ZonedDateTime createdOn;
     private final Optimizer optimizer;
 
     public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn, Optimizer optimizer) {
+        this(id, currencyKey, name, explicitParticipants, expenses, Collections.emptyList(), createdOn, optimizer);
+    }
+
+    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, List<Payment> payments, ZonedDateTime createdOn, Optimizer optimizer) {
         this.id = id;
         this.currencyKey = currencyKey;
         this.name = name;
         this.explicitParticipants = new HashSet<>(explicitParticipants);
         this.expenses = new HashSet<>(expenses);
+        this.payments = new ArrayList<>(payments);
         this.createdOn = createdOn;
-	    this.optimizer = optimizer;
+        this.optimizer = optimizer;
     }
 
     public NobtId getId() {
@@ -45,11 +50,11 @@ public class Nobt {
         return name;
     }
 
-	public Optimizer getOptimizer() {
-		return optimizer;
-	}
+    public Optimizer getOptimizer() {
+        return optimizer;
+    }
 
-	public Set<Expense> getExpenses() {
+    public Set<Expense> getExpenses() {
         return Collections.unmodifiableSet(expenses);
     }
 
@@ -58,22 +63,27 @@ public class Nobt {
         final HashSet<Person> allPersons = new HashSet<>(explicitParticipants);
 
         expenses.stream()
-                .flatMap(expense -> expense.getParticipants().stream() )
+                .flatMap(expense -> expense.getParticipants().stream())
                 .forEach(allPersons::add);
 
         return allPersons;
     }
 
-    public List<Transaction> getOptimalTransactions() {
-        return optimizer.apply(getAllTransactions());
+    public SuggestedTransactions getSuggestedTransactions() {
+
+        final SuggestedTransactions suggestedTransactions = new SuggestedTransactions(optimizer);
+
+        final List<Debt> debts = Stream
+                .of(expenses, payments)
+                .flatMap(Collection::stream)
+                .sorted(comparing(CashFlow::getCreatedOn))
+                .sequential()
+                .flatMap(cashFlow -> cashFlow.calculateAccruingDebts().stream())
+                .collect(toList());
+
+        return suggestedTransactions;
     }
 
-	private List<Transaction> getAllTransactions() {
-		return expenses
-				.stream()
-				.flatMap(expense -> expense.getTransactions().stream())
-				.collect(toList());
-	}
 
     public ZonedDateTime getCreatedOn() {
         return createdOn;
@@ -97,6 +107,6 @@ public class Nobt {
     }
 
     public void removeExpense(Long expenseId) {
-        this.expenses.removeIf( e -> e.getId().equals(expenseId) );
+        this.expenses.removeIf(e -> e.getId().equals(expenseId));
     }
 }

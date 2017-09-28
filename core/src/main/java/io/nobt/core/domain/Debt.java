@@ -8,10 +8,10 @@ import java.util.Set;
 
 import static io.nobt.core.domain.Person.forName;
 
-public class Transaction {
+public class Debt {
 
 	/**
-	 * Gives money.
+	 * Owes money.
 	 */
 	private Person debtor;
 	private Amount amount;
@@ -21,25 +21,25 @@ public class Transaction {
 	 */
 	private Person debtee;
 
-	private Transaction(Person debtor, Amount amount, Person debtee) {
+	private Debt(Person debtor, Amount amount, Person debtee) {
 		this.debtor = debtor;
 		this.amount = amount;
 		this.debtee = debtee;
 	}
 
 	@Deprecated
-	public static Transaction transaction(String debtor, double amount, String debtee) {
-		return transaction(forName(debtor), Amount.fromDouble(amount), forName(debtee));
+	public static Debt debt(String debtor, double amount, String debtee) {
+		return debt(forName(debtor), Amount.fromDouble(amount), forName(debtee));
 	}
 
-	public static Transaction transaction(Person debtor, Amount amount, Person debtee) {
+	public static Debt debt(Person debtor, Amount amount, Person debtee) {
 		if (!amount.isPositive()) {
 			throw new IllegalArgumentException("Amount must be positive.");
 		}
-		return new Transaction(debtor, amount, debtee);
+		return new Debt(debtor, amount, debtee);
 	}
 
-	public Set<Transaction> combine(Transaction other) {
+	public Set<Debt> combine(Debt other) {
 
 		HashSet<Person> participatingPersons = new HashSet<>(Arrays.asList(debtor, debtee, other.debtor, other.debtee));
 
@@ -71,11 +71,11 @@ public class Transaction {
 
 			switch (remaining.getRoundedValue().signum()) {
 			case -1:
-				return transactions(new Transaction(debtee, remaining.absolute(), debtor));
+				return transactions(new Debt(debtee, remaining.absolute(), debtor));
 			case 0:
 				return transactions();
 			case +1:
-				return transactions(new Transaction(debtor, remaining.absolute(), debtee));
+				return transactions(new Debt(debtor, remaining.absolute(), debtee));
 			}
 		}
 
@@ -85,13 +85,13 @@ public class Transaction {
 
 			switch (remaining.getRoundedValue().signum()) {
 			case -1:
-				return transactions(new Transaction(debtor, amount, other.debtee),
-						new Transaction(debtee, remaining.absolute(), other.debtee));
+				return transactions(new Debt(debtor, amount, other.debtee),
+						new Debt(debtee, remaining.absolute(), other.debtee));
 			case 0:
-				return transactions(new Transaction(debtor, amount, other.debtee));
+				return transactions(new Debt(debtor, amount, other.debtee));
 			case +1:
-				return transactions(new Transaction(debtor, other.amount, other.debtee),
-						new Transaction(debtor, remaining.absolute(), debtee));
+				return transactions(new Debt(debtor, other.amount, other.debtee),
+						new Debt(debtor, remaining.absolute(), debtee));
 			}
 		}
 
@@ -101,24 +101,24 @@ public class Transaction {
 
 			switch (remaining.getRoundedValue().signum()) {
 			case -1:
-				return transactions(new Transaction(other.debtor, remaining.absolute(), other.debtee),
-						new Transaction(other.debtor, amount, debtee));
+				return transactions(new Debt(other.debtor, remaining.absolute(), other.debtee),
+						new Debt(other.debtor, amount, debtee));
 			case 0:
-				return transactions(new Transaction(other.debtor, amount, debtee));
+				return transactions(new Debt(other.debtor, amount, debtee));
 			case +1:
-				return transactions(new Transaction(debtor, remaining.absolute(), debtee),
-						new Transaction(other.debtor, other.amount, debtee));
+				return transactions(new Debt(debtor, remaining.absolute(), debtee),
+						new Debt(other.debtor, other.amount, debtee));
 			}
 		}
 
 		if (sameTransactionWithDifferentAmount) {
-			return transactions(new Transaction(debtor, amount.plus(other.amount), other.debtee));
+			return transactions(new Debt(debtor, amount.plus(other.amount), other.debtee));
 		}
 
 		throw new IllegalStateException("Should not reach here");
 	}
 
-	private Set<Transaction> transactions(Transaction... transactions) {
+	private Set<Debt> transactions(Debt... transactions) {
 		return new HashSet<>(Arrays.asList(transactions));
 	}
 
@@ -137,8 +137,8 @@ public class Transaction {
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (!(o instanceof Transaction)) return false;
-		Transaction that = (Transaction) o;
+		if (!(o instanceof Debt)) return false;
+		Debt that = (Debt) o;
 		return Objects.equals(debtor, that.debtor) &&
 				Objects.equals(amount, that.amount) &&
 				Objects.equals(debtee, that.debtee);

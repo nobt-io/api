@@ -1,6 +1,6 @@
 package io.nobt.core;
 
-import io.nobt.core.domain.Transaction;
+import io.nobt.core.domain.Debt;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;
@@ -12,16 +12,16 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JUnitParamsRunner.class)
-public class TransactionTest {
+public class DebtTest {
 
 	@Test
 	@Parameters(source = TransactionTestCases.class)
-	public void testCombineTransactions(Transaction first, Transaction second, Set<Transaction> expected) throws Exception {
+	public void testCombineTransactions(Debt first, Debt second, Set<Debt> expected) throws Exception {
 
-		final Set<Transaction> result = first.combine(second);
+		final Set<Debt> result = first.combine(second);
 
 		if (expected.isEmpty()) {
-			assertThat(result, emptyCollectionOf(Transaction.class));
+			assertThat(result, emptyCollectionOf(Debt.class));
 		} else {
 			assertThat(result, hasSize(expected.size()));
 			assertThat(result, containsInAnyOrder(expected.toArray()));

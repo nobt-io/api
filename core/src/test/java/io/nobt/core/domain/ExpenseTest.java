@@ -4,12 +4,10 @@ import io.nobt.util.Sets;
 import org.junit.Test;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Set;
 
-import static io.nobt.core.domain.Transaction.transaction;
+import static io.nobt.core.domain.Debt.debt;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -22,12 +20,12 @@ public class ExpenseTest {
 
         final Expense expense = anExpense();
 
-        final List<Transaction> transactions = expense.getTransactions();
+        final Set<Debt> transactions = expense.calculateAccruingDebts();
 
         assertThat(transactions, containsInAnyOrder(
-                transaction(david, amount(30), thomas),
-                transaction(thomas, amount(10), thomas),
-                transaction(lukas, amount(20), thomas)
+                debt(david, amount(30), thomas),
+                debt(thomas, amount(10), thomas),
+                debt(lukas, amount(20), thomas)
         ));
     }
 

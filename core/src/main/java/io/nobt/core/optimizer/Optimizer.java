@@ -1,6 +1,6 @@
 package io.nobt.core.optimizer;
 
-import io.nobt.core.domain.Transaction;
+import io.nobt.core.domain.Debt;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public enum Optimizer {
 		this.strategy = strategy;
 	}
 
-	public List<Transaction> apply(List<Transaction> unoptimizedTransactions) {
+	public List<Debt> apply(List<Debt> unoptimizedTransactions) {
 		return strategy.optimize(unoptimizedTransactions);
 	}
 

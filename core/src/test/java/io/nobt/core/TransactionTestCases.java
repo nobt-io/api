@@ -1,13 +1,13 @@
 package io.nobt.core;
 
 import io.nobt.core.domain.Amount;
-import io.nobt.core.domain.Transaction;
+import io.nobt.core.domain.Debt;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.nobt.core.domain.Transaction.transaction;
+import static io.nobt.core.domain.Debt.debt;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static java.util.Collections.emptySet;
 import static junitparams.JUnitParamsRunner.$;
@@ -20,17 +20,17 @@ public final class TransactionTestCases {
     public static Object[] provideUnnecessaryTransactionExamples() {
         return $(
                 $(
-                        transaction(jacqueline, euro(10), jacqueline),
-                        transaction(matthias, euro(5), lukas),
+                        debt(jacqueline, euro(10), jacqueline),
+                        debt(matthias, euro(5), lukas),
                         expected(
-                                transaction(matthias, euro(5), lukas)
+                                debt(matthias, euro(5), lukas)
                         )
                 ),
                 $(
-                        transaction(matthias, euro(5), lukas),
-                        transaction(jacqueline, euro(10), jacqueline),
+                        debt(matthias, euro(5), lukas),
+                        debt(jacqueline, euro(10), jacqueline),
                         expected(
-                                transaction(matthias, euro(5), lukas)
+                                debt(matthias, euro(5), lukas)
                         )
                 )
         );
@@ -39,8 +39,8 @@ public final class TransactionTestCases {
     public static Object[] provideCompensatingTransactionExamples() {
         return $(
                 $(
-                        transaction(matthias, euro(10), thomas),
-                        transaction(thomas, euro(10), matthias),
+                        debt(matthias, euro(10), thomas),
+                        debt(thomas, euro(10), matthias),
                         noTransactions()
                 )
         );
@@ -49,11 +49,11 @@ public final class TransactionTestCases {
     public static Object[] provideNoActionTransactionExamples() {
         return $(
                 $(
-                        transaction(matthias, euro(10), thomas),
-                        transaction(harald, euro(10), simon),
+                        debt(matthias, euro(10), thomas),
+                        debt(harald, euro(10), simon),
                         expected(
-                                transaction(matthias, euro(10), thomas),
-                                transaction(harald, euro(10), simon)
+                                debt(matthias, euro(10), thomas),
+                                debt(harald, euro(10), simon)
                         ))
         );
     }
@@ -61,10 +61,10 @@ public final class TransactionTestCases {
     public static Object[] provideMergingTransactionExamples() {
         return $(
                 $(
-                        transaction(matthias, euro(10), thomas),
-                        transaction(matthias, euro(11), thomas),
+                        debt(matthias, euro(10), thomas),
+                        debt(matthias, euro(11), thomas),
                         expected(
-                                transaction(matthias, euro(21), thomas)
+                                debt(matthias, euro(21), thomas)
                         )
                 )
         );
@@ -73,49 +73,49 @@ public final class TransactionTestCases {
     public static Object[] provideTriangulationTransactionExamples() {
         return $(
                 $(
-                        transaction(matthias, euro(10), thomas),
-                        transaction(thomas, euro(10), lukas),
+                        debt(matthias, euro(10), thomas),
+                        debt(thomas, euro(10), lukas),
                         expected(
-                                transaction(matthias, euro(10), lukas)
+                                debt(matthias, euro(10), lukas)
                         )
                 ),
                 $(
-                        transaction(matthias, euro(10), thomas),
-                        transaction(thomas, euro(6), jacqueline),
+                        debt(matthias, euro(10), thomas),
+                        debt(thomas, euro(6), jacqueline),
                         expected(
-                                transaction(matthias, euro(6), jacqueline),
-                                transaction(matthias, euro(4), thomas)
+                                debt(matthias, euro(6), jacqueline),
+                                debt(matthias, euro(4), thomas)
                         )
                 ),
                 $(
-                        transaction(matthias, euro(10), thomas),
-                        transaction(thomas, euro(11), david),
+                        debt(matthias, euro(10), thomas),
+                        debt(thomas, euro(11), david),
                         expected(
-                                transaction(matthias, euro(10), david),
-                                transaction(thomas, euro(1), david)
+                                debt(matthias, euro(10), david),
+                                debt(thomas, euro(1), david)
                         )
                 ),
                 $(
-                        transaction(matthias, euro(10), thomas),
-                        transaction(lukas, euro(10), matthias),
+                        debt(matthias, euro(10), thomas),
+                        debt(lukas, euro(10), matthias),
                         expected(
-                                transaction(lukas, euro(10), thomas)
+                                debt(lukas, euro(10), thomas)
                         )
                 ),
                 $(
-                        transaction(matthias, euro(10), thomas),
-                        transaction(lukas, euro(6), matthias),
+                        debt(matthias, euro(10), thomas),
+                        debt(lukas, euro(6), matthias),
                         expected(
-                                transaction(matthias, euro(4), thomas),
-                                transaction(lukas, euro(6), thomas)
+                                debt(matthias, euro(4), thomas),
+                                debt(lukas, euro(6), thomas)
                         )
                 ),
                 $(
-                        transaction(matthias, euro(10), thomas),
-                        transaction(lukas, euro(11), matthias),
+                        debt(matthias, euro(10), thomas),
+                        debt(lukas, euro(11), matthias),
                         expected(
-                                transaction(lukas, euro(1), matthias),
-                                transaction(lukas, euro(10), thomas)
+                                debt(lukas, euro(1), matthias),
+                                debt(lukas, euro(10), thomas)
 
                         )
                 )
@@ -130,7 +130,7 @@ public final class TransactionTestCases {
         return emptySet();
     }
 
-    private static Set<Transaction> expected(Transaction... transactions) {
+    private static Set<Debt> expected(Debt... transactions) {
         return new HashSet<>(Arrays.asList(transactions));
     }
 }
