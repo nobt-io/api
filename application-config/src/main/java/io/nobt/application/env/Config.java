@@ -8,12 +8,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import static io.nobt.application.env.Config.Keys.*;
+import static io.nobt.application.env.MissingConfigurationException.missingConfigurationException;
 
-/**
- * Configuration class for the application.
- * All public getters return an {@link Optional} because not all environment variables may have been set and resolution of this conflict is handed to the client
- * because some clients (e.g. tests) may not care about some variables being unset.
- */
 public final class Config {
 
     public enum Keys {
@@ -36,16 +32,30 @@ public final class Config {
         return Optional.ofNullable(getInstance().port);
     }
 
-    public static Optional<Boolean> useInMemoryDatabase() {
-        return Optional.ofNullable(getInstance().shouldUseInMemoryDatabase);
+    /**
+     * Whether or not to use the built-in in-memory database.
+     * Defaults to false in order to ease production usage.
+     */
+    public static boolean useInMemoryDatabase() {
+        return Optional
+                .ofNullable(getInstance().shouldUseInMemoryDatabase)
+                .orElse(false);
     }
 
-    public static Optional<Boolean> migrateDatabaseAtStartUp() {
-        return Optional.ofNullable(getInstance().migrateDatabaseAtStartUp);
+    /**
+     * Whether or not to use migrate the database on startup.
+     * Defaults to true in order to ease production usage.
+     */
+    public static Boolean migrateDatabaseAtStartUp() {
+        return Optional
+                .ofNullable(getInstance().migrateDatabaseAtStartUp)
+                .orElse(true);
     }
 
-    public static Optional<DatabaseConfig> database() {
-        return Optional.ofNullable(getInstance().databaseConnectionString.get());
+    public static DatabaseConfig database() {
+        return Optional
+                .ofNullable(getInstance().databaseConnectionString.get())
+                .orElseThrow(missingConfigurationException(DATABASE_CONNECTION_STRING));
     }
 
     private static Config getInstance() {

@@ -46,7 +46,7 @@ public class NobtApplication {
 
     public void start() {
 
-        if (Config.migrateDatabaseAtStartUp().orElse(true)) {
+        if (Config.migrateDatabaseAtStartUp()) {
             migrateDatabase();
         }
 
@@ -68,7 +68,7 @@ public class NobtApplication {
     }
 
     private void migrateDatabase() {
-        final DatabaseConfig databaseConfig = Config.database().orElseThrow(missingConfigurationException(DATABASE_CONNECTION_STRING));
+        final DatabaseConfig databaseConfig = Config.database();
 
         final MigrationService migrationService = new MigrationService(databaseConfig);
         migrationService.migrate();

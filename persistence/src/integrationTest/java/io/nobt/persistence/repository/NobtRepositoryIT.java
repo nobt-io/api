@@ -53,7 +53,7 @@ public class NobtRepositoryIT {
     @BeforeClass
     public static void setupEnvironment() {
 
-        databaseConfig = Config.database().orElseThrow(missingConfigurationException(DATABASE_CONNECTION_STRING));
+        databaseConfig = Config.database();
         migrationService = new MigrationService(databaseConfig);
 
         DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);

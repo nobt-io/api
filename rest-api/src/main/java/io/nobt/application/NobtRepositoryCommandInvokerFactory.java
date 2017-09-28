@@ -16,7 +16,7 @@ public class NobtRepositoryCommandInvokerFactory {
     public NobtRepositoryCommandInvoker create() {
 
         // make sure that, if unsure we always try to connect to a real database
-        if (Config.useInMemoryDatabase().orElse(false)) {
+        if (Config.useInMemoryDatabase()) {
             return inMemory();
         } else {
             return transactional();
@@ -27,7 +27,7 @@ public class NobtRepositoryCommandInvokerFactory {
 
     public static NobtRepositoryCommandInvoker transactional() {
 
-        final DatabaseConfig config = Config.database().orElseThrow(missingConfigurationException(DATABASE_CONNECTION_STRING));
+        final DatabaseConfig config = Config.database();
         final EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.create(config);
 
         return new TransactionalNobtRepositoryCommandInvoker(entityManagerFactory, (em) -> new NobtRepositoryImpl(em, new NobtMapper(new ExpenseMapper(new ShareMapper()))));

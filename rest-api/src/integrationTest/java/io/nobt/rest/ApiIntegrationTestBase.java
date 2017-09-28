@@ -32,7 +32,7 @@ public abstract class ApiIntegrationTestBase {
     @BeforeClass
     public static void setupEnvironment() {
 
-        DatabaseConfig databaseConfig = Config.database().orElseThrow(missingConfigurationException(DATABASE_CONNECTION_STRING));
+        DatabaseConfig databaseConfig = Config.database();
 
         migrationService = new MigrationService(databaseConfig);
 
