@@ -10,6 +10,9 @@ build_rest-api:
     - postgres:9
   variables:
     DATABASE_CONNECTION_STRING: 'jdbc:postgresql://postgres:password@postgres:5432/postgres'
+    PORT: '18080'
+    MIGRATE_DATABASE_ON_STARTUP: 'true'
+    USE_IN_MEMORY_DATABASE: 'false'
   script:
     - ./gradlew clean
     - ./gradlew test
