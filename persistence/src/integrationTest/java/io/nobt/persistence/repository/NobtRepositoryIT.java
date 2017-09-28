@@ -180,7 +180,7 @@ public class NobtRepositoryIT {
 
         final ZonedDateTime firstOf2017 = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
 
-        final Nobt nobtToSave = new Nobt(null, EUR, "Test", Collections.emptySet(), Collections.emptySet(), firstOf2017);
+        final Nobt nobtToSave = new Nobt(null, EUR, "Test", Collections.emptySet(), Collections.emptySet(), firstOf2017, null);
 
         final NobtId id = sut.save(nobtToSave);
 

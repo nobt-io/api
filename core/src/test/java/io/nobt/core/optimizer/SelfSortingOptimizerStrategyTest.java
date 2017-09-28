@@ -1,6 +1,7 @@
-package io.nobt.core;
+package io.nobt.core.optimizer;
 
 import io.nobt.core.domain.Transaction;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -10,7 +11,14 @@ import static io.nobt.core.domain.Transaction.transaction;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
-public class TransactionListOptimizerTest {
+public class SelfSortingOptimizerStrategyTest {
+
+    private SelfSortingOptimizerStrategy sut;
+
+    @Before
+    public void setUp() throws Exception {
+        sut = new SelfSortingOptimizerStrategy();
+    }
 
     @Test
     public void testShouldOptimizeTransactionList() {
@@ -28,9 +36,7 @@ public class TransactionListOptimizerTest {
                 transaction("David", 17, "Thomas")
         );
 
-        TransactionListOptimizer optimizer = new TransactionListOptimizer(transactionList);
-
-        List<Transaction> optimalTransactions = optimizer.getOptimalTransactions();
+        List<Transaction> optimalTransactions = sut.optimize(transactionList);
 
         assertThat(optimalTransactions, hasSize(5));
         assertThat(optimalTransactions, containsInAnyOrder(
@@ -72,11 +78,8 @@ public class TransactionListOptimizerTest {
                 transaction("David", 17, "Thomas")
         );
 
-        TransactionListOptimizer optimizerA = new TransactionListOptimizer(transactionListA);
-        List<Transaction> optimalTransactionsA = optimizerA.getOptimalTransactions();
-
-        TransactionListOptimizer optimizerB = new TransactionListOptimizer(transactionListB);
-        List<Transaction> optimalTransactionsB = optimizerB.getOptimalTransactions();
+        List<Transaction> optimalTransactionsA = sut.optimize(transactionListA);
+        List<Transaction> optimalTransactionsB = sut.optimize(transactionListB);
 
         assertThat(optimalTransactionsA, equalTo(optimalTransactionsB));
     }
