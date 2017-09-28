@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface OptimizerStrategy {
 
-	List<Debt> optimize(List<Debt> unoptimizedTransactions);
+	List<Debt> optimize(List<Debt> debts);
 
 }

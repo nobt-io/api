@@ -6,7 +6,7 @@ import java.util.List;
 
 public enum Optimizer {
 
-	MINIMAL_AMOUNT_V1(new SelfSortingOptimizerStrategy());
+	MINIMAL_AMOUNT_V1(new SelfSortingMinimalAmountTransferredOptimizerStrategy());
 
 	private final OptimizerStrategy strategy;
 
@@ -14,8 +14,8 @@ public enum Optimizer {
 		this.strategy = strategy;
 	}
 
-	public List<Debt> apply(List<Debt> unoptimizedTransactions) {
-		return strategy.optimize(unoptimizedTransactions);
+	public List<Debt> apply(List<Debt> debts) {
+		return strategy.optimize(debts);
 	}
 
 	public static Optimizer defaultOptimizer() {

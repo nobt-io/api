@@ -10,13 +10,13 @@ import java.util.List;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
-public class SelfSortingOptimizerStrategyTest {
+public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
 
-    private SelfSortingOptimizerStrategy sut;
+    private SelfSortingMinimalAmountTransferredOptimizerStrategy sut;
 
     @Before
     public void setUp() throws Exception {
-        sut = new SelfSortingOptimizerStrategy();
+        sut = new SelfSortingMinimalAmountTransferredOptimizerStrategy();
     }
 
     @Test

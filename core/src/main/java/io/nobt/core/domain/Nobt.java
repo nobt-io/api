@@ -19,21 +19,21 @@ public class Nobt {
     private final String name;
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
-    private final List<Payment> payments;
+    private final Set<Payment> payments;
     private final ZonedDateTime createdOn;
     private final Optimizer optimizer;
 
     public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn, Optimizer optimizer) {
-        this(id, currencyKey, name, explicitParticipants, expenses, Collections.emptyList(), createdOn, optimizer);
+        this(id, currencyKey, name, explicitParticipants, expenses, Collections.emptySet(), createdOn, optimizer);
     }
 
-    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, List<Payment> payments, ZonedDateTime createdOn, Optimizer optimizer) {
+    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, Set<Payment> payments, ZonedDateTime createdOn, Optimizer optimizer) {
         this.id = id;
         this.currencyKey = currencyKey;
         this.name = name;
         this.explicitParticipants = new HashSet<>(explicitParticipants);
         this.expenses = new HashSet<>(expenses);
-        this.payments = new ArrayList<>(payments);
+        this.payments = new HashSet<>(payments);
         this.createdOn = createdOn;
         this.optimizer = optimizer;
     }
@@ -58,6 +58,10 @@ public class Nobt {
         return Collections.unmodifiableSet(expenses);
     }
 
+    public Set<Payment> getPayments() {
+        return payments;
+    }
+
     public Set<Person> getParticipatingPersons() {
 
         final HashSet<Person> allPersons = new HashSet<>(explicitParticipants);
@@ -69,19 +73,18 @@ public class Nobt {
         return allPersons;
     }
 
-    public SuggestedTransactions getSuggestedTransactions() {
+    public List<Debt> getOptimizedDebts() {
+        return optimizer.apply(getAllDebts());
+    }
 
-        final SuggestedTransactions suggestedTransactions = new SuggestedTransactions(optimizer);
-
-        final List<Debt> debts = Stream
+    private List<Debt> getAllDebts() {
+        return Stream
                 .of(expenses, payments)
                 .flatMap(Collection::stream)
                 .sorted(comparing(CashFlow::getCreatedOn))
                 .sequential()
                 .flatMap(cashFlow -> cashFlow.calculateAccruingDebts().stream())
                 .collect(toList());
-
-        return suggestedTransactions;
     }
 
 
