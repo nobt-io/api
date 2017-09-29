@@ -1,5 +1,8 @@
-package io.nobt.core.domain;
+package io.nobt.test.domain.matchers;
 
+import io.nobt.core.domain.Amount;
+import io.nobt.core.domain.Payment;
+import io.nobt.core.domain.Person;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 

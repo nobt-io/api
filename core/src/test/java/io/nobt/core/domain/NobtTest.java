@@ -14,12 +14,12 @@ import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
-import static io.nobt.core.domain.PaymentMatchers.*;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasPayments;
+import static io.nobt.test.domain.matchers.PaymentMatchers.*;
 import static java.util.Collections.emptySet;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
