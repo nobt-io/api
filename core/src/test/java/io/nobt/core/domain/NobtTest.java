@@ -3,7 +3,9 @@ package io.nobt.core.domain;
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.util.Sets;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -12,17 +14,22 @@ import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
-import static java.util.Collections.*;
-import static io.nobt.test.domain.matchers.NobtMatchers.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
+import static java.util.Collections.emptySet;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.iterableWithSize;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NobtTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     private Nobt sut;
 
@@ -57,6 +64,15 @@ public class NobtTest {
 
         verify(firstExpense).getParticipants();
         verify(secondExpense).getParticipants();
+    }
+
+    @Test
+    public void shouldNotBeAbleToAddPaymentForNonParticipatingPerson() throws Exception {
+
+        final Nobt sut = nobtFactory.create("Test", Sets.newHashSet(thomas, matthias, david), new CurrencyKey("EUR"));
+
+        expectedException.expect(PersonNotParticipatingException.class);
+        sut.addPayment(harald, amount(10), thomas, "Money money!");
     }
 
     @Test(expected = ConversionInformationInconsistentException.class)
