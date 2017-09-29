@@ -1,16 +1,23 @@
 package io.nobt.core.optimizer;
 
 import io.nobt.core.domain.Debt;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static io.nobt.core.domain.Debt.debt;
+import static io.nobt.test.domain.factories.AmountFactory.amount;
+import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private SelfSortingMinimalAmountTransferredOptimizerStrategy sut;
 
@@ -23,58 +30,60 @@ public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
     public void testShouldOptimizeTransactionList() {
 
         List<Debt> transactionList = Arrays.asList(
-                Debt.debt("Matthias", 10, "Thomas"),
-                Debt.debt("Thomas", 3, "David"),
-                Debt.debt("Thomas", 10, "David"),
-                Debt.debt("David", 13, "Thomas B."),
-                Debt.debt("Jaci", 7, "Thomas"),
-                Debt.debt("Thomas B.", 6, "Jaci"),
-                Debt.debt("Jaci", 5, "Thomas B."),
-                Debt.debt("Matthias", 4, "Jaci"),
-                Debt.debt("Thomas", 13, "Thomas B."),
-                Debt.debt("David", 17, "Thomas")
+                debt(matthias, amount(10), thomas),
+                debt(thomas, amount(3), david),
+                debt(thomas, amount(10), david),
+                debt(david, amount(13), thomasB),
+                debt(jacqueline, amount(7), thomas),
+                debt(thomasB, amount(6), jacqueline),
+                debt(jacqueline, amount(5), thomasB),
+                debt(matthias, amount(4), jacqueline),
+                debt(thomas, amount(13), thomasB),
+                debt(david, amount(17), thomas)
         );
 
         List<Debt> optimalTransactions = sut.optimize(transactionList);
 
-        assertThat(optimalTransactions, hasSize(5));
-        assertThat(optimalTransactions, containsInAnyOrder(
-                Debt.debt("Matthias", 4, "Thomas"),
-                Debt.debt("Jaci", 2, "Thomas B."),
-                Debt.debt("Matthias", 10, "Thomas B."),
-                Debt.debt("David", 4, "Thomas"),
-                Debt.debt("David", 13, "Thomas B.")
+        assertThat(optimalTransactions, allOf(
+                Matchers.<Debt>iterableWithSize(6),
+                containsInAnyOrder(
+                        debt(matthias, amount(2), thomas),
+                        debt(jacqueline, amount(1), thomasB),
+                        debt(matthias, amount(12), thomasB),
+                        debt(david, amount(5), thomas),
+                        debt(david, amount(12), thomasB),
+                        debt(jacqueline, amount(1), thomas)
                 )
-        );
+        ));
     }
 
     @Test
     public void orderOfTransactionsShouldNotInfluenceResults() {
 
         List<Debt> transactionListA = Arrays.asList(
-                Debt.debt("Matthias", 10, "Thomas"),
-                Debt.debt("Thomas", 3, "David"),
-                Debt.debt("Thomas", 10, "David"),
-                Debt.debt("David", 13, "Thomas B."),
-                Debt.debt("Jaci", 7, "Thomas"),
-                Debt.debt("Thomas B.", 6, "Jaci"),
-                Debt.debt("Jaci", 5, "Thomas B."),
-                Debt.debt("Matthias", 4, "Jaci"),
-                Debt.debt("Thomas", 13, "Thomas B."),
-                Debt.debt("David", 17, "Thomas")
+                debt(matthias, amount(10), thomas),
+                debt(thomas, amount(3), david),
+                debt(thomas, amount(10), david),
+                debt(david, amount(13), thomasB),
+                debt(jacqueline, amount(7), thomas),
+                debt(thomasB, amount(6), jacqueline),
+                debt(jacqueline, amount(5), thomasB),
+                debt(matthias, amount(4), jacqueline),
+                debt(thomas, amount(13), thomasB),
+                debt(david, amount(17), thomas)
         );
 
         List<Debt> transactionListB = Arrays.asList(
-                Debt.debt("Matthias", 4, "Jaci"),
-                Debt.debt("Matthias", 10, "Thomas"),
-                Debt.debt("Thomas", 3, "David"),
-                Debt.debt("Thomas", 13, "Thomas B."),
-                Debt.debt("David", 13, "Thomas B."),
-                Debt.debt("Jaci", 7, "Thomas"),
-                Debt.debt("Thomas B.", 6, "Jaci"),
-                Debt.debt("Jaci", 5, "Thomas B."),
-                Debt.debt("Thomas", 10, "David"),
-                Debt.debt("David", 17, "Thomas")
+                debt(david, amount(17), thomas),
+                debt(david, amount(13), thomasB),
+                debt(matthias, amount(4), jacqueline),
+                debt(thomas, amount(13), thomasB),
+                debt(matthias, amount(10), thomas),
+                debt(thomas, amount(10), david),
+                debt(thomas, amount(3), david),
+                debt(thomasB, amount(6), jacqueline),
+                debt(jacqueline, amount(7), thomas),
+                debt(jacqueline, amount(5), thomasB)
         );
 
         List<Debt> optimalTransactionsA = sut.optimize(transactionListA);
