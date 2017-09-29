@@ -3,6 +3,7 @@ package io.nobt.core.domain;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 public class Payment implements CashFlow {
@@ -49,5 +50,22 @@ public class Payment implements CashFlow {
     @Override
     public ZonedDateTime getCreatedOn() {
         return getAddedOn();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Payment payment = (Payment) o;
+        return Objects.equals(sender, payment.sender) &&
+                Objects.equals(recipient, payment.recipient) &&
+                Objects.equals(amount, payment.amount) &&
+                Objects.equals(description, payment.description) &&
+                Objects.equals(addedOn, payment.addedOn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sender, recipient, amount, description, addedOn);
     }
 }

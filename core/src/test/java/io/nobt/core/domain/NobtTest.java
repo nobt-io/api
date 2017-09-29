@@ -14,13 +14,14 @@ import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
+import static io.nobt.core.domain.PaymentMatchers.*;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
+import static io.nobt.test.domain.matchers.NobtMatchers.hasPayments;
 import static java.util.Collections.emptySet;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -81,6 +82,24 @@ public class NobtTest {
         final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
 
         nobt.addExpense(null, null, david, emptySet(), null, new ConversionInformation(new CurrencyKey("EUR"), BigDecimal.TEN));
+    }
+
+    @Test
+    public void shouldAddPaymentToTheListOfPayments() throws Exception {
+
+        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+
+        nobt.addPayment(thomas, amount(5), david, "Money money!");
+
+        assertThat(nobt, hasPayments(
+                hasItem(
+                        allOf(
+                                hasSender(equalTo(thomas)),
+                                hasRecipient(equalTo(david)),
+                                hasAmount(equalTo(amount(5)))
+                        )
+                )
+        ));
     }
 
     @Test
