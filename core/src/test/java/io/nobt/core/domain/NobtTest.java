@@ -87,7 +87,7 @@ public class NobtTest {
     @Test
     public void shouldAddPaymentToTheListOfPayments() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+        final Nobt nobt = nobtFactory.create("Test", Sets.newHashSet(thomas, david), new CurrencyKey("EUR"));
 
         nobt.addPayment(thomas, amount(5), david, "Money money!");
 

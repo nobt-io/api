@@ -1,6 +1,5 @@
 package io.nobt.core.domain;
 
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Objects;
@@ -14,12 +13,12 @@ public class Payment implements CashFlow {
     private final String description;
     private final ZonedDateTime addedOn;
 
-    public Payment(Person sender, Person recipient, Amount amount, String description) {
+    public Payment(Person sender, Person recipient, Amount amount, String description, ZonedDateTime addedOn) {
         this.sender = sender;
         this.recipient = recipient;
         this.amount = amount;
         this.description = description;
-        this.addedOn = ZonedDateTime.now(ZoneOffset.UTC);
+        this.addedOn = addedOn;
     }
 
     public Person getSender() {

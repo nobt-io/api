@@ -92,9 +92,18 @@ public class Nobt {
 
     public void addPayment(Person sender, Amount amount, Person recipient, String description) {
 
-        if (!getParticipatingPersons().contains(sender) || !getParticipatingPersons().contains(recipient)) {
-            // not allowed TODO
+        if (!getParticipatingPersons().contains(sender)) {
+            throw new PersonNotParticipatingException(sender);
         }
+
+        if (!getParticipatingPersons().contains(recipient)) {
+            throw new PersonNotParticipatingException(recipient);
+        }
+
+        final Payment payment = new Payment(sender, recipient, amount, description, ZonedDateTime.now(ZoneOffset.UTC));
+
+        this.payments.add(payment);
+
     }
 
     public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date, ConversionInformation conversionInformation) {
