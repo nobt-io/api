@@ -2,10 +2,7 @@ package io.nobt.core.domain.transaction;
 
 import io.nobt.core.domain.Amount;
 import io.nobt.core.domain.Person;
-import io.nobt.core.domain.transaction.combination.Add;
-import io.nobt.core.domain.transaction.combination.CombinationResult;
-import io.nobt.core.domain.transaction.combination.CompositeResult;
-import io.nobt.core.domain.transaction.combination.Remove;
+import io.nobt.core.domain.transaction.combination.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,7 +13,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import static io.nobt.core.domain.Person.forName;
-import static io.nobt.core.domain.transaction.combination.CombinationResult.NotCombinable;
 
 public class Transaction {
 
@@ -71,7 +67,7 @@ public class Transaction {
         }
 
         if (combiningWithItself && participatingPersons.size() == 2) {
-            return NotCombinable;
+            return new NotCombinable();
         }
 
         if (thisTransactionIsOnlyAboutOnePerson) {
@@ -84,7 +80,7 @@ public class Transaction {
         }
 
         if (fourDifferentPersons || sameDebtorWithDifferentDebtees || sameDebteeWithDifferentDebtors) {
-            return CombinationResult.NotCombinable;
+            return new NotCombinable();
         }
 
         if (twoPersonsInDebtWithEachOther) {
@@ -171,7 +167,7 @@ public class Transaction {
             );
         }
 
-        return CombinationResult.Illegal;
+        return new IllegalCombination();
     }
 
     public Person getDebtor() {

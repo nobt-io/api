@@ -3,8 +3,8 @@ package io.nobt.core;
 import io.nobt.core.domain.Amount;
 import io.nobt.core.domain.transaction.Transaction;
 import io.nobt.core.domain.transaction.combination.Add;
-import io.nobt.core.domain.transaction.combination.CombinationResult;
 import io.nobt.core.domain.transaction.combination.CompositeResult;
+import io.nobt.core.domain.transaction.combination.NotCombinable;
 import io.nobt.core.domain.transaction.combination.Remove;
 
 import static io.nobt.core.domain.transaction.Transaction.transaction;
@@ -69,7 +69,7 @@ public final class TransactionTestCases {
                 $(
                         transaction(matthias, euro(10), thomas),
                         transaction(harald, euro(10), simon),
-                        CombinationResult.NotCombinable
+                        new NotCombinable()
                 )
         );
     }
