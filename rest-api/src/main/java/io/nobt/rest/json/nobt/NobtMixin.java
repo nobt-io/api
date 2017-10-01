@@ -3,6 +3,7 @@ package io.nobt.rest.json.nobt;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.nobt.core.domain.*;
+import io.nobt.core.domain.transaction.Transaction;
 import io.nobt.core.optimizer.Optimizer;
 
 import java.time.ZonedDateTime;
