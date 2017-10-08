@@ -7,6 +7,8 @@ import java.util.Set;
 
 public interface CashFlow {
 
+    long getId();
+
     Set<Debt> calculateAccruingDebts();
 
     ZonedDateTime getCreatedOn();

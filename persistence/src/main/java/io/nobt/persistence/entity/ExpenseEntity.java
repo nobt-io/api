@@ -1,15 +1,14 @@
 package io.nobt.persistence.entity;
 
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Matthias
@@ -18,10 +17,60 @@ import java.util.List;
 @Entity
 public class ExpenseEntity {
 
-    @Id
-    @SequenceGenerator(name = "expense_seq", sequenceName = "expense_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    @Embeddable
+    public static class Key implements Serializable {
+
+        @Column(name = "id")
+        private long id;
+
+        @ManyToOne
+        @JoinColumn(name = "nobtId", updatable = false, insertable = false, nullable = false)
+        private NobtEntity nobt;
+
+        public Key() {
+        }
+
+        public Key(long id, NobtEntity nobt) {
+            this.id = id;
+            this.nobt = nobt;
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public NobtEntity getNobt() {
+            return nobt;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public void setNobt(NobtEntity nobtId) {
+            this.nobt = nobtId;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Key key = (Key) o;
+            return Objects.equals(id, key.id) &&
+                    Objects.equals(nobt, key.nobt);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id, nobt);
+        }
+    }
+
+    @EmbeddedId
+    private Key id;
+
+    @Column(name = "legacyId", nullable = false)
+    private long legacyId;
 
     @Column(name = "expenseName", nullable = false, length = 50)
     private String name;
@@ -39,7 +88,7 @@ public class ExpenseEntity {
     private BigDecimal conversionRate;
 
     @ManyToOne
-    @JoinColumn(name = "NOBT_ID", nullable = false)
+    @JoinColumn(name = "nobtId", nullable = false, insertable = false, updatable = false)
     private NobtEntity nobt;
 
     @Type(type = "io.nobt.persistence.JsonBinaryType")
@@ -52,11 +101,11 @@ public class ExpenseEntity {
     @Column(name = "createdOn", nullable = false)
     private ZonedDateTime createdOn;
 
-    public long getId() {
+    public Key getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Key id) {
         this.id = id;
     }
 

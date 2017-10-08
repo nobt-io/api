@@ -23,7 +23,7 @@ public class ExpenseMapper implements DomainModelMapper<ExpenseEntity, Expense> 
         final Set<Share> shares = databaseModel.getShares().stream().map(shareMapper::mapToDomainModel).collect(toSet());
 
         return new Expense(
-                databaseModel.getId(),
+                databaseModel.getId().getId(),
                 databaseModel.getName(),
                 databaseModel.getSplitStrategy(),
                 Person.forName(databaseModel.getDebtee()),
@@ -39,10 +39,7 @@ public class ExpenseMapper implements DomainModelMapper<ExpenseEntity, Expense> 
 
         final ExpenseEntity expense = new ExpenseEntity();
 
-        if (domainModel.getId() != null) {
-            expense.setId(domainModel.getId());
-        }
-
+        expense.setId(new ExpenseEntity.Key(domainModel.getId(), null));
         expense.setName(domainModel.getName());
         expense.setDebtee(domainModel.getDebtee().getName());
         expense.setSplitStrategy(domainModel.getSplitStrategy());

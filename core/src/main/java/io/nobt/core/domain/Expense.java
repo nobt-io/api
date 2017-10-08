@@ -36,7 +36,7 @@ public class Expense implements CashFlow {
         this.createdOn = createdOn;
     }
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 

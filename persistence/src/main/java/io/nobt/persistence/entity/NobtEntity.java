@@ -63,6 +63,7 @@ public class NobtEntity {
         }
         expenses.add(expense);
         expense.setNobt(this);
+        expense.getId().setNobt(this);
     }
 
     public void addExplicitParticipant(String participant) {

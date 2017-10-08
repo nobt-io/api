@@ -9,18 +9,25 @@ import java.util.Set;
 
 public class Payment implements CashFlow {
 
+    private final long id;
     private final Person sender;
     private final Person recipient;
     private final Amount amount;
     private final String description;
     private final ZonedDateTime addedOn;
 
-    public Payment(Person sender, Person recipient, Amount amount, String description, ZonedDateTime addedOn) {
+    public Payment(long id, Person sender, Person recipient, Amount amount, String description, ZonedDateTime addedOn) {
+        this.id = id;
         this.sender = sender;
         this.recipient = recipient;
         this.amount = amount;
         this.description = description;
         this.addedOn = addedOn;
+    }
+
+    @Override
+    public long getId() {
+        return id;
     }
 
     public Person getSender() {

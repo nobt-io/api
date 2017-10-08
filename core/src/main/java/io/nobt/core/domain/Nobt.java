@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingLong;
 import static java.util.stream.Collectors.*;
 
 public class Nobt {
@@ -68,14 +69,16 @@ public class Nobt {
                 .collect(toCollection(HashSet::new));
     }
 
+    private Stream<CashFlow> getAllCashFlows() {
+        return Stream.of(expenses, payments).flatMap(Collection::stream);
+    }
+
     public List<Debt> getOptimizedDebts() {
         return optimizer.apply(getAllDebts());
     }
 
     private List<Debt> getAllDebts() {
-        return Stream
-                .of(expenses, payments)
-                .flatMap(Collection::stream)
+        return getAllCashFlows()
                 .sorted(comparing(CashFlow::getCreatedOn))
                 .map(CashFlow::calculateAccruingDebts)
                 .sequential()
@@ -97,7 +100,7 @@ public class Nobt {
             throw new PersonNotParticipatingException(recipient);
         }
 
-        final Payment payment = new Payment(sender, recipient, amount, description, ZonedDateTime.now(ZoneOffset.UTC));
+        final Payment payment = new Payment(getNextIdentifier(), sender, recipient, amount, description, ZonedDateTime.now(ZoneOffset.UTC));
 
         payments.add(payment);
     }
@@ -114,12 +117,21 @@ public class Nobt {
             throw new ConversionInformationInconsistentException(this, conversionInformation);
         }
 
-        final Expense newExpense = new Expense(null, name, splitStrategy, debtee, conversionInformation, shares, date, ZonedDateTime.now(ZoneOffset.UTC));
+        final Expense newExpense = new Expense(getNextIdentifier(), name, splitStrategy, debtee, conversionInformation, shares, date, ZonedDateTime.now(ZoneOffset.UTC));
 
         expenses.add(newExpense);
     }
 
-    public void removeExpense(Long expenseId) {
-        this.expenses.removeIf(e -> e.getId().equals(expenseId));
+    private long getNextIdentifier() {
+        final long highestIdentifier = getAllCashFlows()
+                .map(CashFlow::getId)
+                .max(comparingLong(l -> l))
+                .orElse(1L);
+
+        return highestIdentifier + 1;
+    }
+
+    public void removeExpense(long expenseId) {
+        this.expenses.removeIf(e -> e.getId() == expenseId);
     }
 }
