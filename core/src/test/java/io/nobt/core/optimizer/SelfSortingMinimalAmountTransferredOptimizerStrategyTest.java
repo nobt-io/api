@@ -1,6 +1,6 @@
 package io.nobt.core.optimizer;
 
-import io.nobt.core.domain.Debt;
+import io.nobt.core.domain.transaction.Debt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matchers;
@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.nobt.core.domain.Debt.debt;
+import static io.nobt.core.domain.transaction.Debt.debt;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static org.hamcrest.Matchers.*;
@@ -45,14 +45,13 @@ public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
         List<Debt> optimalTransactions = sut.optimize(transactionList);
 
         assertThat(optimalTransactions, allOf(
-                Matchers.<Debt>iterableWithSize(6),
+                Matchers.<Debt>iterableWithSize(5),
                 containsInAnyOrder(
-                        debt(matthias, amount(2), thomas),
+                        debt(matthias, amount(4), thomas),
                         debt(jacqueline, amount(1), thomasB),
-                        debt(matthias, amount(12), thomasB),
-                        debt(david, amount(5), thomas),
-                        debt(david, amount(12), thomasB),
-                        debt(jacqueline, amount(1), thomas)
+                        debt(matthias, amount(10), thomasB),
+                        debt(david, amount(6), thomas),
+                        debt(david, amount(11), thomasB)
                 )
         ));
     }

@@ -1,10 +1,10 @@
 package io.nobt.core.optimizer;
 
-import io.nobt.core.domain.Debt;
+import io.nobt.core.domain.transaction.Debt;
+import io.nobt.core.domain.transaction.combination.CombinationResult;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class MinimalAmountTransferredOptimizer {
 
@@ -31,16 +31,10 @@ public class MinimalAmountTransferredOptimizer {
         for (Debt first : copy) {
             for (Debt second : copy) {
 
-                if (first == second) {
-                    continue;
-                }
+                final CombinationResult result = first.combine(second);
 
-                Set<Debt> result = first.combine(second);
-
-                if (anyChanges(first, second, result)) {
-                    copy.remove(first);
-                    copy.remove(second);
-                    copy.addAll(result);
+                if (result.hasChanges()) {
+                    result.applyTo(copy);
 
                     needsFurtherOptimization = true;
 
@@ -52,7 +46,4 @@ public class MinimalAmountTransferredOptimizer {
         return debts;
     }
 
-    private boolean anyChanges(Debt first, Debt second, Set<Debt> result) {
-        return !(result.size() == 2 && result.contains(first) && result.contains(second));
-    }
 }

@@ -1,5 +1,7 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.domain.transaction.Debt;
+
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collections;

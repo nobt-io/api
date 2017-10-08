@@ -1,5 +1,6 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.domain.transaction.Debt;
 import io.nobt.core.optimizer.Optimizer;
 import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.util.Sets;

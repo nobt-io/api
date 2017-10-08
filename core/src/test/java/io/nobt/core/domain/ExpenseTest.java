@@ -1,5 +1,6 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.domain.transaction.Debt;
 import io.nobt.util.Sets;
 import org.junit.Test;
 
@@ -7,7 +8,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
-import static io.nobt.core.domain.Debt.debt;
+import static io.nobt.core.domain.transaction.Debt.debt;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static org.hamcrest.Matchers.containsInAnyOrder;

@@ -1,6 +1,6 @@
 package io.nobt.core.optimizer;
 
-import io.nobt.core.domain.Debt;
+import io.nobt.core.domain.transaction.Debt;
 
 import java.util.List;
 

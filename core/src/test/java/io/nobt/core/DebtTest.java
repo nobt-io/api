@@ -1,30 +1,25 @@
 package io.nobt.core;
 
-import io.nobt.core.domain.Debt;
+import io.nobt.core.domain.transaction.Debt;
+import io.nobt.core.domain.transaction.combination.CombinationResult;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Set;
-
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JUnitParamsRunner.class)
 public class DebtTest {
 
 	@Test
-	@Parameters(source = DebtTestCases.class)
-	public void testCombineTransactions(Debt first, Debt second, Set<Debt> expected) throws Exception {
+    @Parameters(source = TransactionTestCases.class)
+    public void testCombineTransactions(Debt first, Debt second, CombinationResult expected) throws Exception {
 
-		final Set<Debt> result = first.combine(second);
+        final CombinationResult result = first.combine(second);
 
-		if (expected.isEmpty()) {
-			assertThat(result, emptyCollectionOf(Debt.class));
-		} else {
-			assertThat(result, hasSize(expected.size()));
-			assertThat(result, containsInAnyOrder(expected.toArray()));
-		}
-	}
+        assertThat(result, is(equalTo(expected)));
+    }
 }

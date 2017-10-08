@@ -1,6 +1,6 @@
 package io.nobt.test.domain.factories;
 
-import io.nobt.core.domain.Debt;
+import io.nobt.core.domain.transaction.Debt;
 
 import static io.nobt.test.domain.factories.AmountFactory.randomAmount;
 import static io.nobt.test.domain.factories.RandomPersonFactory.randomPerson;

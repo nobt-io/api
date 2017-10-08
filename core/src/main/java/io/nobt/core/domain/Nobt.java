@@ -1,6 +1,7 @@
 package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
+import io.nobt.core.domain.transaction.Debt;
 import io.nobt.core.optimizer.Optimizer;
 
 import java.time.LocalDate;

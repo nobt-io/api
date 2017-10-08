@@ -2,8 +2,8 @@ package io.nobt.rest.payloads;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import io.nobt.core.domain.Debt;
 import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.transaction.Debt;
 
 import java.util.Set;
 

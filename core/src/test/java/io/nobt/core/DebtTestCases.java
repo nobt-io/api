@@ -1,12 +1,12 @@
 package io.nobt.core;
 
-import io.nobt.core.domain.Debt;
+import io.nobt.core.domain.transaction.Debt;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static io.nobt.core.domain.Debt.debt;
+import static io.nobt.core.domain.transaction.Debt.debt;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static java.util.Collections.emptySet;
