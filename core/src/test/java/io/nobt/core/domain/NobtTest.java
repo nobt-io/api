@@ -45,7 +45,7 @@ public class NobtTest {
     @Before
     public void setUp() throws Exception {
 
-        sut = new Nobt(null, new CurrencyKey("EUR"), "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense), ZonedDateTime.now(ZoneOffset.UTC), null);
+        sut = new Nobt(null, new CurrencyKey("EUR"), "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense), emptySet(), ZonedDateTime.now(ZoneOffset.UTC), null);
 
         when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
                 randomShare(david),

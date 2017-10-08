@@ -4,6 +4,7 @@ import io.nobt.core.domain.*;
 import io.nobt.persistence.entity.ExpenseEntity;
 import io.nobt.persistence.entity.NobtEntity;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -28,6 +29,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
                 databaseModel.getName(),
                 explicitParticipants,
                 expenses,
+                Collections.emptySet(),
                 databaseModel.getCreatedOn(),
                 databaseModel.getOptimizer()
         );

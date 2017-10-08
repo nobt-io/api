@@ -7,13 +7,14 @@ import io.nobt.core.domain.transaction.Debt;
 import io.nobt.core.optimizer.Optimizer;
 
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public abstract class NobtMixin extends Nobt {
 
     public NobtMixin(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn, Optimizer optimizer) {
-        super(id, currencyKey, name, explicitParticipants, expenses, createdOn, optimizer);
+        super(id, currencyKey, name, explicitParticipants, expenses, Collections.emptySet(), createdOn, optimizer);
     }
 
     @Override

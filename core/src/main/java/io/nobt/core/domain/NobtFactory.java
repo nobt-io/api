@@ -24,6 +24,6 @@ public final class NobtFactory {
     }
 
     public Nobt create(String name, Set<Person> explicitParticipants, CurrencyKey currencyKey) {
-        return new Nobt(null, currencyKey, name, explicitParticipants, emptySet(), nowFactory.get(), optimizerFactory.get());
+        return new Nobt(null, currencyKey, name, explicitParticipants, emptySet(), emptySet(), nowFactory.get(), optimizerFactory.get());
     }
 }

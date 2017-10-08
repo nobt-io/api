@@ -1,9 +1,6 @@
 package io.nobt.test.domain.factories;
 
-import io.nobt.core.domain.CurrencyKey;
-import io.nobt.core.domain.Expense;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.Person;
+import io.nobt.core.domain.*;
 import io.nobt.core.optimizer.Optimizer;
 
 import java.time.ZoneOffset;
@@ -14,9 +11,15 @@ public class NobtBuilder {
 
     private Set<Expense> expenses = Collections.emptySet();
     private Set<Person> participants = Collections.emptySet();
+    private Set<Payment> payments = Collections.emptySet();
 
     public NobtBuilder withExpenses(Expense... expenses) {
         this.expenses = new HashSet<>(Arrays.asList(expenses));
+        return this;
+    }
+
+    public NobtBuilder withPayments(Payment... payments) {
+        this.payments = new HashSet<>(Arrays.asList(payments));
         return this;
     }
 
@@ -32,7 +35,7 @@ public class NobtBuilder {
                 UUID.randomUUID().toString(),
                 participants,
                 expenses,
-                ZonedDateTime.now(ZoneOffset.UTC),
+                payments, ZonedDateTime.now(ZoneOffset.UTC),
                 Optimizer.defaultOptimizer()
         );
     }

@@ -24,10 +24,6 @@ public class Nobt {
     private final ZonedDateTime createdOn;
     private final Optimizer optimizer;
 
-    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn, Optimizer optimizer) {
-        this(id, currencyKey, name, explicitParticipants, expenses, Collections.emptySet(), createdOn, optimizer);
-    }
-
     public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, Set<Payment> payments, ZonedDateTime createdOn, Optimizer optimizer) {
         this.id = id;
         this.currencyKey = currencyKey;
@@ -103,8 +99,7 @@ public class Nobt {
 
         final Payment payment = new Payment(sender, recipient, amount, description, ZonedDateTime.now(ZoneOffset.UTC));
 
-        this.payments.add(payment);
-
+        payments.add(payment);
     }
 
     public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date, ConversionInformation conversionInformation) {
