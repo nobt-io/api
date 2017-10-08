@@ -1,10 +1,10 @@
 package io.nobt.core.optimizer;
 
-import io.nobt.core.domain.Transaction;
+import io.nobt.core.domain.transaction.Transaction;
+import io.nobt.core.domain.transaction.combination.CombinationResult;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import static java.util.Comparator.comparingInt;
 
@@ -41,16 +41,10 @@ public class SelfSortingOptimizerStrategy implements OptimizerStrategy {
 			for (Transaction first : copy) {
 				for (Transaction second : copy) {
 
-					if (first == second) {
-						continue;
-					}
+					final CombinationResult result = first.combine(second);
 
-					Set<Transaction> result = first.combine(second);
-
-					if (anyChanges(first, second, result)) {
-						copy.remove(first);
-						copy.remove(second);
-						copy.addAll(result);
+					if (result.hasChanges()) {
+						result.applyTo(copy);
 
 						needsFurtherOptimization = true;
 
@@ -60,10 +54,6 @@ public class SelfSortingOptimizerStrategy implements OptimizerStrategy {
 			}
 
 			return expenseTransactions;
-		}
-
-		private boolean anyChanges(Transaction first, Transaction second, Set<Transaction> result) {
-			return !(result.size() == 2 && result.contains(first) && result.contains(second));
 		}
 	}
 }

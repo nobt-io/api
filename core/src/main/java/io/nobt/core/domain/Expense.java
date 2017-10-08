@@ -1,5 +1,7 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.domain.transaction.Transaction;
+
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collections;
@@ -7,7 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static io.nobt.core.domain.Transaction.transaction;
+import static io.nobt.core.domain.transaction.Transaction.transaction;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 

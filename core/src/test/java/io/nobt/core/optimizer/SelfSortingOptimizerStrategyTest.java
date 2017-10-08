@@ -1,13 +1,13 @@
 package io.nobt.core.optimizer;
 
-import io.nobt.core.domain.Transaction;
+import io.nobt.core.domain.transaction.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static io.nobt.core.domain.Transaction.transaction;
+import static io.nobt.core.domain.transaction.Transaction.transaction;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
