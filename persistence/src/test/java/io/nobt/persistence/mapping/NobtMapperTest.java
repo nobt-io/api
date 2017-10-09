@@ -1,14 +1,15 @@
 package io.nobt.persistence.mapping;
 
-import io.nobt.persistence.entity.ExpenseEntity;
-import io.nobt.persistence.entity.NobtEntity;
+import io.nobt.persistence.expense.ExpenseEntity;
+import io.nobt.persistence.expense.ExpenseMapper;
+import io.nobt.persistence.nobt.NobtEntity;
+import io.nobt.persistence.nobt.NobtMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static java.util.Collections.emptySet;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)

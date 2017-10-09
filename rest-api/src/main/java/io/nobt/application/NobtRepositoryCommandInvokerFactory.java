@@ -2,9 +2,9 @@ package io.nobt.application;
 
 import io.nobt.application.env.Config;
 import io.nobt.persistence.*;
-import io.nobt.persistence.mapping.ExpenseMapper;
-import io.nobt.persistence.mapping.NobtMapper;
-import io.nobt.persistence.mapping.ShareMapper;
+import io.nobt.persistence.expense.ExpenseMapper;
+import io.nobt.persistence.nobt.NobtMapper;
+import io.nobt.persistence.share.ShareMapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

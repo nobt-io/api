@@ -1,4 +1,4 @@
-package io.nobt.persistence.mapping;
+package io.nobt.persistence;
 
 public interface DomainModelMapper<DBM, DM> {
 

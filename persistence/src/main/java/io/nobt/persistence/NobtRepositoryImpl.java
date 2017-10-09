@@ -3,8 +3,7 @@ package io.nobt.persistence;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtId;
-import io.nobt.persistence.entity.NobtEntity;
-import io.nobt.persistence.mapping.DomainModelMapper;
+import io.nobt.persistence.nobt.NobtEntity;
 
 import javax.persistence.EntityManager;
 import java.io.Closeable;

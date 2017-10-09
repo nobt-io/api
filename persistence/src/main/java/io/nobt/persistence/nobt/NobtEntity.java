@@ -1,6 +1,7 @@
-package io.nobt.persistence.entity;
+package io.nobt.persistence.nobt;
 
 import io.nobt.core.optimizer.Optimizer;
+import io.nobt.persistence.expense.ExpenseEntity;
 import io.nobt.util.Sets;
 
 import javax.persistence.*;
@@ -63,7 +64,6 @@ public class NobtEntity {
         }
         expenses.add(expense);
         expense.setNobt(this);
-        expense.getId().setNobt(this);
     }
 
     public void addExplicitParticipant(String participant) {

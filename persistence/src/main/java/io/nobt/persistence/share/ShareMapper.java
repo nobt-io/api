@@ -1,9 +1,9 @@
-package io.nobt.persistence.mapping;
+package io.nobt.persistence.share;
 
 import io.nobt.core.domain.Amount;
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
-import io.nobt.persistence.entity.ShareEntity;
+import io.nobt.persistence.DomainModelMapper;
 
 public class ShareMapper implements DomainModelMapper<ShareEntity, Share> {
 

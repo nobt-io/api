@@ -1,4 +1,4 @@
-package io.nobt.persistence.entity;
+package io.nobt.persistence.share;
 
 import javax.persistence.Embeddable;
 import java.io.Serializable;

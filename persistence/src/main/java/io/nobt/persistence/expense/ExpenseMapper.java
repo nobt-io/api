@@ -1,8 +1,8 @@
-package io.nobt.persistence.mapping;
+package io.nobt.persistence.expense;
 
 import io.nobt.core.domain.*;
-import io.nobt.persistence.entity.ExpenseEntity;
-import io.nobt.persistence.entity.ShareEntity;
+import io.nobt.persistence.DomainModelMapper;
+import io.nobt.persistence.share.ShareEntity;
 
 import java.util.Set;
 

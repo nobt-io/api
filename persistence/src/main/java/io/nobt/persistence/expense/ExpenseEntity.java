@@ -1,5 +1,7 @@
-package io.nobt.persistence.entity;
+package io.nobt.persistence.expense;
 
+import io.nobt.persistence.nobt.NobtEntity;
+import io.nobt.persistence.share.ShareEntity;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -10,9 +12,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * @author Matthias
- */
 @Table(name = "expenses")
 @Entity
 public class ExpenseEntity {
@@ -155,6 +154,7 @@ public class ExpenseEntity {
 
     public void setNobt(NobtEntity nobt) {
         this.nobt = nobt;
+        this.id.nobt = nobt;
     }
 
     public List<ShareEntity> getShares() {
