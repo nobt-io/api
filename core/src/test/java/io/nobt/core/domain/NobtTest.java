@@ -175,4 +175,20 @@ public class NobtTest {
                 )
         ));
     }
+
+    @Test
+    public void shouldNotAssignSameIdsToExpensesAndPayments() throws Exception {
+
+        final Nobt nobt = nobtFactory.create("Test", Sets.newHashSet(thomas, matthias), new CurrencyKey("EUR"));
+
+
+        nobt.addExpense("Test", null, thomas, Collections.emptySet(), LocalDate.now(), null);
+        nobt.addPayment(thomas, amount(3L), matthias, null);
+
+
+        final Payment payment = nobt.getPayments().iterator().next();
+        final Expense expense = nobt.getExpenses().iterator().next();
+
+        assertThat(payment, PaymentMatchers.hasId(not(equalTo(expense.getId()))));
+    }
 }
