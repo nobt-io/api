@@ -14,7 +14,7 @@ import static javax.persistence.InheritanceType.TABLE_PER_CLASS;
 public abstract class CashFlowEntity {
 
     @EmbeddedId
-    private Key id;
+    private Key key = new Key();
 
     @ManyToOne
     @JoinColumn(name = "nobtId", nullable = false, insertable = false, updatable = false)
@@ -29,15 +29,15 @@ public abstract class CashFlowEntity {
 
     public void setNobt(NobtEntity nobt) {
         this.nobt = nobt;
-        this.id.setNobt(nobt);
+        this.key.setNobt(nobt);
     }
 
-    public Key getId() {
-        return id;
+    public Key getKey() {
+        return key;
     }
 
-    public void setId(Key id) {
-        this.id = id;
+    public void setKey(Key id) {
+        this.key = id;
     }
 
     public ZonedDateTime getCreatedOn() {

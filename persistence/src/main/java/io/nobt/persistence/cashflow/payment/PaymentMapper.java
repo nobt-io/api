@@ -11,7 +11,7 @@ public class PaymentMapper implements DomainModelMapper<PaymentEntity, Payment> 
     @Override
     public Payment mapToDomainModel(PaymentEntity databaseModel) {
         return new Payment(
-                databaseModel.getId().getId(),
+                databaseModel.getKey().getId(),
                 Person.forName(databaseModel.getSender()),
                 Person.forName(databaseModel.getRecipient()),
                 Amount.fromBigDecimal(databaseModel.getAmount()),
@@ -24,7 +24,7 @@ public class PaymentMapper implements DomainModelMapper<PaymentEntity, Payment> 
     public PaymentEntity mapToDatabaseModel(Payment domainModel) {
 
         final PaymentEntity entity = new PaymentEntity();
-        entity.setId(new CashFlowEntity.Key(domainModel.getId(), null));
+        entity.setKey(new CashFlowEntity.Key(domainModel.getId(), null));
         entity.setSender(domainModel.getSender().getName());
         entity.setRecipient(domainModel.getRecipient().getName());
         entity.setAmount(domainModel.getAmount().getRoundedValue());
