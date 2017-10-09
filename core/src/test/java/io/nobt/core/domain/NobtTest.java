@@ -1,6 +1,7 @@
 package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
+import io.nobt.test.domain.matchers.PaymentMatchers;
 import io.nobt.util.Sets;
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,12 +12,15 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
+import static io.nobt.test.domain.matchers.ExpenseMatchers.hasId;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasPayments;
 import static io.nobt.test.domain.matchers.PaymentMatchers.*;
@@ -132,5 +136,43 @@ public class NobtTest {
         sut.removeExpense(1L);
 
         assertThat(sut, hasExpenses(iterableWithSize(1)));
+    }
+
+    @Test
+    public void shouldAssignIdToExpense() throws Exception {
+
+        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+
+
+        nobt.addExpense("Test", null, thomas, Collections.emptySet(), LocalDate.now(), null);
+
+
+        assertThat(nobt, hasExpenses(
+                allOf(
+                        iterableWithSize(greaterThan(0)),
+                        everyItem(
+                                hasId(notNullValue(Long.class))
+                        )
+                )
+        ));
+    }
+
+    @Test
+    public void shouldAssignIdToPayment() throws Exception {
+
+        final Nobt nobt = nobtFactory.create("Test", Sets.newHashSet(thomas, matthias), new CurrencyKey("EUR"));
+
+
+        nobt.addPayment(thomas, amount(3L), matthias, null);
+
+
+        assertThat(nobt, hasPayments(
+                allOf(
+                        iterableWithSize(greaterThan(0)),
+                        everyItem(
+                                PaymentMatchers.hasId(notNullValue(Long.class))
+                        )
+                )
+        ));
     }
 }

@@ -5,16 +5,14 @@ import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
 import io.nobt.test.domain.factories.StaticPersonFactory;
-import io.nobt.test.domain.matchers.ExpenseMatchers;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.time.LocalDate;
 import java.util.Collections;
 
-import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasId;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 public class InMemoryNobtRepositoryTest {
@@ -40,14 +38,6 @@ public class InMemoryNobtRepositoryTest {
 
         final Nobt persistedNobt = sut.getById(nobtId);
 
-        assertThat(persistedNobt, allOf(
-                hasId(notNullValue(NobtId.class)),
-                hasExpenses(
-                        everyItem(
-                                ExpenseMatchers.hasId(notNullValue(Long.class))
-                        )
-                )
-
-        ));
+        assertThat(persistedNobt, hasId(notNullValue(NobtId.class)));
     }
 }

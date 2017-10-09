@@ -8,6 +8,15 @@ import org.hamcrest.Matcher;
 
 public class PaymentMatchers {
 
+    public static Matcher<Payment> hasId(final Matcher<Long> subMatcher) {
+        return new FeatureMatcher<Payment, Long>(subMatcher, "id", "id") {
+            @Override
+            protected Long featureValueOf(Payment actual) {
+                return actual.getId();
+            }
+        };
+    }
+
     public static Matcher<Payment> hasSender(Matcher<Person> subMatcher) {
         return new FeatureMatcher<Payment, Person>(subMatcher, "sender", "sender") {
             @Override
