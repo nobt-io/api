@@ -1,7 +1,7 @@
 package io.nobt.persistence.mapping;
 
-import io.nobt.persistence.expense.ExpenseEntity;
-import io.nobt.persistence.expense.ExpenseMapper;
+import io.nobt.persistence.cashflow.expense.ExpenseEntity;
+import io.nobt.persistence.cashflow.expense.ExpenseMapper;
 import io.nobt.persistence.share.ShareEntity;
 import io.nobt.persistence.share.ShareMapper;
 import org.junit.Before;

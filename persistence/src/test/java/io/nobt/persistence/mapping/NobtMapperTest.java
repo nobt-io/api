@@ -1,7 +1,8 @@
 package io.nobt.persistence.mapping;
 
-import io.nobt.persistence.expense.ExpenseEntity;
-import io.nobt.persistence.expense.ExpenseMapper;
+import io.nobt.persistence.cashflow.expense.ExpenseEntity;
+import io.nobt.persistence.cashflow.expense.ExpenseMapper;
+import io.nobt.persistence.cashflow.payment.PaymentMapper;
 import io.nobt.persistence.nobt.NobtEntity;
 import io.nobt.persistence.nobt.NobtMapper;
 import org.junit.Before;
@@ -22,7 +23,7 @@ public class NobtMapperTest {
 
     @Before
     public void setUp() throws Exception {
-        sut = new NobtMapper(expenseMapper);
+        sut = new NobtMapper(expenseMapper, new PaymentMapper());
     }
 
     @Test

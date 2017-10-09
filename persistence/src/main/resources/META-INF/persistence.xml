@@ -5,7 +5,8 @@
     <persistence-unit name="persistence">
 
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-		<class>io.nobt.persistence.expense.ExpenseEntity</class>
+		<class>io.nobt.persistence.cashflow.expense.ExpenseEntity</class>
+		<class>io.nobt.persistence.cashflow.payment.PaymentEntity</class>
 		<class>io.nobt.persistence.nobt.NobtEntity</class>
 
 		<properties>

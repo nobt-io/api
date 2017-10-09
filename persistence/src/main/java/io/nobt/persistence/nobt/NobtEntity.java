@@ -1,7 +1,9 @@
 package io.nobt.persistence.nobt;
 
 import io.nobt.core.optimizer.Optimizer;
-import io.nobt.persistence.expense.ExpenseEntity;
+import io.nobt.persistence.cashflow.CashFlowEntity;
+import io.nobt.persistence.cashflow.expense.ExpenseEntity;
+import io.nobt.persistence.cashflow.payment.PaymentEntity;
 import io.nobt.util.Sets;
 
 import javax.persistence.*;
@@ -31,8 +33,11 @@ public class NobtEntity {
     @Column(name = "createdOn", nullable = false)
     private ZonedDateTime createdOn;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = CashFlowEntity.class)
     private Set<ExpenseEntity> expenses = new HashSet<>();
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = CashFlowEntity.class)
+    private Set<PaymentEntity> payments = new HashSet<>();
 
     @Column(name = "optimizer")
     @Enumerated(EnumType.STRING)
@@ -56,6 +61,19 @@ public class NobtEntity {
 
     public Set<ExpenseEntity> getExpenses() {
         return expenses;
+    }
+
+    public Set<PaymentEntity> getPayments() {
+        return payments;
+    }
+
+    public void addPayment(PaymentEntity payment) {
+        if (payments == null) {
+            payments = new HashSet<>();
+        }
+
+        payments.add(payment);
+        payment.setNobt(this);
     }
 
     public void addExpense(ExpenseEntity expense) {

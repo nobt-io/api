@@ -8,7 +8,8 @@ import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
 import io.nobt.persistence.NobtRepositoryImpl;
-import io.nobt.persistence.expense.ExpenseMapper;
+import io.nobt.persistence.cashflow.expense.ExpenseMapper;
+import io.nobt.persistence.cashflow.payment.PaymentMapper;
 import io.nobt.persistence.nobt.NobtMapper;
 import io.nobt.persistence.share.ShareMapper;
 import io.nobt.sql.flyway.MigrationService;
@@ -26,9 +27,11 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 
 import static io.nobt.test.domain.Currencies.EUR;
+import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.*;
 import static io.nobt.test.domain.matchers.NobtMatchers.*;
+import static io.nobt.test.domain.matchers.PaymentMatchers.*;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -77,7 +80,7 @@ public class NobtRepositoryIT {
 
         final ShareMapper shareMapper = new ShareMapper();
         final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
-        final NobtMapper nobtMapper = new NobtMapper(expenseMapper);
+        final NobtMapper nobtMapper = new NobtMapper(expenseMapper, new PaymentMapper());
 
         sut = new NobtRepositoryImpl(entityManager, nobtMapper);
 
@@ -190,5 +193,23 @@ public class NobtRepositoryIT {
         final ZonedDateTime expected = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
 
         assertThat(persistedTimestamp, is(expected));
+    }
+
+    @Test
+    public void shouldPersistPayment() throws Exception {
+        final Nobt nobt = nobtFactory.create("Test", Sets.newHashSet(thomas, matthias), new CurrencyKey("EUR"));
+        nobt.addPayment(thomas, amount(3L), matthias, "Testzahlung");
+
+
+        final NobtId id = sut.save(nobt);
+
+
+        final Nobt retrievedNobt = sut.getById(id);
+        assertThat(retrievedNobt, hasPayments(iterableWithSize(greaterThan(0))));
+        assertThat(retrievedNobt.getPayments().iterator().next(), allOf(
+                hasSender(equalTo(thomas)),
+                hasRecipient(equalTo(matthias)),
+                hasAmount(equalTo(amount(3)))
+        ));
     }
 }

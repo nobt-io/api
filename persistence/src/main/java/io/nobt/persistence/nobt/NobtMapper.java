@@ -2,9 +2,9 @@ package io.nobt.persistence.nobt;
 
 import io.nobt.core.domain.*;
 import io.nobt.persistence.DomainModelMapper;
-import io.nobt.persistence.expense.ExpenseEntity;
+import io.nobt.persistence.cashflow.expense.ExpenseEntity;
+import io.nobt.persistence.cashflow.payment.PaymentEntity;
 
-import java.util.Collections;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toSet;
@@ -12,9 +12,11 @@ import static java.util.stream.Collectors.toSet;
 public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
 
     private final DomainModelMapper<ExpenseEntity, Expense> expenseMapper;
+    private final DomainModelMapper<PaymentEntity, Payment> paymentMapper;
 
-    public NobtMapper(DomainModelMapper<ExpenseEntity, Expense> expenseMapper) {
+    public NobtMapper(DomainModelMapper<ExpenseEntity, Expense> expenseMapper, DomainModelMapper<PaymentEntity, Payment> paymentMapper) {
         this.expenseMapper = expenseMapper;
+        this.paymentMapper = paymentMapper;
     }
 
     @Override
@@ -22,6 +24,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
 
         final Set<Person> explicitParticipants = databaseModel.getExplicitParticipants().stream().map(Person::forName).collect(toSet());
         final Set<Expense> expenses = databaseModel.getExpenses().stream().map(expenseMapper::mapToDomainModel).collect(toSet());
+        final Set<Payment> payments = databaseModel.getPayments().stream().map(paymentMapper::mapToDomainModel).collect(toSet());
 
         return new Nobt(
                 new NobtId(databaseModel.getId()),
@@ -29,7 +32,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
                 databaseModel.getName(),
                 explicitParticipants,
                 expenses,
-                Collections.emptySet(),
+                payments,
                 databaseModel.getCreatedOn(),
                 databaseModel.getOptimizer()
         );
@@ -51,6 +54,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
 
         domainModel.getParticipatingPersons().stream().map(Person::getName).forEach(nobtEntity::addExplicitParticipant);
         domainModel.getExpenses().stream().map(expenseMapper::mapToDatabaseModel).forEach(nobtEntity::addExpense);
+        domainModel.getPayments().stream().map(paymentMapper::mapToDatabaseModel).forEach(nobtEntity::addPayment);
 
         return nobtEntity;
     }

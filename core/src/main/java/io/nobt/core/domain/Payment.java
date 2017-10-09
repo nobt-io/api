@@ -14,15 +14,15 @@ public class Payment implements CashFlow {
     private final Person recipient;
     private final Amount amount;
     private final String description;
-    private final ZonedDateTime addedOn;
+    private final ZonedDateTime createdOn;
 
-    public Payment(long id, Person sender, Person recipient, Amount amount, String description, ZonedDateTime addedOn) {
+    public Payment(long id, Person sender, Person recipient, Amount amount, String description, ZonedDateTime createdOn) {
         this.id = id;
         this.sender = sender;
         this.recipient = recipient;
         this.amount = amount;
         this.description = description;
-        this.addedOn = addedOn;
+        this.createdOn = createdOn;
     }
 
     @Override
@@ -46,10 +46,6 @@ public class Payment implements CashFlow {
         return description;
     }
 
-    public ZonedDateTime getAddedOn() {
-        return addedOn;
-    }
-
     @Override
     public Set<Debt> calculateAccruingDebts() {
         return Collections.singleton(Debt.debt(recipient, amount, sender));
@@ -57,7 +53,7 @@ public class Payment implements CashFlow {
 
     @Override
     public ZonedDateTime getCreatedOn() {
-        return getAddedOn();
+        return createdOn;
     }
 
     @Override
@@ -69,11 +65,11 @@ public class Payment implements CashFlow {
                 Objects.equals(recipient, payment.recipient) &&
                 Objects.equals(amount, payment.amount) &&
                 Objects.equals(description, payment.description) &&
-                Objects.equals(addedOn, payment.addedOn);
+                Objects.equals(createdOn, payment.createdOn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sender, recipient, amount, description, addedOn);
+        return Objects.hash(sender, recipient, amount, description, createdOn);
     }
 }

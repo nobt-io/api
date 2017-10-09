@@ -2,7 +2,8 @@ package io.nobt.application;
 
 import io.nobt.application.env.Config;
 import io.nobt.persistence.*;
-import io.nobt.persistence.expense.ExpenseMapper;
+import io.nobt.persistence.cashflow.expense.ExpenseMapper;
+import io.nobt.persistence.cashflow.payment.PaymentMapper;
 import io.nobt.persistence.nobt.NobtMapper;
 import io.nobt.persistence.share.ShareMapper;
 import org.apache.logging.log4j.LogManager;
@@ -37,7 +38,7 @@ public class NobtRepositoryCommandInvokerFactory {
         final DatabaseConfig databaseConfig = config.database();
         final EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.create(databaseConfig);
 
-        return new TransactionalNobtRepositoryCommandInvoker(entityManagerFactory, (em) -> new NobtRepositoryImpl(em, new NobtMapper(new ExpenseMapper(new ShareMapper()))));
+        return new TransactionalNobtRepositoryCommandInvoker(entityManagerFactory, (em) -> new NobtRepositoryImpl(em, new NobtMapper(new ExpenseMapper(new ShareMapper()), new PaymentMapper())));
     }
 
     public NobtRepositoryCommandInvoker inMemory() {

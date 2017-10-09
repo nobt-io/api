@@ -1,7 +1,8 @@
-package io.nobt.persistence.expense;
+package io.nobt.persistence.cashflow.expense;
 
 import io.nobt.core.domain.*;
 import io.nobt.persistence.DomainModelMapper;
+import io.nobt.persistence.cashflow.CashFlowEntity;
 import io.nobt.persistence.share.ShareEntity;
 
 import java.util.Set;
@@ -39,7 +40,7 @@ public class ExpenseMapper implements DomainModelMapper<ExpenseEntity, Expense> 
 
         final ExpenseEntity expense = new ExpenseEntity();
 
-        expense.setId(new ExpenseEntity.Key(domainModel.getId(), null));
+        expense.setId(new CashFlowEntity.Key(domainModel.getId(), null));
         expense.setName(domainModel.getName());
         expense.setDebtee(domainModel.getDebtee().getName());
         expense.setSplitStrategy(domainModel.getSplitStrategy());
