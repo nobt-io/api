@@ -1,6 +1,5 @@
 package db.migration.v13;
 
-import io.nobt.core.domain.NobtId;
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.spring.SpringJdbcMigration;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -22,9 +21,10 @@ public class V13__Persist_Nobt_IDs_in_DB implements SpringJdbcMigration, Migrati
             public void setValues(PreparedStatement ps, int i) throws SQLException {
 
                 final Long currentId = ids.get(i);
-                final NobtId nobtId = new NobtId(currentId);
 
-                ps.setString(1, nobtId.toExternalIdentifier());
+                final String externalId = ShortURL.encode(PseudoCrypter.pseudoCryptLong(currentId));
+
+                ps.setString(1, externalId);
                 ps.setLong(2, currentId);
             }
 

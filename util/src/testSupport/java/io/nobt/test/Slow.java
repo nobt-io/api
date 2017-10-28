@@ -1,4 +1,4 @@
-package io.nobt.rest;
+package io.nobt.test;
 
 public interface Slow {
 }
