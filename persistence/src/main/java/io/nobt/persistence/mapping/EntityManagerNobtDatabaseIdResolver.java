@@ -3,6 +3,7 @@ package io.nobt.persistence.mapping;
 import io.nobt.persistence.entity.NobtEntity;
 
 import javax.persistence.EntityManager;
+import java.util.Optional;
 
 public class EntityManagerNobtDatabaseIdResolver implements NobtDatabaseIdResolver {
 
@@ -13,12 +14,13 @@ public class EntityManagerNobtDatabaseIdResolver implements NobtDatabaseIdResolv
     }
 
     @Override
-    public Long resolveDatabaseId(String externalId) {
-        final NobtEntity nobtEntity = entityManager
+    public Optional<Long> resolveDatabaseId(String externalId) {
+        return entityManager
                 .createNamedQuery("getByExternalId", NobtEntity.class)
                 .setParameter("externalId", externalId)
-                .getSingleResult();
-
-        return nobtEntity.getId();
+                .getResultList()
+                .stream()
+                .findFirst()
+                .map(NobtEntity::getId);
     }
 }

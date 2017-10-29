@@ -1,7 +1,9 @@
 package io.nobt.persistence.mapping;
 
+import java.util.Optional;
+
 public interface NobtDatabaseIdResolver {
 
-    Long resolveDatabaseId(String externalId);
+    Optional<Long> resolveDatabaseId(String externalId);
 
 }

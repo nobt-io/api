@@ -40,7 +40,7 @@ public class NobtEntity {
     @Enumerated(EnumType.STRING)
     private Optimizer optimizer;
 
-    @Column(name = "externalId", length = 20, nullable = false, unique = true, insertable = false, updatable = false)
+    @Column(name = "externalId", length = 20, nullable = false, unique = true, updatable = false)
     private String externalId;
 
     public String getName() {

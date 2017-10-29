@@ -40,12 +40,13 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
 
         final NobtEntity nobtEntity = new NobtEntity();
 
-        if (domainModel.getId() != null) {
-            final Long databaseId = nobtDatabaseIdResolver.resolveDatabaseId(domainModel.getId().getValue());
-            nobtEntity.setId(databaseId);
-            nobtEntity.setExternalId(domainModel.getId().getValue());
-        }
+        final NobtId nobtId = domainModel.getId();
 
+        nobtDatabaseIdResolver
+                .resolveDatabaseId(nobtId.getValue())
+                .ifPresent(nobtEntity::setId);
+
+        nobtEntity.setExternalId(nobtId.getValue());
         nobtEntity.setName(domainModel.getName());
         nobtEntity.setCurrency(domainModel.getCurrencyKey().getKey());
         nobtEntity.setCreatedOn(domainModel.getCreatedOn());

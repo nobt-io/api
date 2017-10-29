@@ -11,6 +11,10 @@ public final class NobtId {
         this.value = value;
     }
 
+    public static NobtId newInstance() {
+        return new NobtId(ShortURL.generate());
+    }
+
     public String getValue() {
         return value;
     }

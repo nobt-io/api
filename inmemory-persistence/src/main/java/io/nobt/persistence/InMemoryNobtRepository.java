@@ -33,13 +33,11 @@ public class InMemoryNobtRepository implements NobtRepository {
 
         final long nextId = idGenerator.getAndIncrement();
 
-        final NobtId id = new NobtId(ShortURL.generate());
+        assignIds(nobt, nextId);
 
-        assignIds(nobt, id, nextId);
+        nobtDatabase.put(nobt.getId(), nobt);
 
-        nobtDatabase.put(id, nobt);
-
-        return id;
+        return nobt.getId();
     }
 
     @Override
@@ -47,17 +45,8 @@ public class InMemoryNobtRepository implements NobtRepository {
         return Optional.ofNullable(nobtDatabase.get(id)).orElseThrow(UnknownNobtException::new);
     }
 
-    private void assignIds(Nobt nobt, NobtId id, long nextId) {
-        assignNobtId(nobt, id);
+    private void assignIds(Nobt nobt, long nextId) {
         assignExpenseIds(nobt);
-    }
-
-    private void assignNobtId(Nobt nobt, NobtId id) {
-        try {
-            nobtIdField.set(nobt, id);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     private void assignExpenseIds(Nobt nobt) {

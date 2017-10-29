@@ -17,9 +17,7 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import javax.persistence.EntityManagerFactory;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Collections;
 
 import static io.nobt.test.domain.Currencies.EUR;
@@ -175,16 +173,19 @@ public class NobtRepositoryIT {
     @Test
     public void shouldCorrectlyHandleTimezones() throws Exception {
 
-        final ZonedDateTime firstOf2017 = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
+        final LocalDateTime firstOf2017 = LocalDateTime.of(2017, 1, 1, 0, 0, 0, 0);
+        final ZoneOffset fiveHourOffset = ZoneOffset.ofHours(5);
 
-        final Nobt nobtToSave = new Nobt(null, EUR, "Test", Collections.emptySet(), Collections.emptySet(), firstOf2017, null);
+        final NobtFactory nobtFactory = new NobtFactory(Clock.fixed(firstOf2017.toInstant(fiveHourOffset), fiveHourOffset));
+
+        final Nobt nobtToSave = nobtFactory.create("Test", Collections.emptySet(), EUR);
 
         final NobtId id = saveNobt(nobtToSave);
 
         final Nobt loadedNobt = getNobt(id);
-        final ZonedDateTime persistedTimestamp = loadedNobt.getCreatedOn().withZoneSameInstant(ZoneOffset.ofHours(5));
+        final ZonedDateTime persistedTimestamp = loadedNobt.getCreatedOn().withZoneSameInstant(fiveHourOffset);
 
-        final ZonedDateTime expected = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
+        final ZonedDateTime expected = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, fiveHourOffset);
 
         assertThat(persistedTimestamp, is(expected));
     }
