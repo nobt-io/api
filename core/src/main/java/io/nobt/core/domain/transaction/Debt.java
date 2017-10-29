@@ -64,7 +64,6 @@ public class Debt {
         }
 
         if (thisTransactionIsOnlyAboutOnePerson) {
-            LOGGER.debug("");
             return new Remove(this);
         }
 
