@@ -3,21 +3,13 @@ stages:
   - deploy
 
 build_rest-api:
+  image: docker:latest
   stage: build
   services:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay2
-   image: docker:latest
-   stage: test
-   script:
-     - >
-        docker run -t --rm
-        -v /var/run/docker.sock:/var/run/docker.sock
-        -v "$(pwd)":"$(pwd)"
-        -w "$(pwd)"
-        -u 0:0
-        gradle:3.1 ./gradlew clean build
+  script: docker run -t --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$(pwd)":"$(pwd)" -w "$(pwd)" -u 0:0 gradle:3.1 ./gradlew clean build
   artifacts:
     when: always
     paths:
