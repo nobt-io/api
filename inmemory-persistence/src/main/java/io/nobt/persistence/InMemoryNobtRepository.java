@@ -33,7 +33,7 @@ public class InMemoryNobtRepository implements NobtRepository {
 
         final long nextId = idGenerator.getAndIncrement();
 
-        final NobtId id = new NobtId(ShortURL.encode(PseudoCrypter.pseudoCryptLong(nextId)));
+        final NobtId id = new NobtId(ShortURL.generate());
 
         assignIds(nobt, id, nextId);
 

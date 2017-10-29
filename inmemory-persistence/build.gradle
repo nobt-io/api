@@ -2,7 +2,5 @@ dependencies {
     compile project(':core')
 
     testCompile project(path: ':core', configuration: 'testSupport')
-    testCompile project(path: ':util', configuration: 'testSupport')
-
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
