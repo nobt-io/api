@@ -7,7 +7,6 @@ import io.nobt.persistence.entity.NobtEntity;
 import io.nobt.persistence.mapping.DomainModelMapper;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Optional;
