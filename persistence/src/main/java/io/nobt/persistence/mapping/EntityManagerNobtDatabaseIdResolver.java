@@ -4,11 +4,11 @@ import io.nobt.persistence.entity.NobtEntity;
 
 import javax.persistence.EntityManager;
 
-public class EntityManagerDatabaseIdResolver implements DatabaseIdResolver {
+public class EntityManagerNobtDatabaseIdResolver implements NobtDatabaseIdResolver {
 
     private final EntityManager entityManager;
 
-    public EntityManagerDatabaseIdResolver(EntityManager entityManager) {
+    public EntityManagerNobtDatabaseIdResolver(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 

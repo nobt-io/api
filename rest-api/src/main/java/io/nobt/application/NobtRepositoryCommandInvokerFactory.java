@@ -2,7 +2,7 @@ package io.nobt.application;
 
 import io.nobt.application.env.Config;
 import io.nobt.persistence.*;
-import io.nobt.persistence.mapping.EntityManagerDatabaseIdResolver;
+import io.nobt.persistence.mapping.EntityManagerNobtDatabaseIdResolver;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
@@ -43,7 +43,7 @@ public class NobtRepositoryCommandInvokerFactory {
                 (entityManager) -> new EntityManagerNobtRepository(
                         entityManager,
                         new NobtMapper(
-                                new EntityManagerDatabaseIdResolver(entityManager),
+                                new EntityManagerNobtDatabaseIdResolver(entityManager),
                                 new ExpenseMapper(
                                         new ShareMapper()
                                 )

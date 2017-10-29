@@ -21,7 +21,7 @@ public class NobtMapperTest {
 
     @Before
     public void setUp() throws Exception {
-        sut = new NobtMapper(mock(DatabaseIdResolver.class), expenseMapper);
+        sut = new NobtMapper(mock(NobtDatabaseIdResolver.class), expenseMapper);
     }
 
     @Test

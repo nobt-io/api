@@ -5,7 +5,7 @@ import io.nobt.application.env.RealEnvironment;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
 import io.nobt.persistence.*;
-import io.nobt.persistence.mapping.EntityManagerDatabaseIdResolver;
+import io.nobt.persistence.mapping.EntityManagerNobtDatabaseIdResolver;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
@@ -74,7 +74,7 @@ public class NobtRepositoryIT {
 
             final ShareMapper shareMapper = new ShareMapper();
             final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
-            final NobtMapper nobtMapper = new NobtMapper(new EntityManagerDatabaseIdResolver(entityManager), expenseMapper);
+            final NobtMapper nobtMapper = new NobtMapper(new EntityManagerNobtDatabaseIdResolver(entityManager), expenseMapper);
 
             return new EntityManagerNobtRepository(entityManager, nobtMapper);
         }));

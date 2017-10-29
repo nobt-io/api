@@ -10,11 +10,11 @@ import static java.util.stream.Collectors.toSet;
 
 public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
 
-    private final DatabaseIdResolver databaseIdResolver;
+    private final NobtDatabaseIdResolver nobtDatabaseIdResolver;
     private final DomainModelMapper<ExpenseEntity, Expense> expenseMapper;
 
-    public NobtMapper(DatabaseIdResolver databaseIdResolver, DomainModelMapper<ExpenseEntity, Expense> expenseMapper) {
-        this.databaseIdResolver = databaseIdResolver;
+    public NobtMapper(NobtDatabaseIdResolver nobtDatabaseIdResolver, DomainModelMapper<ExpenseEntity, Expense> expenseMapper) {
+        this.nobtDatabaseIdResolver = nobtDatabaseIdResolver;
         this.expenseMapper = expenseMapper;
     }
 
@@ -41,7 +41,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         final NobtEntity nobtEntity = new NobtEntity();
 
         if (domainModel.getId() != null) {
-            final Long databaseId = databaseIdResolver.resolveDatabaseId(domainModel.getId().getValue());
+            final Long databaseId = nobtDatabaseIdResolver.resolveDatabaseId(domainModel.getId().getValue());
             nobtEntity.setId(databaseId);
             nobtEntity.setExternalId(domainModel.getId().getValue());
         }
