@@ -67,6 +67,10 @@ distributions {
     }
 }
 
+applicationDefaultJvmArgs = [
+        "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+]
+
 test {
     useJUnit {
         if (!project.hasProperty("includeSlowTests")) {
