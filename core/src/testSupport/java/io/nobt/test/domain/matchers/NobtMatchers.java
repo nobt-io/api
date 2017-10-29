@@ -4,6 +4,7 @@ import io.nobt.core.domain.*;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 public final class NobtMatchers {
@@ -31,6 +32,15 @@ public final class NobtMatchers {
             @Override
             protected CurrencyKey featureValueOf(Nobt actual) {
                 return actual.getCurrencyKey();
+            }
+        };
+    }
+
+    public static Matcher<Nobt> hasCreationTime(final Matcher<ZonedDateTime> subMatcher) {
+        return new FeatureMatcher<Nobt, ZonedDateTime>(subMatcher, "createdOn", "createdOn") {
+            @Override
+            protected ZonedDateTime featureValueOf(Nobt actual) {
+                return actual.getCreatedOn();
             }
         };
     }
