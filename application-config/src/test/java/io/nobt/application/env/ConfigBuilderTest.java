@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 @RunWith(JUnitParamsRunner.class)
-public class ConfigTest {
+public class ConfigBuilderTest {
 
     private static final String VALID_CONNECTION_STRING = "jdbc:postgresql://postgres:password@postgres:5432/postgres";
 
@@ -26,7 +26,7 @@ public class ConfigTest {
     @Parameters(method = "parseExamples")
     public void shouldParseValuesFromEnvironment(Environment environment, Config expected) throws Exception {
 
-        final Config config = Config.from(environment);
+        final Config config = ConfigBuilder.newInstance().applyEnvironment(environment).build();
 
         assertThat(config, equalTo(expected));
     }
@@ -48,7 +48,7 @@ public class ConfigTest {
     public void portShouldBeMandatory() throws Exception {
         expectedException.expect(MissingConfigurationException.class);
 
-        Config.from(new EmptyEnvironment());
+        ConfigBuilder.newInstance().applyEnvironment(new EmptyEnvironment()).build();
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ConfigTest {
 
         expectedException.expect(IllegalConfigurationException.class);
 
-        final Config sut = Config.from(environment);
+        final Config sut = ConfigBuilder.newInstance().applyEnvironment(environment).build();
     }
 
     private static Object[] invalidEnvironments() {
@@ -76,7 +76,7 @@ public class ConfigTest {
     @Test
     @Parameters(method = "validEnvironments")
     public void testValidConfigurations(Environment environment) throws Exception {
-        final Config sut = Config.from(environment);
+        final Config sut = ConfigBuilder.newInstance().applyEnvironment(environment).build();
     }
 
     private static Object[] validEnvironments() {

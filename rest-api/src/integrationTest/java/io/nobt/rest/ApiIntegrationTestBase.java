@@ -5,23 +5,26 @@ import io.nobt.application.BodyParser;
 import io.nobt.application.NobtRepositoryCommandInvokerFactory;
 import io.nobt.application.ObjectMapperFactory;
 import io.nobt.application.env.Config;
+import io.nobt.application.env.ConfigBuilder;
 import io.nobt.application.env.RealEnvironment;
 import io.nobt.core.domain.NobtFactory;
-import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.sql.flyway.MigrationService;
-import io.nobt.test.persistence.DatabaseAvailabilityCheck;
+import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.testcontainers.containers.PostgreSQLContainer;
 import spark.Service;
 
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.io.IOException;
 
-import static org.awaitility.Awaitility.await;
-
 public abstract class ApiIntegrationTestBase {
+
+    @ClassRule
+    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9");
 
     private static MigrationService migrationService;
     private static Service http;
@@ -31,15 +34,14 @@ public abstract class ApiIntegrationTestBase {
     @BeforeClass
     public static void setupEnvironment() {
 
-        config = Config.from(new RealEnvironment());
+        config = ConfigBuilder
+                .newInstance()
+                .applyEnvironment(new RealEnvironment())
+                .overridePort(8080)
+                .overrideDatabase(new PostgreSQLContainerDatabaseConfig(postgreSQLContainer))
+                .build();
 
-        DatabaseConfig databaseConfig = config.database();
-
-        migrationService = new MigrationService(databaseConfig);
-
-        final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
-        await().until(availabilityCheck::isDatabaseUp);
-
+        migrationService = new MigrationService(config.database());
         migrationService.migrate();
 
         final ObjectMapper objectMapper = new ObjectMapperFactory().create();

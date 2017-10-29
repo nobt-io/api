@@ -1,17 +1,14 @@
 package io.nobt.sql.flyway;
 
-import io.nobt.application.env.Config;
-import io.nobt.application.env.RealEnvironment;
 import io.nobt.persistence.DatabaseConfig;
-import io.nobt.test.persistence.DatabaseAvailabilityCheck;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static org.awaitility.Awaitility.await;
+import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
+import org.junit.*;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 public class MigrationServiceIT {
+
+    @ClassRule
+    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9");
 
     private static DatabaseConfig databaseConfig;
 
@@ -19,13 +16,7 @@ public class MigrationServiceIT {
 
     @BeforeClass
     public static void setupEnvironment() {
-
-        final Config config = Config.from(new RealEnvironment());
-
-        databaseConfig = config.database();
-
-        final DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
-        await().until(availabilityCheck::isDatabaseUp);
+        databaseConfig = new PostgreSQLContainerDatabaseConfig(postgreSQLContainer);
     }
 
     @Before

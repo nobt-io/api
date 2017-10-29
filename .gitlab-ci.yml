@@ -7,17 +7,12 @@ stages:
 build_rest-api:
   stage: build
   services:
-    - postgres:9
+    - docker:dind
   variables:
-    DATABASE_CONNECTION_STRING: 'jdbc:postgresql://postgres:password@postgres:5432/postgres'
-    PORT: '18080'
-    MIGRATE_DATABASE_ON_STARTUP: 'true'
-    USE_IN_MEMORY_DATABASE: 'false'
+    DOCKER_DRIVER: overlay2
   script:
     - ./gradlew clean
-    - ./gradlew test
-    - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel
-    - ./gradlew :rest-api:distZip
+    - ./gradlew build
   artifacts:
     when: always
     paths:
