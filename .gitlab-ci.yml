@@ -9,7 +9,7 @@ build_rest-api:
     - docker:dind
   variables:
     DOCKER_DRIVER: overlay2
-  script: docker run -t --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$(pwd)":"$(pwd)" -w "$(pwd)" -u 0:0 gradle:3.1 ./gradlew clean build
+  script: docker run -t --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$(pwd)":"$(pwd)" -w "$(pwd)" -u 0:0 gradle:4.1 ./gradlew clean build
   artifacts:
     when: always
     paths:
