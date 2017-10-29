@@ -9,7 +9,7 @@ allprojects {
     }
 }
 
-subprojects {
+subprojects { subproject ->
     apply plugin: 'java'
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
@@ -17,5 +17,19 @@ subprojects {
     dependencies {
         compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.5'
         testCompile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
+    }
+
+    if (subproject.name != 'util') {
+        dependencies {
+            testCompile project(path: ':util', configuration: 'testSupport')
+        }
+    }
+
+    test {
+        useJUnit {
+            if (!project.hasProperty("includeSlowTests")) {
+                excludeCategories 'io.nobt.test.Slow'
+            }
+        }
     }
 }
