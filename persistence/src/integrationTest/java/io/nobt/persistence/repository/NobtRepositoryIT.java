@@ -4,10 +4,8 @@ import io.nobt.application.env.Config;
 import io.nobt.application.env.RealEnvironment;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
-import io.nobt.persistence.DatabaseConfig;
-import io.nobt.persistence.EntityManagerFactoryProvider;
-import io.nobt.persistence.NobtRepository;
-import io.nobt.persistence.NobtRepositoryImpl;
+import io.nobt.persistence.*;
+import io.nobt.persistence.mapping.EntityManagerDatabaseIdResolver;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
@@ -18,7 +16,6 @@ import io.nobt.util.Sets;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -43,11 +40,10 @@ public class NobtRepositoryIT {
     public ExpectedException expectedException = ExpectedException.none();
 
     private static EntityManagerFactory entityManagerFactory;
-    private static EntityManager entityManager;
 
     private NobtFactory nobtFactory;
 
-    private NobtRepository sut;
+    private TransactionalNobtRepositoryCommandInvoker commandInvoker;
 
     @BeforeClass
     public static void setupEnvironment() {
@@ -73,20 +69,21 @@ public class NobtRepositoryIT {
         final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
 
         entityManagerFactory = emfProvider.create(databaseConfig);
-        entityManager = entityManagerFactory.createEntityManager();
 
-        final ShareMapper shareMapper = new ShareMapper();
-        final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
-        final NobtMapper nobtMapper = new NobtMapper(expenseMapper);
+        commandInvoker = new TransactionalNobtRepositoryCommandInvoker(entityManagerFactory, (entityManager -> {
 
-        sut = new NobtRepositoryImpl(entityManager, nobtMapper);
+            final ShareMapper shareMapper = new ShareMapper();
+            final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
+            final NobtMapper nobtMapper = new NobtMapper(new EntityManagerDatabaseIdResolver(entityManager), expenseMapper);
+
+            return new EntityManagerNobtRepository(entityManager, nobtMapper);
+        }));
 
         nobtFactory = new NobtFactory();
     }
 
     @After
     public void closeEM() {
-        entityManager.close();
         entityManagerFactory.close();
     }
 
@@ -98,11 +95,11 @@ public class NobtRepositoryIT {
 
         final Nobt nobtToSave = nobtFactory.create(name, Sets.newHashSet(explicitParticipants), new CurrencyKey("EUR"));
 
-        final NobtId id = sut.save(nobtToSave);
+        final NobtId id = saveNobt(nobtToSave);
 
         assumeThat(id, is(notNullValue()));
 
-        final Nobt retrievedNobt = sut.getById(id);
+        final Nobt retrievedNobt = getNobt(id);
 
         assertThat(retrievedNobt, allOf(
                 hasName(equalTo(name)),
@@ -113,10 +110,10 @@ public class NobtRepositoryIT {
     @Test
     public void shouldThrowExceptionForUnknownNobt() throws Exception {
 
-        final NobtId unknownId = new NobtId(1234L);
+        final NobtId unknownId = new NobtId("abcd");
 
         expectedException.expect(UnknownNobtException.class);
-        sut.getById(unknownId);
+        getNobt(unknownId);
     }
 
     @Test
@@ -129,9 +126,9 @@ public class NobtRepositoryIT {
         final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet(), new CurrencyKey("EUR"));
         nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate, null);
 
-        final NobtId id = sut.save(nobtToSave);
+        final NobtId id = saveNobt(nobtToSave);
 
-        final Nobt retrievedNobt = sut.getById(id);
+        final Nobt retrievedNobt = getNobt(id);
 
         assertThat(retrievedNobt, hasExpenses(
                 allOf(
@@ -157,18 +154,18 @@ public class NobtRepositoryIT {
         final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet(), new CurrencyKey("EUR"));
         nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate, null);
 
-        final NobtId id = sut.save(nobtToSave);
+        final NobtId id = saveNobt(nobtToSave);
 
+        final Nobt retrievedNobt = getNobt(id);
 
-        final Nobt retrievedNobt = sut.getById(id);
         final Long idOfFirstExpense = retrievedNobt.getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
 
         retrievedNobt.removeExpense(idOfFirstExpense);
 
-        sut.save(retrievedNobt);
+        saveNobt(retrievedNobt);
 
 
-        final Nobt nobtWithoutExpense = sut.getById(id);
+        final Nobt nobtWithoutExpense = getNobt(id);
 
         assertThat(nobtWithoutExpense, hasExpenses(
                 iterableWithSize(0)
@@ -182,13 +179,21 @@ public class NobtRepositoryIT {
 
         final Nobt nobtToSave = new Nobt(null, EUR, "Test", Collections.emptySet(), Collections.emptySet(), firstOf2017, null);
 
-        final NobtId id = sut.save(nobtToSave);
+        final NobtId id = saveNobt(nobtToSave);
 
-        final Nobt loadedNobt = sut.getById(id);
-        final ZonedDateTime persistedTimestamp = loadedNobt.getCreatedOn();
+        final Nobt loadedNobt = getNobt(id);
+        final ZonedDateTime persistedTimestamp = loadedNobt.getCreatedOn().withZoneSameInstant(ZoneOffset.ofHours(5));
 
         final ZonedDateTime expected = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
 
         assertThat(persistedTimestamp, is(expected));
+    }
+
+    private NobtId saveNobt(Nobt nobtToSave) {
+        return commandInvoker.invoke(repository -> repository.save(nobtToSave));
+    }
+
+    private Nobt getNobt(NobtId id) {
+        return commandInvoker.invoke(repository -> repository.getById(id));
     }
 }

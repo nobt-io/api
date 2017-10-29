@@ -8,7 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static java.util.Collections.emptySet;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -21,7 +21,7 @@ public class NobtMapperTest {
 
     @Before
     public void setUp() throws Exception {
-        sut = new NobtMapper(expenseMapper);
+        sut = new NobtMapper(mock(DatabaseIdResolver.class), expenseMapper);
     }
 
     @Test
@@ -36,6 +36,7 @@ public class NobtMapperTest {
         entity.setId(123L);
         entity.addExpense(firstExpense);
         entity.addExpense(secondExpense);
+        entity.setExternalId("abcd");
 
 
         sut.mapToDomainModel(entity);

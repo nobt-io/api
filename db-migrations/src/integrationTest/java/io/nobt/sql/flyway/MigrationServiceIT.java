@@ -40,5 +40,6 @@ public class MigrationServiceIT {
 
     @After
     public void tearDown() throws Exception {
+        sut.clean();
     }
 }

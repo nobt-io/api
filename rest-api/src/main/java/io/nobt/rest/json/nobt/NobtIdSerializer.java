@@ -11,6 +11,6 @@ public class NobtIdSerializer extends JsonSerializer<NobtId> {
 
     @Override
     public void serialize(NobtId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        gen.writeString(value.toExternalIdentifier());
+        gen.writeString(value.getValue());
     }
 }

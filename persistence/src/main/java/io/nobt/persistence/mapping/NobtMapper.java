@@ -10,9 +10,11 @@ import static java.util.stream.Collectors.toSet;
 
 public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
 
+    private final DatabaseIdResolver databaseIdResolver;
     private final DomainModelMapper<ExpenseEntity, Expense> expenseMapper;
 
-    public NobtMapper(DomainModelMapper<ExpenseEntity, Expense> expenseMapper) {
+    public NobtMapper(DatabaseIdResolver databaseIdResolver, DomainModelMapper<ExpenseEntity, Expense> expenseMapper) {
+        this.databaseIdResolver = databaseIdResolver;
         this.expenseMapper = expenseMapper;
     }
 
@@ -23,7 +25,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         final Set<Expense> expenses = databaseModel.getExpenses().stream().map(expenseMapper::mapToDomainModel).collect(toSet());
 
         return new Nobt(
-                new NobtId(databaseModel.getId()),
+                new NobtId(databaseModel.getExternalId()),
                 new CurrencyKey(databaseModel.getCurrency()),
                 databaseModel.getName(),
                 explicitParticipants,
@@ -39,7 +41,9 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         final NobtEntity nobtEntity = new NobtEntity();
 
         if (domainModel.getId() != null) {
-            nobtEntity.setId(domainModel.getId().getId());
+            final Long databaseId = databaseIdResolver.resolveDatabaseId(domainModel.getId().getValue());
+            nobtEntity.setId(databaseId);
+            nobtEntity.setExternalId(domainModel.getId().getValue());
         }
 
         nobtEntity.setName(domainModel.getName());

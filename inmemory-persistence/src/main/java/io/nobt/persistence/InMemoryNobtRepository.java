@@ -31,9 +31,11 @@ public class InMemoryNobtRepository implements NobtRepository {
     @Override
     public NobtId save(Nobt nobt) {
 
-        final NobtId id = new NobtId(idGenerator.getAndIncrement());
+        final long nextId = idGenerator.getAndIncrement();
 
-        assignIds(nobt, id);
+        final NobtId id = new NobtId(ShortURL.encode(PseudoCrypter.pseudoCryptLong(nextId)));
+
+        assignIds(nobt, id, nextId);
 
         nobtDatabase.put(id, nobt);
 
@@ -45,8 +47,7 @@ public class InMemoryNobtRepository implements NobtRepository {
         return Optional.ofNullable(nobtDatabase.get(id)).orElseThrow(UnknownNobtException::new);
     }
 
-    private void assignIds(Nobt nobt, NobtId id) {
-
+    private void assignIds(Nobt nobt, NobtId id, long nextId) {
         assignNobtId(nobt, id);
         assignExpenseIds(nobt);
     }
@@ -70,8 +71,12 @@ public class InMemoryNobtRepository implements NobtRepository {
     }
 
     private static Field findIdField(Class<?> type) {
+        return findField(type, "id");
+    }
+
+    private static Field findField(Class<?> type, String name) {
         try {
-            return type.getDeclaredField("id");
+            return type.getDeclaredField(name);
         } catch (NoSuchFieldException e) {
             throw new IllegalArgumentException(e);
         }

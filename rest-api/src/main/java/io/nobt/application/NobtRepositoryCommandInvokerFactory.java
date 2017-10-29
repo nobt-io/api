@@ -2,6 +2,7 @@ package io.nobt.application;
 
 import io.nobt.application.env.Config;
 import io.nobt.persistence.*;
+import io.nobt.persistence.mapping.EntityManagerDatabaseIdResolver;
 import io.nobt.persistence.mapping.ExpenseMapper;
 import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
@@ -32,15 +33,26 @@ public class NobtRepositoryCommandInvokerFactory {
 
     private static EntityManagerFactoryProvider entityManagerFactoryProvider = new EntityManagerFactoryProvider();
 
-    public NobtRepositoryCommandInvoker transactional() {
+    private NobtRepositoryCommandInvoker transactional() {
 
         final DatabaseConfig databaseConfig = config.database();
         final EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.create(databaseConfig);
 
-        return new TransactionalNobtRepositoryCommandInvoker(entityManagerFactory, (em) -> new NobtRepositoryImpl(em, new NobtMapper(new ExpenseMapper(new ShareMapper()))));
+        return new TransactionalNobtRepositoryCommandInvoker(
+                entityManagerFactory,
+                (entityManager) -> new EntityManagerNobtRepository(
+                        entityManager,
+                        new NobtMapper(
+                                new EntityManagerDatabaseIdResolver(entityManager),
+                                new ExpenseMapper(
+                                        new ShareMapper()
+                                )
+                        )
+                )
+        );
     }
 
-    public NobtRepositoryCommandInvoker inMemory() {
+    private NobtRepositoryCommandInvoker inMemory() {
         LOGGER.info("Using In-Memory database.");
         return new InMemoryRepositoryCommandInvoker(new InMemoryNobtRepository());
     }

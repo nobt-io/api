@@ -9,7 +9,6 @@ import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
-import io.nobt.persistence.NobtRepository;
 import io.nobt.persistence.NobtRepositoryCommand;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.rest.payloads.CreateExpenseInput;
@@ -96,20 +95,17 @@ public class NobtRestApi {
     private void registerCreateExpenseRoute() {
         http.post("/nobts/:nobtId/expenses", "application/json", (req, resp) -> {
 
-            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
+            final NobtId databaseId = extractNobtId(req);
             final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
 
 
-            nobtRepositoryCommandInvoker.invoke(new NobtRepositoryCommand<Void>() {
-                @Override
-                public Void execute(NobtRepository repository) {
+            nobtRepositoryCommandInvoker.invoke((NobtRepositoryCommand<Void>) repository -> {
 
-                    final Nobt nobt = repository.getById(databaseId);
-                    nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date, input.conversionInformation);
-                    repository.save(nobt);
+                final Nobt nobt = repository.getById(databaseId);
+                nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date, input.conversionInformation);
+                repository.save(nobt);
 
-                    return null;
-                }
+                return null;
             });
 
             // TODO return id of expense
@@ -123,20 +119,17 @@ public class NobtRestApi {
 
         http.delete("/nobts/:nobtId/expenses/:expenseId", (req, res) -> {
 
-            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
+            final NobtId databaseId = extractNobtId(req);
             final Long expenseId = Long.parseLong(req.params(":expenseId"));
 
 
-            nobtRepositoryCommandInvoker.invoke(new NobtRepositoryCommand<Void>() {
-                @Override
-                public Void execute(NobtRepository repository) {
+            nobtRepositoryCommandInvoker.invoke((NobtRepositoryCommand<Void>) repository -> {
 
-                    final Nobt nobt = repository.getById(databaseId);
-                    nobt.removeExpense(expenseId);
-                    repository.save(nobt);
+                final Nobt nobt = repository.getById(databaseId);
+                nobt.removeExpense(expenseId);
+                repository.save(nobt);
 
-                    return null;
-                }
+                return null;
             });
 
 
@@ -149,7 +142,7 @@ public class NobtRestApi {
     private void registerRetrieveNobtRoute() {
         http.get("/nobts/:nobtId", (req, res) -> {
 
-            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
+            final NobtId databaseId = extractNobtId(req);
 
 
             final Nobt nobt = nobtRepositoryCommandInvoker.invoke(repository -> repository.getById(databaseId));
@@ -177,7 +170,7 @@ public class NobtRestApi {
 
 
             res.status(201);
-            res.header("Location", req.url() + "/" + nobt.getId().toExternalIdentifier());
+            res.header("Location", req.url() + "/" + nobt.getId().getValue());
             res.header("Content-Type", "application/json");
 
             return nobt;
@@ -190,9 +183,9 @@ public class NobtRestApi {
         });
     }
 
-    private static NobtId decodeNobtIdentifierToDatabaseId(Request req) {
+    private static NobtId extractNobtId(Request req) {
         final String externalIdentifier = req.params(":nobtId");
-        return NobtId.fromExternalIdentifier(externalIdentifier);
+        return new NobtId(externalIdentifier);
     }
 
     private void setupCORS() {
