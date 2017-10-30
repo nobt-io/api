@@ -2,6 +2,7 @@ stages:
   - build
   - deploy
 
+# Inspired by: https://www.testcontainers.org/ci/ci.html#gitlab
 build_rest-api:
   image: docker:latest
   stage: build
