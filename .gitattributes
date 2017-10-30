@@ -16,11 +16,12 @@
 *.jsp           text
 *.jspf          text
 *.properties    text
-*.sh            crlf=input
+*.sh            eol=lf
+gradlew         eol=lf
 *.tld           text
 *.txt           text
 *.xml           text
-*.bat           -crlf
+*.bat           eol=crlf
 
 # These files are binary and should be left untouched
 # (binary is a macro for -text -diff)
