@@ -1,7 +1,6 @@
 package io.nobt.persistence.nobt;
 
 import io.nobt.core.optimizer.Optimizer;
-import io.nobt.persistence.cashflow.CashFlowEntity;
 import io.nobt.persistence.cashflow.expense.ExpenseEntity;
 import io.nobt.persistence.cashflow.payment.PaymentEntity;
 import io.nobt.util.Sets;
@@ -33,10 +32,10 @@ public class NobtEntity {
     @Column(name = "createdOn", nullable = false)
     private ZonedDateTime createdOn;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = CashFlowEntity.class)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ExpenseEntity> expenses = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = CashFlowEntity.class)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<PaymentEntity> payments = new HashSet<>();
 
     @Column(name = "optimizer")

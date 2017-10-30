@@ -9,7 +9,7 @@ import java.util.Objects;
 
 import static javax.persistence.InheritanceType.TABLE_PER_CLASS;
 
-@Entity
+@MappedSuperclass
 @Inheritance(strategy = TABLE_PER_CLASS)
 public abstract class CashFlowEntity {
 

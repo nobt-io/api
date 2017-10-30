@@ -15,9 +15,6 @@ import java.util.List;
 @Entity
 public class ExpenseEntity extends CashFlowEntity {
 
-    @Column(name = "legacyId", nullable = false)
-    private long legacyId;
-
     @Column(name = "expenseName", nullable = false, length = 50)
     private String name;
 

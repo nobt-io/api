@@ -3,4 +3,7 @@
   <component name="SqlDialectMappings">
     <file url="file://$PROJECT_DIR$/db-migrations" dialect="PostgreSQL" />
   </component>
+  <component name="SqlResolveMappings">
+    <file url="file://$PROJECT_DIR$/db-migrations" scope="{&quot;node&quot;:{  &quot;@negative&quot;:&quot;1&quot;,  &quot;group&quot;:{   &quot;@kind&quot;:&quot;data-source&quot;,   &quot;node&quot;:{    &quot;name&quot;:{     &quot;@name&quot;:&quot;2475b895-0d55-4a0a-ac35-320371b90fa3&quot;,     &quot;@quoted&quot;:&quot;1&quot;    },    &quot;group&quot;:{     &quot;@kind&quot;:&quot;database&quot;,     &quot;node&quot;:{      &quot;name&quot;:{       &quot;@name&quot;:&quot;postgres&quot;,       &quot;@quoted&quot;:&quot;1&quot;      },      &quot;group&quot;:{       &quot;@kind&quot;:&quot;schema&quot;,       &quot;node&quot;:{        &quot;name&quot;:{         &quot;@name&quot;:&quot;public&quot;,         &quot;@quoted&quot;:&quot;1&quot;        }       }      }     }    }   }  } }}" />
+  </component>
 </project>
