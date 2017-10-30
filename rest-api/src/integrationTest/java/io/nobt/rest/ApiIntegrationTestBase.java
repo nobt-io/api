@@ -24,7 +24,7 @@ import java.io.IOException;
 public abstract class ApiIntegrationTestBase {
 
     @ClassRule
-    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9");
+    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9.6");
 
     private static MigrationService migrationService;
     private static Service http;

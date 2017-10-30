@@ -8,7 +8,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 public class MigrationServiceIT {
 
     @ClassRule
-    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9");
+    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9.6");
 
     private static DatabaseConfig databaseConfig;
 

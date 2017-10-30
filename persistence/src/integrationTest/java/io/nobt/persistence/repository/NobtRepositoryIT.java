@@ -41,7 +41,7 @@ public class NobtRepositoryIT {
     public ExpectedException expectedException = ExpectedException.none();
 
     @ClassRule
-    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9");
+    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9.6");
 
     private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;
