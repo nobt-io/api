@@ -69,7 +69,9 @@ public class ConfigBuilderTest {
                 staticEnvironment(aPort(), "false", unset(), unset()),
 
                 staticEnvironment(aPort(), "true", "true", unset()),
-                staticEnvironment(aPort(), "true", unset(), unset())
+                staticEnvironment(aPort(), "true", unset(), unset()),
+
+                staticEnvironment(aPort(), "false", "false", unset())
         );
     }
 
