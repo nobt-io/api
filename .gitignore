@@ -96,6 +96,11 @@ local.properties
 # Mongo Explorer plugin:
 # .idea/mongoSettings.xml
 
+!.idea/vcs.xml
+!.idea/sqldialects.xml
+!.idea/encodings.xml
+!.idea/codeStyleSettings.xml
+
 ## File-based project format:
 *.ipr
 *.iws
