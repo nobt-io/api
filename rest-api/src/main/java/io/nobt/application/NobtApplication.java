@@ -2,6 +2,7 @@ package io.nobt.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.application.env.Config;
+import io.nobt.application.env.ConfigBuilder;
 import io.nobt.application.env.RealEnvironment;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.persistence.DatabaseConfig;
@@ -38,7 +39,10 @@ public class NobtApplication {
 
     public static void main(String[] args) {
 
-        final Config config = Config.from(new RealEnvironment());
+        final Config config = ConfigBuilder
+                .newInstance()
+                .applyEnvironment(new RealEnvironment())
+                .build();
 
         final NobtApplication application = new NobtApplication(
                 new NobtRepositoryCommandInvokerFactory(config),

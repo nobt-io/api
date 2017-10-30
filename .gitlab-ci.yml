@@ -1,23 +1,16 @@
-image: registry.gitlab.com/nobt-io-public/api-build-image:2.1.0
-
 stages:
   - build
   - deploy
 
+# Inspired by: https://www.testcontainers.org/ci/ci.html#gitlab
 build_rest-api:
+  image: docker:latest
   stage: build
   services:
-    - postgres:9
+    - docker:dind
   variables:
-    DATABASE_CONNECTION_STRING: 'jdbc:postgresql://postgres:password@postgres:5432/postgres'
-    PORT: '18080'
-    MIGRATE_DATABASE_ON_STARTUP: 'true'
-    USE_IN_MEMORY_DATABASE: 'false'
-  script:
-    - ./gradlew clean
-    - ./gradlew test
-    - ./gradlew integrationTest -Dorg.gradle.parallel=false # MUST NOT run integration tests in parallel
-    - ./gradlew :rest-api:distZip
+    DOCKER_DRIVER: overlay2
+  script: docker run -t --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$(pwd)":"$(pwd)" -w "$(pwd)" -u 0:0 gradle:4.1 ./gradlew clean build
   artifacts:
     when: always
     paths:
