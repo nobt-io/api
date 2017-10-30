@@ -16,10 +16,11 @@
 *.jsp           text
 *.jspf          text
 *.properties    text
-*.sh            text
+*.sh            crlf=input
 *.tld           text
 *.txt           text
 *.xml           text
+*.bat           -crlf
 
 # These files are binary and should be left untouched
 # (binary is a macro for -text -diff)
