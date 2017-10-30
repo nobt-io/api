@@ -36,10 +36,10 @@ The collection automatically remembers the last `nobt` you created and reuses it
 
 # Building from source
 
-To build the project from source, simply issue the following command: `./gradlew distZip`.
-The ready-to-run API can be found under `build/distributions`.
+To build the project from source, simply issue the following command: `./gradlew clean build`.
+This runs all the tests and packages the API into a shippable bundle.
 
-The `distZip` command performs only the really necessary tasks needed for building the zip-file.
+The ready-to-run API can be found under `build/distributions`.
 
 ## Testing
 
@@ -47,4 +47,4 @@ Unit tests can be run with the `test` command: `./gradlew test`
 
 ## Integration tests
 
-To run all integration tests locally, use the batch-file located in the `.bin` folder. For this to work you need to have docker installed and running.
+Docker has to be installed and running in order to execute the integration tests.
