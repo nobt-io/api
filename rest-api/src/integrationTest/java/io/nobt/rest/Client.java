@@ -63,4 +63,14 @@ public class Client {
                         "}")
                 .post("/nobts/{id}/expenses", nobtId);
     }
+
+    public void addPayment(String nobtId, String from, String to, int amount) {
+        given().port(port)
+                .body("{\n" +
+                        "  \"sender\": \"" + from + "\",\n" +
+                        "  \"recipient\": \"" + to + "\",\n" +
+                        "  \"amount\": " + amount + "\n" +
+                        "}")
+                .post("/nobts/{id}/expenses", nobtId);
+    }
 }

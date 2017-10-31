@@ -135,6 +135,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
 
         final String nobtId = client.createGrillfeierNobt();
         client.addFleischExpense(nobtId);
+        client.addPayment(nobtId, "David", "Thomas", 4);
 
         given(this.documentationSpec)
                 .port(config.port())
@@ -156,6 +157,10 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                                         fieldWithPath("expenses[].shares").type(JsonFieldType.ARRAY).description("The array of shares this expense consists of."),
                                         fieldWithPath("expenses[].shares[].debtor").type(JsonFieldType.STRING).description("The debtor of this share."),
                                         fieldWithPath("expenses[].shares[].amount").type(JsonFieldType.NUMBER).description("The amount of this share."),
+                                        fieldWithPath("payments[].sender").type(JsonFieldType.STRING).description("The sender of the payment."),
+                                        fieldWithPath("payments[].recipient").type(JsonFieldType.STRING).description("The recipient of the payment."),
+                                        fieldWithPath("payments[].amount").type(JsonFieldType.NUMBER).description("The total of this payment. Interpreted in the currency of the nobt."),
+                                        fieldWithPath("payments[].description").type(JsonFieldType.STRING).optional().description("An optional description of the payment."),
                                         fieldWithPath("participatingPersons").type(JsonFieldType.ARRAY).description("An array of persons participating in this nobt. Contains the explicit participants passed to the API on creation of the nobt and all persons that take part in this nobt either as debtee or as debtor. Each name is only contained once."),
                                         fieldWithPath("transactions").type(JsonFieldType.ARRAY).description("Contains an array of transactions that need to be made so that all debts are paid."),
                                         fieldWithPath("transactions[].debtor").type(JsonFieldType.STRING).description("The person who has to pay / give money in this transaction."),
