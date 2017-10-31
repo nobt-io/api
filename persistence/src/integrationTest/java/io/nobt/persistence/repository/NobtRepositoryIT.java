@@ -30,6 +30,7 @@ import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.*;
 import static io.nobt.test.domain.matchers.NobtMatchers.*;
+import static io.nobt.test.domain.matchers.PaymentMatchers.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
