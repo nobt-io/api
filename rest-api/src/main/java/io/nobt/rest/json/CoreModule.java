@@ -16,6 +16,8 @@ import io.nobt.rest.json.expense.ExpenseDraftMixin;
 import io.nobt.rest.json.expense.ExpenseMixin;
 import io.nobt.rest.json.nobt.NobtIdSerializer;
 import io.nobt.rest.json.nobt.NobtMixin;
+import io.nobt.rest.json.payment.PaymentDraftMixin;
+import io.nobt.rest.json.payment.PaymentMixin;
 import io.nobt.rest.json.person.PersonDeserializer;
 import io.nobt.rest.json.person.PersonSerializer;
 import io.nobt.rest.json.share.ShareMixin;
@@ -42,8 +44,13 @@ public class CoreModule extends SimpleModule {
 
         setMixInAnnotation(Share.class, ShareMixin.class);
         setMixInAnnotation(Nobt.class, NobtMixin.class);
+
         setMixInAnnotation(Expense.class, ExpenseMixin.class);
         setMixInAnnotation(ExpenseDraft.class, ExpenseDraftMixin.class);
+
+        setMixInAnnotation(Payment.class, PaymentMixin.class);
+        setMixInAnnotation(PaymentDraft.class, PaymentDraftMixin.class);
+
         setMixInAnnotation(ConversionInformation.class, ConversionInformationMixin.class);
     }
 

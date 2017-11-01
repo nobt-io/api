@@ -89,17 +89,25 @@ public class Nobt {
         return createdOn;
     }
 
+    public void createExpenseFrom(ExpenseDraft expenseDraft) {
+
+        final Expense expense = Expense.fromDraft(getNextIdentifier(), currencyKey, expenseDraft);
+
+        expenses.add(expense);
+    }
+
+    public void createPaymentFrom(PaymentDraft paymentDraft) {
+
+        paymentDraft.validatePersons(getParticipatingPersons());
+
+
+    }
+
     public void addPayment(Person sender, Amount amount, Person recipient, String description, LocalDate date) {
 
-        if (!getParticipatingPersons().contains(sender)) {
-            throw new PersonNotParticipatingException(sender);
-        }
 
-        if (!getParticipatingPersons().contains(recipient)) {
-            throw new PersonNotParticipatingException(recipient);
-        }
 
-        final Payment payment = new Payment(getNextIdentifier(), sender, recipient, amount, description, date, ZonedDateTime.now(ZoneOffset.UTC));
+        final Payment payment = new Payment(getNextIdentifier(), sender, recipient, amount, description, date, null, ZonedDateTime.now(ZoneOffset.UTC));
 
         payments.add(payment);
     }
@@ -115,12 +123,5 @@ public class Nobt {
 
     public void removeExpense(long expenseId) {
         this.expenses.removeIf(e -> e.getId() == expenseId);
-    }
-
-    public void createExpenseFrom(ExpenseDraft expenseDraft) {
-
-        final Expense expense = Expense.fromDraft(getNextIdentifier(), currencyKey, expenseDraft);
-
-        expenses.add(expense);
     }
 }

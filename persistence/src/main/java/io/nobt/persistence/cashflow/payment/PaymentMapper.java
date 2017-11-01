@@ -1,8 +1,6 @@
 package io.nobt.persistence.cashflow.payment;
 
-import io.nobt.core.domain.Amount;
-import io.nobt.core.domain.Payment;
-import io.nobt.core.domain.Person;
+import io.nobt.core.domain.*;
 import io.nobt.persistence.DomainModelMapper;
 import io.nobt.persistence.cashflow.CashFlowEntity;
 
@@ -17,6 +15,7 @@ public class PaymentMapper implements DomainModelMapper<PaymentEntity, Payment> 
                 Amount.fromBigDecimal(databaseModel.getAmount()),
                 databaseModel.getDescription(),
                 databaseModel.getDate(),
+                new ConversionInformation(new CurrencyKey(databaseModel.getCurrency()), databaseModel.getConversionRate()),
                 databaseModel.getCreatedOn()
         );
     }
@@ -32,6 +31,8 @@ public class PaymentMapper implements DomainModelMapper<PaymentEntity, Payment> 
         entity.setDescription(domainModel.getDescription());
         entity.setCreatedOn(domainModel.getCreatedOn());
         entity.setDate(domainModel.getDate());
+        entity.setCurrency(domainModel.getConversionInformation().getForeignCurrencyKey().getKey());
+        entity.setConversionRate(domainModel.getConversionInformation().getRate());
 
         return entity;
     }

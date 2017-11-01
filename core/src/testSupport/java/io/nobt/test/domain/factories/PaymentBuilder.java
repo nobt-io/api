@@ -1,6 +1,7 @@
 package io.nobt.test.domain.factories;
 
 import io.nobt.core.domain.Amount;
+import io.nobt.core.domain.ConversionInformation;
 import io.nobt.core.domain.Payment;
 import io.nobt.core.domain.Person;
 
@@ -16,6 +17,7 @@ public final class PaymentBuilder {
     private String description;
     private ZonedDateTime dateTime;
     private LocalDate date;
+    private ConversionInformation conversionInformation;
 
     public PaymentBuilder withId(long id) {
         this.id = id;
@@ -52,6 +54,11 @@ public final class PaymentBuilder {
         return this;
     }
 
+    public PaymentBuilder withConversionInformation(ConversionInformation conversionInformation) {
+        this.conversionInformation = conversionInformation;
+        return this;
+    }
+
     public Payment build() {
         return new Payment(
                 id,
@@ -60,6 +67,7 @@ public final class PaymentBuilder {
                 amount,
                 description,
                 date,
+                conversionInformation,
                 dateTime
         );
     }

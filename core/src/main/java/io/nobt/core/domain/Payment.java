@@ -16,15 +16,18 @@ public class Payment implements CashFlow {
     private final Amount amount;
     private final String description;
     private final LocalDate date;
+    private final ConversionInformation conversionInformation;
     private final ZonedDateTime createdOn;
 
-    public Payment(long id, Person sender, Person recipient, Amount amount, String description, LocalDate date, ZonedDateTime createdOn) {
+    public Payment(long id, Person sender, Person recipient, Amount amount, String description, LocalDate date, ConversionInformation conversionInformation, ZonedDateTime createdOn) {
         this.id = id;
         this.sender = sender;
         this.recipient = recipient;
         this.amount = amount;
         this.description = description;
         this.date = date;
+        this.conversionInformation = conversionInformation;
+
         this.createdOn = createdOn;
     }
 
@@ -51,6 +54,10 @@ public class Payment implements CashFlow {
 
     public LocalDate getDate() {
         return date;
+    }
+
+    public ConversionInformation getConversionInformation() {
+        return conversionInformation;
     }
 
     @Override

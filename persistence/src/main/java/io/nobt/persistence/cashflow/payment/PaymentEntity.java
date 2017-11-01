@@ -27,6 +27,12 @@ public class PaymentEntity extends CashFlowEntity {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @Column(name = "currency", nullable = false)
+    private String currency;
+
+    @Column(name = "conversionRate", nullable = false)
+    private BigDecimal conversionRate;
+
     public String getSender() {
         return sender;
     }
@@ -57,6 +63,22 @@ public class PaymentEntity extends CashFlowEntity {
 
     public void setDate(LocalDate date) {
         this.date = date;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
+    }
+
+    public BigDecimal getConversionRate() {
+        return conversionRate;
+    }
+
+    public void setConversionRate(BigDecimal conversionRate) {
+        this.conversionRate = conversionRate;
     }
 
     public String getDescription() {
