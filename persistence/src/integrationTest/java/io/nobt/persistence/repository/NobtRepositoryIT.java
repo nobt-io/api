@@ -1,7 +1,10 @@
 package io.nobt.persistence.repository;
 
 import io.nobt.core.UnknownNobtException;
-import io.nobt.core.domain.*;
+import io.nobt.core.domain.Nobt;
+import io.nobt.core.domain.NobtId;
+import io.nobt.core.domain.Person;
+import io.nobt.core.domain.Share;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.EntityManagerFactoryProvider;
 import io.nobt.persistence.NobtRepository;
@@ -13,7 +16,6 @@ import io.nobt.persistence.share.ShareMapper;
 import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
-import io.nobt.util.Sets;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -23,10 +25,11 @@ import javax.persistence.EntityManagerFactory;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 
-import static io.nobt.test.domain.Currencies.EUR;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
+import static io.nobt.test.domain.factories.ExpenseBuilderProvider.anExpense;
+import static io.nobt.test.domain.factories.NobtBuilderProvider.aNobt;
+import static io.nobt.test.domain.factories.PaymentBuilderProvider.aPayment;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.*;
 import static io.nobt.test.domain.matchers.NobtMatchers.*;
@@ -48,8 +51,6 @@ public class NobtRepositoryIT {
 
     private static EntityManagerFactory entityManagerFactory;
     private static EntityManager entityManager;
-
-    private NobtFactory nobtFactory;
 
     private NobtRepository sut;
 
@@ -80,8 +81,6 @@ public class NobtRepositoryIT {
         final NobtMapper nobtMapper = new NobtMapper(expenseMapper, new PaymentMapper());
 
         sut = new NobtRepositoryImpl(entityManager, nobtMapper);
-
-        nobtFactory = new NobtFactory();
     }
 
     @After
@@ -96,7 +95,10 @@ public class NobtRepositoryIT {
         final String name = "Some name";
         final Person[] explicitParticipants = {thomas, david};
 
-        final Nobt nobtToSave = nobtFactory.create(name, Sets.newHashSet(explicitParticipants), new CurrencyKey("EUR"));
+        final Nobt nobtToSave = aNobt()
+                .withName(name)
+                .withParticipants(explicitParticipants)
+                .build();
 
         final NobtId id = sut.save(nobtToSave);
 
@@ -126,8 +128,9 @@ public class NobtRepositoryIT {
         final Share matthiasShare = ShareFactory.randomShare(matthias);
         final LocalDate expenseDate = LocalDate.now();
 
-        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet(), new CurrencyKey("EUR"));
-        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate, null);
+        final Nobt nobtToSave = aNobt()
+                .withExpenses(anExpense().withDebtee(thomas).withShares(thomasShare, matthiasShare).happendOn(expenseDate))
+                .build();
 
         final NobtId id = sut.save(nobtToSave);
 
@@ -150,12 +153,14 @@ public class NobtRepositoryIT {
     @Test
     public void shouldRemoveOrphanExpense() throws Exception {
 
+
         final Share thomasShare = ShareFactory.randomShare(thomas);
         final Share matthiasShare = ShareFactory.randomShare(matthias);
         final LocalDate expenseDate = LocalDate.now();
 
-        final Nobt nobtToSave = nobtFactory.create("Some name", Collections.emptySet(), new CurrencyKey("EUR"));
-        nobtToSave.addExpense("Billa", "UNKNOWN", thomas, Sets.newHashSet(thomasShare, matthiasShare), expenseDate, null);
+        final Nobt nobtToSave = aNobt()
+                .withExpenses(anExpense().withDebtee(thomas).withShares(thomasShare, matthiasShare).happendOn(expenseDate))
+                .build();
 
         final NobtId id = sut.save(nobtToSave);
 
@@ -180,7 +185,7 @@ public class NobtRepositoryIT {
 
         final ZonedDateTime firstOf2017 = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
 
-        final Nobt nobtToSave = new Nobt(null, EUR, "Test", Collections.emptySet(), Collections.emptySet(), Collections.emptySet(), firstOf2017, null);
+        final Nobt nobtToSave = aNobt().onDate(firstOf2017).build();
 
         final NobtId id = sut.save(nobtToSave);
 
@@ -194,8 +199,13 @@ public class NobtRepositoryIT {
 
     @Test
     public void shouldPersistPayment() throws Exception {
-        final Nobt nobt = nobtFactory.create("Test", Sets.newHashSet(thomas, matthias), new CurrencyKey("EUR"));
-        nobt.addPayment(thomas, amount(3L), matthias, "Testzahlung");
+
+        final Nobt nobt = aNobt()
+                .withParticipants(thomas, matthias)
+                .withPayments(
+                        aPayment().withSender(thomas).withRecipient(matthias).withAmount(amount(3L))
+                )
+                .build();
 
 
         final NobtId id = sut.save(nobt);

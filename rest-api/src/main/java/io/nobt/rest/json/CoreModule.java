@@ -12,6 +12,7 @@ import io.nobt.rest.json.amount.AmountSerializer;
 import io.nobt.rest.json.currency.CurrencyKeyDeserializer;
 import io.nobt.rest.json.currency.CurrencyKeySerializer;
 import io.nobt.rest.json.expense.ConversionInformationMixin;
+import io.nobt.rest.json.expense.ExpenseDraftMixin;
 import io.nobt.rest.json.expense.ExpenseMixin;
 import io.nobt.rest.json.nobt.NobtIdSerializer;
 import io.nobt.rest.json.nobt.NobtMixin;
@@ -42,6 +43,7 @@ public class CoreModule extends SimpleModule {
         setMixInAnnotation(Share.class, ShareMixin.class);
         setMixInAnnotation(Nobt.class, NobtMixin.class);
         setMixInAnnotation(Expense.class, ExpenseMixin.class);
+        setMixInAnnotation(ExpenseDraft.class, ExpenseDraftMixin.class);
         setMixInAnnotation(ConversionInformation.class, ConversionInformationMixin.class);
     }
 

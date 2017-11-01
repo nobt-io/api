@@ -1,6 +1,5 @@
 package io.nobt.core.domain;
 
-import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.domain.transaction.Debt;
 import io.nobt.core.optimizer.Optimizer;
 
@@ -90,7 +89,7 @@ public class Nobt {
         return createdOn;
     }
 
-    public void addPayment(Person sender, Amount amount, Person recipient, String description) {
+    public void addPayment(Person sender, Amount amount, Person recipient, String description, LocalDate date) {
 
         if (!getParticipatingPersons().contains(sender)) {
             throw new PersonNotParticipatingException(sender);
@@ -100,26 +99,9 @@ public class Nobt {
             throw new PersonNotParticipatingException(recipient);
         }
 
-        final Payment payment = new Payment(getNextIdentifier(), sender, recipient, amount, description, ZonedDateTime.now(ZoneOffset.UTC));
+        final Payment payment = new Payment(getNextIdentifier(), sender, recipient, amount, description, date, ZonedDateTime.now(ZoneOffset.UTC));
 
         payments.add(payment);
-    }
-
-    public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date, ConversionInformation conversionInformation) {
-
-        if (conversionInformation == null) {
-            conversionInformation = ConversionInformation.sameCurrencyAs(this);
-        }
-
-        final boolean isSameCurrency = conversionInformation.getForeignCurrencyKey().equals(currencyKey);
-
-        if (isSameCurrency && !conversionInformation.hasDefaultRate()) {
-            throw new ConversionInformationInconsistentException(this, conversionInformation);
-        }
-
-        final Expense newExpense = new Expense(getNextIdentifier(), name, splitStrategy, debtee, conversionInformation, shares, date, ZonedDateTime.now(ZoneOffset.UTC));
-
-        expenses.add(newExpense);
     }
 
     private long getNextIdentifier() {
@@ -133,5 +115,12 @@ public class Nobt {
 
     public void removeExpense(long expenseId) {
         this.expenses.removeIf(e -> e.getId() == expenseId);
+    }
+
+    public void createExpenseFrom(ExpenseDraft expenseDraft) {
+
+        final Expense expense = Expense.fromDraft(getNextIdentifier(), currencyKey, expenseDraft);
+
+        expenses.add(expense);
     }
 }

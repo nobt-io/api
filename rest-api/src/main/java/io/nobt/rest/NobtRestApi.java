@@ -6,11 +6,11 @@ import io.nobt.application.BodyParser;
 import io.nobt.application.NobtApplication;
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.UnknownNobtException;
+import io.nobt.core.domain.ExpenseDraft;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
-import io.nobt.rest.payloads.CreateExpenseInput;
 import io.nobt.rest.payloads.CreateNobtInput;
 import io.nobt.rest.payloads.CreatePaymentInput;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +24,6 @@ import spark.Service;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.HashSet;
 import java.util.Set;
 
 import static javax.ws.rs.core.Response.Status.*;
@@ -73,13 +72,13 @@ public class NobtRestApi {
         http.post("/nobts/:nobtId/expenses", "application/json", (req, resp) -> {
 
             final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
-            final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
+            final ExpenseDraft expenseDraft = bodyParser.parseBodyAs(req, ExpenseDraft.class);
 
 
             nobtRepositoryCommandInvoker.invoke(repository -> {
 
                 final Nobt nobt = repository.getById(databaseId);
-                nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date, input.conversionInformation);
+                nobt.createExpenseFrom(expenseDraft);
                 repository.save(nobt);
 
                 return null;
@@ -105,7 +104,7 @@ public class NobtRestApi {
 
                 // TODO: Need ConversionInformation?
                 // TODO: Refactor to PaymentDraft?
-                nobt.addPayment(input.sender, input.amount, input.recipient, input.description);
+                nobt.addPayment(input.sender, input.amount, input.recipient, input.description, null);
                 repository.save(nobt);
 
                 return null;
@@ -234,8 +233,8 @@ public class NobtRestApi {
                     .withTitle("The supplied conversion information is inconsistent.")
                     .withDetail("Either supply a foreign currency different from the nobt-currency or a rate of 1.")
                     .with("nobtCurrency", exception.getNobtCurrencyKey())
-                    .with("foreignCurrency", exception.getForeignCurrencyKey().getForeignCurrencyKey())
-                    .with("foreignCurrencyRate", exception.getForeignCurrencyKey().getRate())
+                    .with("foreignCurrency", exception.getConversionInformation().getForeignCurrencyKey())
+                    .with("foreignCurrencyRate", exception.getConversionInformation().getRate())
                     .build();
 
             writeProblemAsJsonToResponse(response, problem);

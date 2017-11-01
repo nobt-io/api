@@ -1,6 +1,6 @@
 package io.nobt.core.domain.transaction.combination;
 
-import io.nobt.core.domain.transaction.Transaction;
+import io.nobt.core.domain.transaction.Debt;
 import io.nobt.test.domain.factories.AmountFactory;
 import org.junit.Test;
 
@@ -22,9 +22,9 @@ public class AddTest {
     @Test
     public void shouldAddItemsToList() throws Exception {
 
-        final Transaction transaction = Transaction.transaction(thomas, AmountFactory.amount(10), matthias);
-        final Add combinationResult = new Add(transaction);
-        final ArrayList<Transaction> list = new ArrayList<>();
+        final Debt debt = Debt.debt(thomas, AmountFactory.amount(10), matthias);
+        final Add combinationResult = new Add(debt);
+        final ArrayList<Debt> list = new ArrayList<>();
 
 
         combinationResult.applyTo(list);
@@ -32,7 +32,7 @@ public class AddTest {
 
         assertThat(list, allOf(
                 iterableWithSize(1),
-                hasItem(transaction)
+                hasItem(debt)
         ));
     }
 }

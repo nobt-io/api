@@ -2,33 +2,28 @@ package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.test.domain.matchers.PaymentMatchers;
-import io.nobt.util.Sets;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.Collections;
 
 import static io.nobt.test.domain.factories.AmountFactory.amount;
-import static io.nobt.test.domain.factories.ShareFactory.randomShare;
+import static io.nobt.test.domain.factories.ExpenseBuilderProvider.anExpense;
+import static io.nobt.test.domain.factories.ExpenseDraftBuilderProvider.anExpenseDraft;
+import static io.nobt.test.domain.factories.NobtBuilderProvider.aNobt;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasId;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasPayments;
 import static io.nobt.test.domain.matchers.PaymentMatchers.*;
-import static java.util.Collections.emptySet;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class NobtTest {
@@ -36,36 +31,19 @@ public class NobtTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    private Nobt sut;
-
-    @Mock
-    private Expense firstExpense;
-
-    @Mock
-    private Expense secondExpense;
-
-    private NobtFactory nobtFactory = new NobtFactory();
-
-    @Before
-    public void setUp() throws Exception {
-
-        sut = new Nobt(null, new CurrencyKey("EUR"), "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense), emptySet(), ZonedDateTime.now(ZoneOffset.UTC), null);
-
-        when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
-                randomShare(david),
-                randomShare(lukas)
-        ));
-
-        when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
-                randomShare(matthias),
-                randomShare(simon)
-        ));
-    }
-
     @Test
     public void shouldBuildListOfPersonsFromEveryExpense() throws Exception {
 
-        sut.getParticipatingPersons();
+        final Expense firstExpense = mock(Expense.class);
+        final Expense secondExpense = mock(Expense.class);
+
+        final Nobt nobt = aNobt()
+                .withExpenses(firstExpense, secondExpense)
+                .build();
+
+
+        nobt.getParticipatingPersons();
+
 
         verify(firstExpense).getParticipants();
         verify(secondExpense).getParticipants();
@@ -74,26 +52,41 @@ public class NobtTest {
     @Test
     public void shouldNotBeAbleToAddPaymentForNonParticipatingPerson() throws Exception {
 
-        final Nobt sut = nobtFactory.create("Test", Sets.newHashSet(thomas, matthias, david), new CurrencyKey("EUR"));
+        final Nobt sut = aNobt()
+                .withParticipants(thomas, matthias, david)
+                .build();
+
 
         expectedException.expect(PersonNotParticipatingException.class);
-        sut.addPayment(harald, amount(10), thomas, "Money money!");
+        sut.addPayment(harald, amount(10), thomas, "Money money!", LocalDate.now());
     }
 
-    @Test(expected = ConversionInformationInconsistentException.class)
+    @Test
     public void shouldThrowExceptionIfConversionInformationIsNotConsistent() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt()
+                .withCurrency(new CurrencyKey("EUR"))
+                .build();
 
-        nobt.addExpense(null, null, david, emptySet(), null, new ConversionInformation(new CurrencyKey("EUR"), BigDecimal.TEN));
+        final ExpenseDraft expenseDraft = anExpenseDraft()
+                .withConversionInformation(new ConversionInformation(new CurrencyKey("EUR"), BigDecimal.TEN))
+                .build();
+
+
+        expectedException.expect(ConversionInformationInconsistentException.class);
+        nobt.createExpenseFrom(expenseDraft);
     }
 
     @Test
     public void shouldAddPaymentToTheListOfPayments() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", Sets.newHashSet(thomas, david), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt()
+                .withParticipants(thomas, david)
+                .build();
 
-        nobt.addPayment(thomas, amount(5), david, "Money money!");
+
+        nobt.addPayment(thomas, amount(5), david, "Money money!", LocalDate.now());
+
 
         assertThat(nobt, hasPayments(
                 hasItem(
@@ -109,9 +102,12 @@ public class NobtTest {
     @Test
     public void shouldUseDefaultConversionInformationIfNonGiven() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt().build();
+        final ExpenseDraft expenseDraft = anExpenseDraft().build();
 
-        nobt.addExpense("Test", "Some strategy", david, emptySet(), null, null);
+
+        nobt.createExpenseFrom(expenseDraft);
+
 
         final Expense expense = nobt.getExpenses().stream().findAny().orElseThrow(IllegalStateException::new);
 
@@ -122,29 +118,39 @@ public class NobtTest {
     @Test
     public void shouldAddExpenseIfConversionInformationIsConsistent() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt()
+                .withCurrency(new CurrencyKey("EUR"))
+                .build();
 
-        nobt.addExpense(null, null, david, emptySet(), null, new ConversionInformation(new CurrencyKey("USD"), BigDecimal.TEN));
+        final ExpenseDraft expenseDraft = anExpenseDraft()
+                .withConversionInformation(new ConversionInformation(new CurrencyKey("USD"), BigDecimal.TEN))
+                .build();
+
+
+        nobt.createExpenseFrom(expenseDraft);
     }
 
     @Test
     public void shouldRemoveExpenseById() throws Exception {
 
-        when(firstExpense.getId()).thenReturn(1L);
-        when(secondExpense.getId()).thenReturn(2L);
+        final Nobt nobt = aNobt()
+                .withExpenses(anExpense().withId(1L))
+                .build();
 
-        sut.removeExpense(1L);
 
-        assertThat(sut, hasExpenses(iterableWithSize(1)));
+        nobt.removeExpense(1L);
+
+
+        assertThat(nobt, hasExpenses(iterableWithSize(0)));
     }
 
     @Test
     public void shouldAssignIdToExpense() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt().build();
 
 
-        nobt.addExpense("Test", null, thomas, Collections.emptySet(), LocalDate.now(), null);
+        nobt.createExpenseFrom(anExpenseDraft().build());
 
 
         assertThat(nobt, hasExpenses(
@@ -160,10 +166,12 @@ public class NobtTest {
     @Test
     public void shouldAssignIdToPayment() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", Sets.newHashSet(thomas, matthias), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt()
+                .withParticipants(thomas, matthias)
+                .build();
 
 
-        nobt.addPayment(thomas, amount(3L), matthias, null);
+        nobt.addPayment(thomas, amount(3L), matthias, null, LocalDate.now());
 
 
         assertThat(nobt, hasPayments(
@@ -179,11 +187,13 @@ public class NobtTest {
     @Test
     public void shouldNotAssignSameIdsToExpensesAndPayments() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", Sets.newHashSet(thomas, matthias), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt()
+                .withParticipants(thomas, matthias)
+                .build();
 
 
-        nobt.addExpense("Test", null, thomas, Collections.emptySet(), LocalDate.now(), null);
-        nobt.addPayment(thomas, amount(3L), matthias, null);
+        nobt.createExpenseFrom(anExpenseDraft().build());
+        nobt.addPayment(thomas, amount(3L), matthias, null, LocalDate.now());
 
 
         final Payment payment = nobt.getPayments().iterator().next();

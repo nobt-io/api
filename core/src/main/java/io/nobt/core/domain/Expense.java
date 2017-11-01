@@ -1,13 +1,16 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.domain.transaction.Debt;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import static io.nobt.core.domain.ConversionInformation.defaultConversionInformation;
 import static java.util.stream.Collectors.toSet;
 
 /**
@@ -16,7 +19,7 @@ import static java.util.stream.Collectors.toSet;
  */
 public class Expense implements CashFlow {
 
-    private final Long id;
+    private final long id;
     private final String name;
     private final Person debtee;
     private final String splitStrategy;
@@ -25,7 +28,7 @@ public class Expense implements CashFlow {
     private final LocalDate date;
     private final ZonedDateTime createdOn;
 
-    public Expense(Long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, ZonedDateTime createdOn) {
+    public Expense(long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, ZonedDateTime createdOn) {
         this.id = id;
         this.name = name;
         this.splitStrategy = splitStrategy;
@@ -36,6 +39,26 @@ public class Expense implements CashFlow {
         this.createdOn = createdOn;
     }
 
+    public static Expense fromDraft(long id, CurrencyKey nobtCurrency, ExpenseDraft draft) {
+
+        final ConversionInformation conversionInformation = draft.getConversionInformation();
+
+        if (conversionInformation == null) {
+            return new Expense(id, draft, defaultConversionInformation(nobtCurrency));
+        }
+
+        if (!conversionInformation.isConsistent(nobtCurrency)) {
+            throw new ConversionInformationInconsistentException(conversionInformation, nobtCurrency);
+        }
+
+        return new Expense(id, draft, conversionInformation);
+    }
+
+    private Expense(long id, ExpenseDraft draft, ConversionInformation conversionInformation) {
+        this(id, draft.getName(), draft.getSplitStrategy(), draft.getDebtee(), conversionInformation, draft.getShares(), draft.getDate(), ZonedDateTime.now(ZoneOffset.UTC));
+    }
+
+    @Override
     public long getId() {
         return id;
     }

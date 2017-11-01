@@ -2,6 +2,7 @@ package io.nobt.core.domain;
 
 import io.nobt.core.domain.transaction.Debt;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Objects;
@@ -14,14 +15,16 @@ public class Payment implements CashFlow {
     private final Person recipient;
     private final Amount amount;
     private final String description;
+    private final LocalDate date;
     private final ZonedDateTime createdOn;
 
-    public Payment(long id, Person sender, Person recipient, Amount amount, String description, ZonedDateTime createdOn) {
+    public Payment(long id, Person sender, Person recipient, Amount amount, String description, LocalDate date, ZonedDateTime createdOn) {
         this.id = id;
         this.sender = sender;
         this.recipient = recipient;
         this.amount = amount;
         this.description = description;
+        this.date = date;
         this.createdOn = createdOn;
     }
 
@@ -44,6 +47,10 @@ public class Payment implements CashFlow {
 
     public String getDescription() {
         return description;
+    }
+
+    public LocalDate getDate() {
+        return date;
     }
 
     @Override

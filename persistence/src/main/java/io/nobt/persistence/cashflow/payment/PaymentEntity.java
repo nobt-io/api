@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "payments")
@@ -22,6 +23,9 @@ public class PaymentEntity extends CashFlowEntity {
 
     @Column(name = "description", nullable = false)
     private String description;
+
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 
     public String getSender() {
         return sender;
@@ -45,6 +49,14 @@ public class PaymentEntity extends CashFlowEntity {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public String getDescription() {

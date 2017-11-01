@@ -1,24 +1,34 @@
 package io.nobt.test.domain.factories;
 
+import io.nobt.core.domain.ConversionInformation;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
 
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
+
+import static java.util.stream.Collectors.toSet;
 
 public class ExpenseBuilder {
 
-    private Set<Share> shares = Collections.emptySet();
+    private Set<Share> shares;
     private Person debtee;
+    private LocalDate date;
+    private long id;
+    private String name;
+    private String splitStrategy;
+    private ConversionInformation conversionInformation;
+    private ZonedDateTime createdOn;
 
     public ExpenseBuilder withShares(Share... shares) {
-        this.shares = new HashSet<Share>(Arrays.asList(shares));
+        return withShares(Arrays.stream(shares).collect(toSet()));
+    }
+
+    public ExpenseBuilder withShares(Set<Share> shares) {
+        this.shares = shares;
         return this;
     }
 
@@ -27,16 +37,46 @@ public class ExpenseBuilder {
         return this;
     }
 
+    public ExpenseBuilder happendOn(LocalDate date) {
+        this.date = date;
+        return this;
+    }
+
+    public ExpenseBuilder withId(long id) {
+        this.id = id;
+        return this;
+    }
+
+    public ExpenseBuilder withName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public ExpenseBuilder withSplitStrategy(String splitStrategy) {
+        this.splitStrategy = splitStrategy;
+        return this;
+    }
+
+    public ExpenseBuilder withConversionInformation(ConversionInformation conversionInformation) {
+        this.conversionInformation = conversionInformation;
+        return this;
+    }
+
+    public ExpenseBuilder createdOn(ZonedDateTime dateTime) {
+        this.createdOn = dateTime;
+        return this;
+    }
+
     public Expense build() {
         return new Expense(
-                null,
-                null,
-                null,
+                id,
+                name,
+                splitStrategy,
                 debtee,
-                null,
+                conversionInformation,
                 shares,
-                LocalDate.now(),
-                ZonedDateTime.now(ZoneOffset.UTC)
+                date,
+                createdOn
         );
     }
 }

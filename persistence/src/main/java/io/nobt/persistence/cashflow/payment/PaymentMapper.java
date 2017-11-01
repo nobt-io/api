@@ -16,6 +16,7 @@ public class PaymentMapper implements DomainModelMapper<PaymentEntity, Payment> 
                 Person.forName(databaseModel.getRecipient()),
                 Amount.fromBigDecimal(databaseModel.getAmount()),
                 databaseModel.getDescription(),
+                databaseModel.getDate(),
                 databaseModel.getCreatedOn()
         );
     }
@@ -30,6 +31,7 @@ public class PaymentMapper implements DomainModelMapper<PaymentEntity, Payment> 
         entity.setAmount(domainModel.getAmount().getRoundedValue());
         entity.setDescription(domainModel.getDescription());
         entity.setCreatedOn(domainModel.getCreatedOn());
+        entity.setDate(domainModel.getDate());
 
         return entity;
     }
