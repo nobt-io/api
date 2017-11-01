@@ -9,7 +9,6 @@ import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtFactory;
 import io.nobt.core.domain.NobtId;
-import io.nobt.persistence.NobtRepositoryCommand;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.rest.payloads.CreateExpenseInput;
 import io.nobt.rest.payloads.CreateNobtInput;
@@ -56,32 +55,8 @@ public class NobtRestApi {
         registerApplicationRoutes();
         registerTestFailRoute();
 
-        http.exception(UnknownNobtException.class, (e, request, response) -> {
-
-            final ThrowableProblem problem = Problem.builder()
-                    .withStatus(NOT_FOUND)
-                    .withDetail("The nobt you are looking for cannot be found.")
-                    .build();
-
-            writeProblemAsJsonToResponse(response, problem);
-        });
-
-        http.exception(ConversionInformationInconsistentException.class, (e, request, response) -> {
-
-            final ConversionInformationInconsistentException exception = (ConversionInformationInconsistentException) e;
-
-            final ThrowableProblem problem = Problem.builder()
-                    .withStatus(BAD_REQUEST)
-                    .withTitle("The supplied conversion information is inconsistent.")
-                    .withDetail("Either supply a foreign currency different from the nobt-currency or a rate of 1.")
-                    .with("nobtCurrency", exception.getNobtCurrencyKey())
-                    .with("foreignCurrency", exception.getForeignCurrencyKey().getForeignCurrencyKey())
-                    .with("foreignCurrencyRate", exception.getForeignCurrencyKey().getRate())
-                    .build();
-
-            writeProblemAsJsonToResponse(response, problem);
-        });
-
+        registerUnknownNobtExceptionHandler();
+        registerConversionInformationInconsistentExceptionHandler();
         registerValidationErrorExceptionHandler();
         registerUncaughtExceptionHandler();
     }
@@ -101,7 +76,7 @@ public class NobtRestApi {
             final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
 
 
-            nobtRepositoryCommandInvoker.invoke((NobtRepositoryCommand<Void>) repository -> {
+            nobtRepositoryCommandInvoker.invoke(repository -> {
 
                 final Nobt nobt = repository.getById(databaseId);
                 nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date, input.conversionInformation);
@@ -124,7 +99,7 @@ public class NobtRestApi {
             final CreatePaymentInput input = bodyParser.parseBodyAs(req, CreatePaymentInput.class);
 
 
-            nobtRepositoryCommandInvoker.invoke((NobtRepositoryCommand<Void>) repository -> {
+            nobtRepositoryCommandInvoker.invoke(repository -> {
 
                 final Nobt nobt = repository.getById(databaseId);
 
@@ -151,7 +126,7 @@ public class NobtRestApi {
             final Long expenseId = Long.parseLong(req.params(":expenseId"));
 
 
-            nobtRepositoryCommandInvoker.invoke((NobtRepositoryCommand<Void>) repository -> {
+            nobtRepositoryCommandInvoker.invoke(repository -> {
 
                 final Nobt nobt = repository.getById(databaseId);
                 nobt.removeExpense(expenseId);
@@ -234,6 +209,36 @@ public class NobtRestApi {
                 res.header("Access-Control-Allow-Methods", accessControlRequestMethod);
             }
             return "OK";
+        });
+    }
+
+    private void registerUnknownNobtExceptionHandler() {
+        http.exception(UnknownNobtException.class, (e, request, response) -> {
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(NOT_FOUND)
+                    .withDetail("The nobt you are looking for cannot be found.")
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
+        });
+    }
+
+    private void registerConversionInformationInconsistentExceptionHandler() {
+        http.exception(ConversionInformationInconsistentException.class, (e, request, response) -> {
+
+            final ConversionInformationInconsistentException exception = (ConversionInformationInconsistentException) e;
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(BAD_REQUEST)
+                    .withTitle("The supplied conversion information is inconsistent.")
+                    .withDetail("Either supply a foreign currency different from the nobt-currency or a rate of 1.")
+                    .with("nobtCurrency", exception.getNobtCurrencyKey())
+                    .with("foreignCurrency", exception.getForeignCurrencyKey().getForeignCurrencyKey())
+                    .with("foreignCurrencyRate", exception.getForeignCurrencyKey().getRate())
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
         });
     }
 
