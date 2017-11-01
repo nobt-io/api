@@ -1,19 +1,19 @@
-package io.nobt.core.domain.transaction.combination;
+package io.nobt.core.domain.debt.combination;
 
-import io.nobt.core.domain.transaction.Debt;
+import io.nobt.core.domain.debt.Debt;
 
 import java.util.Collection;
 
-public class NotCombinable implements CombinationResult {
+public class IllegalCombination implements CombinationResult {
 
     @Override
     public boolean hasChanges() {
-        return false;
+        return true;
     }
 
     @Override
     public void applyTo(Collection<Debt> debts) {
-
+        throw new IllegalStateException("Illegal combination of transactions!");
     }
 
     @Override

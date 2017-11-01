@@ -1,6 +1,6 @@
 package io.nobt.core.optimizer;
 
-import io.nobt.core.domain.transaction.Debt;
+import io.nobt.core.domain.debt.Debt;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matchers;
@@ -10,7 +10,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.nobt.core.domain.transaction.Debt.debt;
+import static io.nobt.core.domain.debt.Debt.debt;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static org.hamcrest.Matchers.*;

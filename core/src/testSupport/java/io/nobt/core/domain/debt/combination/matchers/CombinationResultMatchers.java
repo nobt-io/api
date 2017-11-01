@@ -1,6 +1,6 @@
-package io.nobt.core.domain.transaction.combination.matchers;
+package io.nobt.core.domain.debt.combination.matchers;
 
-import io.nobt.core.domain.transaction.combination.CombinationResult;
+import io.nobt.core.domain.debt.combination.CombinationResult;
 import org.hamcrest.FeatureMatcher;
 import org.hamcrest.Matcher;
 

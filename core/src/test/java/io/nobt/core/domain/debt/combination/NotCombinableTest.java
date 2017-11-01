@@ -1,8 +1,8 @@
-package io.nobt.core.domain.transaction.combination;
+package io.nobt.core.domain.debt.combination;
 
 import org.junit.Test;
 
-import static io.nobt.core.domain.transaction.combination.matchers.CombinationResultMatchers.hasChanges;
+import static io.nobt.core.domain.debt.combination.matchers.CombinationResultMatchers.hasChanges;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 

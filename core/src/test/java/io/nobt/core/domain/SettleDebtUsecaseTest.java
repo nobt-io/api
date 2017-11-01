@@ -1,12 +1,12 @@
 package io.nobt.core.domain;
 
-import io.nobt.core.domain.transaction.Debt;
+import io.nobt.core.domain.debt.Debt;
 import org.junit.Test;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static io.nobt.core.domain.transaction.Debt.debt;
+import static io.nobt.core.domain.debt.Debt.debt;
 import static io.nobt.core.optimizer.Optimizer.MINIMAL_AMOUNT_V2;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.ExpenseBuilderProvider.anExpense;

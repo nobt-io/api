@@ -1,8 +1,8 @@
-package io.nobt.core.domain.transaction;
+package io.nobt.core.domain.debt;
 
 import io.nobt.core.domain.Amount;
 import io.nobt.core.domain.Person;
-import io.nobt.core.domain.transaction.combination.*;
+import io.nobt.core.domain.debt.combination.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

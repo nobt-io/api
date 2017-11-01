@@ -1,7 +1,7 @@
 package io.nobt.core;
 
-import io.nobt.core.domain.transaction.Debt;
-import io.nobt.core.domain.transaction.combination.CombinationResult;
+import io.nobt.core.domain.debt.Debt;
+import io.nobt.core.domain.debt.combination.CombinationResult;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;

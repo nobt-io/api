@@ -1,6 +1,6 @@
-package io.nobt.core.domain.transaction.combination;
+package io.nobt.core.domain.debt.combination;
 
-import io.nobt.core.domain.transaction.Debt;
+import io.nobt.core.domain.debt.Debt;
 import io.nobt.test.domain.factories.AmountFactory;
 import org.junit.Test;
 
@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.nobt.core.domain.transaction.Debt.debt;
-import static io.nobt.core.domain.transaction.combination.matchers.CombinationResultMatchers.hasChanges;
+import static io.nobt.core.domain.debt.Debt.debt;
+import static io.nobt.core.domain.debt.combination.matchers.CombinationResultMatchers.hasChanges;
 import static io.nobt.test.domain.factories.StaticPersonFactory.matthias;
 import static io.nobt.test.domain.factories.StaticPersonFactory.thomas;
 import static org.hamcrest.Matchers.*;

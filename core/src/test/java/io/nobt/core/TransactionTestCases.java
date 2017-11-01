@@ -1,13 +1,13 @@
 package io.nobt.core;
 
 import io.nobt.core.domain.Amount;
-import io.nobt.core.domain.transaction.Debt;
-import io.nobt.core.domain.transaction.combination.Add;
-import io.nobt.core.domain.transaction.combination.CompositeResult;
-import io.nobt.core.domain.transaction.combination.NotCombinable;
-import io.nobt.core.domain.transaction.combination.Remove;
+import io.nobt.core.domain.debt.Debt;
+import io.nobt.core.domain.debt.combination.Add;
+import io.nobt.core.domain.debt.combination.CompositeResult;
+import io.nobt.core.domain.debt.combination.NotCombinable;
+import io.nobt.core.domain.debt.combination.Remove;
 
-import static io.nobt.core.domain.transaction.Debt.debt;
+import static io.nobt.core.domain.debt.Debt.debt;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static junitparams.JUnitParamsRunner.$;
 

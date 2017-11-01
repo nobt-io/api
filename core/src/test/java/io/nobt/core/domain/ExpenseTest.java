@@ -1,11 +1,11 @@
 package io.nobt.core.domain;
 
-import io.nobt.core.domain.transaction.Debt;
+import io.nobt.core.domain.debt.Debt;
 import org.junit.Test;
 
 import java.util.Set;
 
-import static io.nobt.core.domain.transaction.Debt.debt;
+import static io.nobt.core.domain.debt.Debt.debt;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.ExpenseBuilderProvider.anExpense;
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;

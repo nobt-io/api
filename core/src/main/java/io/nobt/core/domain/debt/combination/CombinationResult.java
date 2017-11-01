@@ -1,6 +1,6 @@
-package io.nobt.core.domain.transaction.combination;
+package io.nobt.core.domain.debt.combination;
 
-import io.nobt.core.domain.transaction.Debt;
+import io.nobt.core.domain.debt.Debt;
 
 import java.util.Collection;
 
