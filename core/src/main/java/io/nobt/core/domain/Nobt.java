@@ -3,8 +3,6 @@ package io.nobt.core.domain;
 import io.nobt.core.domain.debt.Debt;
 import io.nobt.core.optimizer.Optimizer;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
@@ -100,14 +98,7 @@ public class Nobt {
 
         paymentDraft.validatePersons(getParticipatingPersons());
 
-
-    }
-
-    public void addPayment(Person sender, Amount amount, Person recipient, String description, LocalDate date) {
-
-
-
-        final Payment payment = new Payment(getNextIdentifier(), sender, recipient, amount, description, date, null, ZonedDateTime.now(ZoneOffset.UTC));
+        final Payment payment = Payment.fromDraft(getNextIdentifier(), currencyKey, paymentDraft);
 
         payments.add(payment);
     }

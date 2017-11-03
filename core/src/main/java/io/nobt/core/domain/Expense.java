@@ -41,13 +41,11 @@ public class Expense implements CashFlow {
 
     public static Expense fromDraft(long id, CurrencyKey nobtCurrency, ExpenseDraft draft) {
 
-        final ConversionInformation conversionInformation = draft.getConversionInformation();
+        final ConversionInformation conversionInformation = draft
+                .getConversionInformation()
+                .orElse(defaultConversionInformation(nobtCurrency));
 
-        if (conversionInformation == null) {
-            return new Expense(id, draft, defaultConversionInformation(nobtCurrency));
-        }
-
-        if (!conversionInformation.isConsistent(nobtCurrency)) {
+        if (!conversionInformation.isValid(nobtCurrency)) {
             throw new ConversionInformationInconsistentException(conversionInformation, nobtCurrency);
         }
 

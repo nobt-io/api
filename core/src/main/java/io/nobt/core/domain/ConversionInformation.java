@@ -26,8 +26,8 @@ public final class ConversionInformation {
         return new ConversionInformation(currencyKey, DEFAULT_RATE);
     }
 
-    public boolean isConsistent(CurrencyKey nobtCurrency) {
-        return hasDefaultRate() || !isSameCurrency(nobtCurrency);
+    public boolean isValid(CurrencyKey nobtCurrency) {
+        return isSameCurrency(nobtCurrency) == hasDefaultRate();
     }
 
     public CurrencyKey getForeignCurrencyKey() {

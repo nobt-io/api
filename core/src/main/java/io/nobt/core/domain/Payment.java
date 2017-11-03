@@ -1,12 +1,16 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.domain.debt.Debt;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
+
+import static io.nobt.core.domain.ConversionInformation.defaultConversionInformation;
 
 public class Payment implements CashFlow {
 
@@ -29,6 +33,19 @@ public class Payment implements CashFlow {
         this.conversionInformation = conversionInformation;
 
         this.createdOn = createdOn;
+    }
+
+    public static Payment fromDraft(long id, CurrencyKey nobtCurrency, PaymentDraft draft) {
+
+        final ConversionInformation conversionInformation = draft
+                .getConversionInformation()
+                .orElse(defaultConversionInformation(nobtCurrency));
+
+        if (!conversionInformation.isValid(nobtCurrency)) {
+            throw new ConversionInformationInconsistentException(conversionInformation, nobtCurrency);
+        }
+
+        return new Payment(id, draft.getSender(), draft.getRecipient(), draft.getAmount(), draft.getDescription(), draft.getDate(), conversionInformation, ZonedDateTime.now(ZoneOffset.UTC));
     }
 
     @Override

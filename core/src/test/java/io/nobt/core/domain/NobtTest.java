@@ -9,12 +9,12 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.ExpenseBuilderProvider.anExpense;
 import static io.nobt.test.domain.factories.ExpenseDraftBuilderProvider.anExpenseDraft;
 import static io.nobt.test.domain.factories.NobtBuilderProvider.aNobt;
+import static io.nobt.test.domain.factories.PaymentDraftBuilderProvider.aPaymentDraft;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasId;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
@@ -57,8 +57,13 @@ public class NobtTest {
                 .build();
 
 
+        final PaymentDraft paymentDraftWithUnknownPersons = aPaymentDraft()
+                .withSender(harald)
+                .withRecipient(thomasB)
+                .build();
+
         expectedException.expect(PersonNotParticipatingException.class);
-        sut.addPayment(harald, amount(10), thomas, "Money money!", LocalDate.now());
+        sut.createPaymentFrom(paymentDraftWithUnknownPersons);
     }
 
     @Test
@@ -84,8 +89,13 @@ public class NobtTest {
                 .withParticipants(thomas, david)
                 .build();
 
+        final PaymentDraft paymentDraft = aPaymentDraft()
+                .withSender(thomas)
+                .withRecipient(david)
+                .withAmount(amount(5))
+                .build();
 
-        nobt.addPayment(thomas, amount(5), david, "Money money!", LocalDate.now());
+        nobt.createPaymentFrom(paymentDraft);
 
 
         assertThat(nobt, hasPayments(
@@ -171,7 +181,12 @@ public class NobtTest {
                 .build();
 
 
-        nobt.addPayment(thomas, amount(3L), matthias, null, LocalDate.now());
+        nobt.createPaymentFrom(
+                aPaymentDraft()
+                        .withSender(thomas)
+                        .withRecipient(matthias)
+                        .build()
+        );
 
 
         assertThat(nobt, hasPayments(
@@ -193,7 +208,7 @@ public class NobtTest {
 
 
         nobt.createExpenseFrom(anExpenseDraft().build());
-        nobt.addPayment(thomas, amount(3L), matthias, null, LocalDate.now());
+        nobt.createPaymentFrom(aPaymentDraft().withSender(thomas).withRecipient(matthias).build());
 
 
         final Payment payment = nobt.getPayments().iterator().next();

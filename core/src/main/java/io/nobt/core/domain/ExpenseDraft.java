@@ -5,6 +5,7 @@ import io.nobt.core.validation.org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 public class ExpenseDraft {
@@ -59,8 +60,8 @@ public class ExpenseDraft {
         return date;
     }
 
-    public ConversionInformation getConversionInformation() {
-        return conversionInformation;
+    public Optional<ConversionInformation> getConversionInformation() {
+        return Optional.ofNullable(conversionInformation);
     }
 
 }
