@@ -11,25 +11,11 @@ import java.util.Optional;
 
 public class ExpenseDraft {
 
-    @NotEmpty
     private final String name;
-
-    @NotEmpty
     private final String splitStrategy;
-
-    @Valid
-    @NotNull
     private final Person debtee;
-
-    @Valid
-    @NotEmpty
-    @CheckNoDuplicateDebtors
     private final List<Share> shares;
-
-    @NotNull
     private final LocalDate date;
-
-    @Valid
     private final ConversionInformation conversionInformation;
 
     public ExpenseDraft(String name, String splitStrategy, Person debtee, List<Share> shares, LocalDate date, ConversionInformation conversionInformation) {
@@ -41,28 +27,36 @@ public class ExpenseDraft {
         this.conversionInformation = conversionInformation;
     }
 
+    @NotEmpty
     public String getName() {
         return name;
     }
 
+    @NotEmpty
     public String getSplitStrategy() {
         return splitStrategy;
     }
 
+    @Valid
+    @NotNull
     public Person getDebtee() {
         return debtee;
     }
 
+    @Valid
+    @NotEmpty
+    @CheckNoDuplicateDebtors
     public List<Share> getShares() {
         return shares;
     }
 
+    @NotNull
     public LocalDate getDate() {
         return date;
     }
 
+    @Valid
     public Optional<ConversionInformation> getConversionInformation() {
         return Optional.ofNullable(conversionInformation);
     }
-
 }

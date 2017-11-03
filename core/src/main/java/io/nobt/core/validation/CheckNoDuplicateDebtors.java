@@ -5,7 +5,7 @@ import javax.validation.Payload;
 import java.lang.annotation.*;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
+@Target(ElementType.METHOD)
 @Constraint(validatedBy = CheckNoDuplicateDebtorsValidator.class)
 @Documented
 public @interface CheckNoDuplicateDebtors {
