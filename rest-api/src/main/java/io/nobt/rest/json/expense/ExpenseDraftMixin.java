@@ -8,7 +8,7 @@ import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 public abstract class ExpenseDraftMixin extends ExpenseDraft {
 
@@ -17,9 +17,9 @@ public abstract class ExpenseDraftMixin extends ExpenseDraft {
             @JsonProperty(value = "name", required = true) String name,
             @JsonProperty(value = "splitStrategy", required = true) String splitStrategy,
             @JsonProperty(value = "debtee", required = true) Person debtee,
-            @JsonProperty(value = "shares", required = true) Set<Share> shares,
+            @JsonProperty(value = "shares", required = true) List<Share> shares,
             @JsonProperty(value = "date", required = true) LocalDate date,
-            @JsonProperty(value = "conversionInformation", required = true) ConversionInformation conversionInformation) {
+            @JsonProperty(value = "conversionInformation") ConversionInformation conversionInformation) {
         super(name, splitStrategy, debtee, shares, date, conversionInformation);
     }
 }

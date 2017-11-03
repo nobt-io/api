@@ -69,8 +69,10 @@ public class Client {
                 .body("{\n" +
                         "  \"sender\": \"" + from + "\",\n" +
                         "  \"recipient\": \"" + to + "\",\n" +
-                        "  \"amount\": " + amount + "\n" +
+                        "  \"amount\": " + amount + ",\n" +
+                        "  \"description\": \"Settle debts\",\n" +
+                        "  \"date\": \"2017-10-10\"\n" +
                         "}")
-                .post("/nobts/{id}/expenses", nobtId);
+                .post("/nobts/{id}/payments", nobtId);
     }
 }

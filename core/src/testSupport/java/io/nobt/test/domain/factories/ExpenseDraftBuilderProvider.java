@@ -3,7 +3,7 @@ package io.nobt.test.domain.factories;
 import java.time.LocalDate;
 
 import static io.nobt.test.domain.factories.RandomPersonFactory.randomPerson;
-import static java.util.Collections.emptySet;
+import static java.util.Collections.emptyList;
 
 public class ExpenseDraftBuilderProvider {
 
@@ -12,7 +12,7 @@ public class ExpenseDraftBuilderProvider {
 
     public static ExpenseDraftBuilder anExpenseDraft() {
         return new ExpenseDraftBuilder()
-                .withShares(emptySet())
+                .withShares(emptyList())
                 .withDebtee(randomPerson())
                 .happendOn(LocalDate.now().minusDays(1));
     }

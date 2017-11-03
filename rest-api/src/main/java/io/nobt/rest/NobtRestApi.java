@@ -6,13 +6,9 @@ import io.nobt.application.BodyParser;
 import io.nobt.application.NobtApplication;
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.UnknownNobtException;
-import io.nobt.core.domain.ExpenseDraft;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.NobtFactory;
-import io.nobt.core.domain.NobtId;
+import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.rest.payloads.CreateNobtInput;
-import io.nobt.rest.payloads.CreatePaymentInput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.zalando.problem.Problem;
@@ -95,16 +91,13 @@ public class NobtRestApi {
         http.post("/nobts/:nobtId/payments", "application/json", (req, resp) -> {
 
             final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
-            final CreatePaymentInput input = bodyParser.parseBodyAs(req, CreatePaymentInput.class);
+            final PaymentDraft paymentDraft = bodyParser.parseBodyAs(req, PaymentDraft.class);
 
 
             nobtRepositoryCommandInvoker.invoke(repository -> {
 
                 final Nobt nobt = repository.getById(databaseId);
-
-                // TODO: Need ConversionInformation?
-                // TODO: Refactor to PaymentDraft?
-                nobt.addPayment(input.sender, input.amount, input.recipient, input.description, null);
+                nobt.createPaymentFrom(paymentDraft);
                 repository.save(nobt);
 
                 return null;

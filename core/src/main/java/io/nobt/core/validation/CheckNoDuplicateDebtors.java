@@ -1,4 +1,4 @@
-package io.nobt.rest.constraints;
+package io.nobt.core.validation;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

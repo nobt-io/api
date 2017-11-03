@@ -1,12 +1,13 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.validation.CheckNoDuplicateDebtors;
 import io.nobt.core.validation.org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public class ExpenseDraft {
 
@@ -22,16 +23,16 @@ public class ExpenseDraft {
 
     @Valid
     @NotEmpty
-    private final Set<Share> shares;
+    @CheckNoDuplicateDebtors
+    private final List<Share> shares;
 
     @NotNull
     private final LocalDate date;
 
     @Valid
-    @NotNull
     private final ConversionInformation conversionInformation;
 
-    public ExpenseDraft(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date, ConversionInformation conversionInformation) {
+    public ExpenseDraft(String name, String splitStrategy, Person debtee, List<Share> shares, LocalDate date, ConversionInformation conversionInformation) {
         this.name = name;
         this.splitStrategy = splitStrategy;
         this.debtee = debtee;
@@ -52,7 +53,7 @@ public class ExpenseDraft {
         return debtee;
     }
 
-    public Set<Share> getShares() {
+    public List<Share> getShares() {
         return shares;
     }
 

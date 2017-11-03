@@ -6,14 +6,14 @@ import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 public class ExpenseDraftBuilder {
 
     private String name;
     private String splitStrategy;
     private Person debtee;
-    private Set<Share> shares;
+    private List<Share> shares;
     private LocalDate date;
     private ConversionInformation conversionInformation;
 
@@ -32,7 +32,7 @@ public class ExpenseDraftBuilder {
         return this;
     }
 
-    public ExpenseDraftBuilder withShares(Set<Share> shares) {
+    public ExpenseDraftBuilder withShares(List<Share> shares) {
         this.shares = shares;
         return this;
     }

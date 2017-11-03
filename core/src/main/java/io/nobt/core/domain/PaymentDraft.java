@@ -27,7 +27,6 @@ public class PaymentDraft {
     private final LocalDate date;
 
     @Valid
-    @NotNull
     private final ConversionInformation conversionInformation;
 
     public PaymentDraft(Person sender, Person recipient, Amount amount, String description, LocalDate date, ConversionInformation conversionInformation) {

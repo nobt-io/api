@@ -1,13 +1,27 @@
 package io.nobt.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.specification.RequestSpecification;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import io.nobt.application.BodyParser;
+import io.nobt.application.NobtRepositoryCommandInvokerFactory;
+import io.nobt.application.ObjectMapperFactory;
+import io.nobt.application.env.Config;
+import io.nobt.application.env.ConfigBuilder;
+import io.nobt.application.env.RealEnvironment;
+import io.nobt.core.domain.NobtFactory;
+import io.nobt.persistence.NobtRepositoryCommandInvoker;
+import io.nobt.sql.flyway.MigrationService;
+import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
+import org.junit.*;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.testcontainers.containers.PostgreSQLContainer;
+import spark.Service;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import java.io.IOException;
 import java.util.stream.IntStream;
 
 import static com.jayway.restassured.RestAssured.given;
@@ -18,12 +32,55 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.restassured.operation.preprocess.RestAssuredPreprocessors.modifyUris;
 
-public class ApiDocumentationTest extends ApiIntegrationTestBase {
+public class ApiDocumentationTest {
 
     private static final int DOCUMENTED_PORT = 80;
 
     @Rule
     public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
+
+
+    @ClassRule
+    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9.6");
+
+    private static MigrationService migrationService;
+    private static Service http;
+
+    protected static Config config;
+
+    @BeforeClass
+    public static void setupEnvironment() {
+
+        config = ConfigBuilder
+                .newInstance()
+                .applyEnvironment(new RealEnvironment())
+                .overridePort(8080)
+                .overrideDatabase(new PostgreSQLContainerDatabaseConfig(postgreSQLContainer))
+                .build();
+
+        migrationService = new MigrationService(config.database());
+        migrationService.migrate();
+
+        final ObjectMapper objectMapper = new ObjectMapperFactory().create();
+        final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+        final NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker = new NobtRepositoryCommandInvokerFactory(config).create();
+
+        http = Service.ignite();
+
+        new NobtRestApi(
+                http,
+                nobtRepositoryCommandInvoker,
+                new BodyParser(objectMapper, validator),
+                objectMapper,
+                new NobtFactory()
+        ).run(config.port());
+    }
+
+    @AfterClass
+    public static void cleanupEnvironment() throws IOException {
+        http.stop();
+        migrationService.clean();
+    }
 
     protected RequestSpecification documentationSpec;
     private Client client;
@@ -147,6 +204,7 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                                         fieldWithPath("name").type(JsonFieldType.STRING).description("The name of the nobt."),
                                         fieldWithPath("currency").type(JsonFieldType.STRING).description("The currency of this nobt."),
                                         fieldWithPath("createdOn").type(JsonFieldType.STRING).description("An ISO6801-compliant timestamp when the nobt was created."),
+
                                         fieldWithPath("expenses").type(JsonFieldType.ARRAY).description("All expenses associated with this nobt."),
                                         fieldWithPath("expenses[].id").type(JsonFieldType.NUMBER).description("The id of the expense."),
                                         fieldWithPath("expenses[].createdOn").type(JsonFieldType.STRING).description("An ISO6801-compliant timestamp when the expense was created."),
@@ -157,11 +215,18 @@ public class ApiDocumentationTest extends ApiIntegrationTestBase {
                                         fieldWithPath("expenses[].shares").type(JsonFieldType.ARRAY).description("The array of shares this expense consists of."),
                                         fieldWithPath("expenses[].shares[].debtor").type(JsonFieldType.STRING).description("The debtor of this share."),
                                         fieldWithPath("expenses[].shares[].amount").type(JsonFieldType.NUMBER).description("The amount of this share."),
+
+                                        fieldWithPath("payments").type(JsonFieldType.ARRAY).description("All payments associated with this nobt."),
+                                        fieldWithPath("payments[].id").type(JsonFieldType.NUMBER).description("The id of the payment."),
+                                        fieldWithPath("payments[].createdOn").type(JsonFieldType.STRING).description("An ISO6801-compliant timestamp when the payment was created."),
+                                        fieldWithPath("payments[].date").type(JsonFieldType.STRING).description("The given date of the payment."),
                                         fieldWithPath("payments[].sender").type(JsonFieldType.STRING).description("The sender of the payment."),
                                         fieldWithPath("payments[].recipient").type(JsonFieldType.STRING).description("The recipient of the payment."),
                                         fieldWithPath("payments[].amount").type(JsonFieldType.NUMBER).description("The total of this payment. Interpreted in the currency of the nobt."),
-                                        fieldWithPath("payments[].description").type(JsonFieldType.STRING).optional().description("An optional description of the payment."),
+                                        fieldWithPath("payments[].description").optional().type(JsonFieldType.STRING).description("An optional description of the payment."),
+
                                         fieldWithPath("participatingPersons").type(JsonFieldType.ARRAY).description("An array of persons participating in this nobt. Contains the explicit participants passed to the API on creation of the nobt and all persons that take part in this nobt either as debtee or as debtor. Each name is only contained once."),
+
                                         fieldWithPath("transactions").type(JsonFieldType.ARRAY).description("Contains an array of transactions that need to be made so that all debts are paid."),
                                         fieldWithPath("transactions[].debtor").type(JsonFieldType.STRING).description("The person who has to pay / give money in this transaction."),
                                         fieldWithPath("transactions[].amount").type(JsonFieldType.NUMBER).description("The amount the debtor has to pay."),

@@ -1,4 +1,4 @@
-package io.nobt.rest.constraints;
+package io.nobt.core.validation;
 
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;

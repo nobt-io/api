@@ -53,7 +53,7 @@ public class Expense implements CashFlow {
     }
 
     private Expense(long id, ExpenseDraft draft, ConversionInformation conversionInformation) {
-        this(id, draft.getName(), draft.getSplitStrategy(), draft.getDebtee(), conversionInformation, draft.getShares(), draft.getDate(), ZonedDateTime.now(ZoneOffset.UTC));
+        this(id, draft.getName(), draft.getSplitStrategy(), draft.getDebtee(), conversionInformation, new HashSet<>(draft.getShares()), draft.getDate(), ZonedDateTime.now(ZoneOffset.UTC));
     }
 
     @Override
