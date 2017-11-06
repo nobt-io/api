@@ -22,7 +22,7 @@ public class ExpenseDraftTest {
     @Test
     public void sharesFieldShouldValidateNoDuplicateDebtors() throws Exception {
 
-        final CheckNoDuplicateDebtors annotation = ExpenseDraft.class.getDeclaredField("shares").getAnnotation(CheckNoDuplicateDebtors.class);
+        final CheckNoDuplicateDebtors annotation = ExpenseDraft.class.getDeclaredMethod("getShares").getAnnotation(CheckNoDuplicateDebtors.class);
 
         assertThat(annotation, is(notNullValue()));
     }
