@@ -2,6 +2,7 @@ package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.domain.debt.Debt;
+import io.nobt.util.Sets;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -85,6 +86,11 @@ public class Payment implements CashFlow {
     @Override
     public ZonedDateTime getCreatedOn() {
         return createdOn;
+    }
+
+    @Override
+    public Set<Person> getParticipants() {
+        return Sets.newHashSet(getSender(), getRecipient());
     }
 
     @Override

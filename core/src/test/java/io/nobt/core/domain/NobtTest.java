@@ -15,7 +15,8 @@ import static io.nobt.test.domain.factories.ExpenseBuilderProvider.anExpense;
 import static io.nobt.test.domain.factories.ExpenseDraftBuilderProvider.anExpenseDraft;
 import static io.nobt.test.domain.factories.NobtBuilderProvider.aNobt;
 import static io.nobt.test.domain.factories.PaymentDraftBuilderProvider.aPaymentDraft;
-import static io.nobt.test.domain.factories.StaticPersonFactory.*;
+import static io.nobt.test.domain.factories.StaticPersonFactory.david;
+import static io.nobt.test.domain.factories.StaticPersonFactory.thomas;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasId;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasPayments;
@@ -50,23 +51,6 @@ public class NobtTest {
     }
 
     @Test
-    public void shouldNotBeAbleToAddPaymentForNonParticipatingPerson() throws Exception {
-
-        final Nobt sut = aNobt()
-                .withParticipants(thomas, matthias, david)
-                .build();
-
-
-        final PaymentDraft paymentDraftWithUnknownPersons = aPaymentDraft()
-                .withSender(harald)
-                .withRecipient(thomasB)
-                .build();
-
-        expectedException.expect(PersonNotParticipatingException.class);
-        sut.createPaymentFrom(paymentDraftWithUnknownPersons);
-    }
-
-    @Test
     public void shouldThrowExceptionIfConversionInformationIsNotConsistent() throws Exception {
 
         final Nobt nobt = aNobt()
@@ -85,9 +69,7 @@ public class NobtTest {
     @Test
     public void shouldAddPaymentToTheListOfPayments() throws Exception {
 
-        final Nobt nobt = aNobt()
-                .withParticipants(thomas, david)
-                .build();
+        final Nobt nobt = aNobt().build();
 
         final PaymentDraft paymentDraft = aPaymentDraft()
                 .withSender(thomas)
@@ -176,17 +158,10 @@ public class NobtTest {
     @Test
     public void shouldAssignIdToPayment() throws Exception {
 
-        final Nobt nobt = aNobt()
-                .withParticipants(thomas, matthias)
-                .build();
+        final Nobt nobt = aNobt().build();
 
 
-        nobt.createPaymentFrom(
-                aPaymentDraft()
-                        .withSender(thomas)
-                        .withRecipient(matthias)
-                        .build()
-        );
+        nobt.createPaymentFrom(aPaymentDraft().build());
 
 
         assertThat(nobt, hasPayments(
@@ -202,13 +177,11 @@ public class NobtTest {
     @Test
     public void shouldNotAssignSameIdsToExpensesAndPayments() throws Exception {
 
-        final Nobt nobt = aNobt()
-                .withParticipants(thomas, matthias)
-                .build();
+        final Nobt nobt = aNobt().build();
 
 
         nobt.createExpenseFrom(anExpenseDraft().build());
-        nobt.createPaymentFrom(aPaymentDraft().withSender(thomas).withRecipient(matthias).build());
+        nobt.createPaymentFrom(aPaymentDraft().build());
 
 
         final Payment payment = nobt.getPayments().iterator().next();

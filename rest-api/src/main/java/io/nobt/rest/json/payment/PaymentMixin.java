@@ -23,4 +23,9 @@ public abstract class PaymentMixin extends Payment {
         return super.calculateAccruingDebts();
     }
 
+    @Override
+    @JsonIgnore
+    public Set<Person> getParticipants() {
+        return super.getParticipants();
+    }
 }

@@ -6,7 +6,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.Set;
 
 public class PaymentDraft {
 
@@ -36,16 +35,6 @@ public class PaymentDraft {
         this.description = description;
         this.date = date;
         this.conversionInformation = conversionInformation;
-    }
-
-    public void validatePersons(Set<Person> availablePersons) {
-        if (!availablePersons.contains(sender)) {
-            throw new PersonNotParticipatingException(sender);
-        }
-
-        if (!availablePersons.contains(recipient)) {
-            throw new PersonNotParticipatingException(recipient);
-        }
     }
 
     public Person getSender() {

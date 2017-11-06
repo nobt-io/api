@@ -97,6 +97,7 @@ public class Expense implements CashFlow {
         return conversionInformation;
     }
 
+    @Override
     public Set<Person> getParticipants() {
         final Set<Person> debtors = shares.stream().map(Share::getDebtor).collect(toSet());
 

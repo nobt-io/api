@@ -59,9 +59,13 @@ public class Nobt {
 
     public Set<Person> getParticipatingPersons() {
 
-        final Set<Person> participantsFromExpenses = expenses.stream().map(Expense::getParticipants).flatMap(Collection::stream).collect(toSet());
+        final Set<Person> participantsFromCashFlows = Stream.of(expenses, payments)
+                .flatMap(Collection::stream)
+                .map(CashFlow::getParticipants)
+                .flatMap(Collection::stream)
+                .collect(toSet());
 
-        return Stream.of(explicitParticipants, participantsFromExpenses)
+        return Stream.of(explicitParticipants, participantsFromCashFlows)
                 .flatMap(Collection::stream)
                 .collect(toCollection(HashSet::new));
     }
@@ -95,8 +99,6 @@ public class Nobt {
     }
 
     public void createPaymentFrom(PaymentDraft paymentDraft) {
-
-        paymentDraft.validatePersons(getParticipatingPersons());
 
         final Payment payment = Payment.fromDraft(getNextIdentifier(), currencyKey, paymentDraft);
 

@@ -13,4 +13,5 @@ public interface CashFlow {
 
     ZonedDateTime getCreatedOn();
 
+    Set<Person> getParticipants();
 }
