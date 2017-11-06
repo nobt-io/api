@@ -18,7 +18,7 @@ public abstract class NobtMixin extends Nobt {
     }
 
     @Override
-    @JsonProperty("transactions")
+    @JsonProperty("debts")
     public abstract List<Debt> getOptimizedDebts();
 
     @JsonIgnore

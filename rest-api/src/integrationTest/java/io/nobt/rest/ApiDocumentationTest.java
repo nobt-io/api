@@ -22,7 +22,6 @@ import spark.Service;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import java.io.IOException;
-import java.util.stream.IntStream;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
@@ -188,6 +187,50 @@ public class ApiDocumentationTest {
     }
 
     @Test
+    public void shouldAddNewPayment() throws Exception {
+
+        final String nobtId = client.createGrillfeierNobt();
+
+        given(this.documentationSpec)
+                .port(config.port())
+                .filter(
+                        document("add-payment",
+                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
+                                requestFields(
+                                        fieldWithPath("sender").description("The sender of the payment."),
+                                        fieldWithPath("recipient").description("The recipient of the payment."),
+                                        fieldWithPath("amount").description("The total of this payment."),
+                                        fieldWithPath("date").description("The date which should be stored for the payment. Takes any ISO6801-compliant string."),
+                                        fieldWithPath("description").optional().description("A human readable description of the payment."),
+                                        fieldWithPath("currencyInformation").optional().type(JsonFieldType.OBJECT).description("An object defining the conversion information to the currency of the associated nobt. If this object is present, the amounts of this expense are to be interpreted in the given currency. If this object is not present, it is assumed that the currency of this expense is equal to the currency of the nobt, hence the conversion rate is 1."),
+                                        fieldWithPath("currencyInformation.foreignCurrency").type(JsonFieldType.STRING).description("The ISO-4217 code of the currency."),
+                                        fieldWithPath("currencyInformation.rate").type(JsonFieldType.NUMBER).description("The conversion rate for converting the amounts of this expense into the currency of the associated nobt.")
+                                )
+                        )
+                )
+                .body("{\n" +
+                        "  \"sender\": \"David\",\n" +
+                        "  \"recipient\": \"Thomas\",\n" +
+                        "  \"amount\": 4,\n" +
+                        "  \"description\": \"Settle debts\",\n" +
+                        "  \"date\": \"2017-10-10\",\n" +
+                        "  \"currencyInformation\": {\n" +
+                        "    \"foreignCurrency\": \"EUR\",\n" +
+                        "    \"rate\": 1.0\n" +
+                        "  }\n" +
+                        "}")
+                .contentType("application/json")
+
+                .when()
+
+                .post("/nobts/{nobtId}/payments", nobtId)
+
+                .then()
+
+                .statusCode(201);
+    }
+
+    @Test
     public void shouldGetCompleteNobt() throws Exception {
 
         final String nobtId = client.createGrillfeierNobt();
@@ -222,15 +265,15 @@ public class ApiDocumentationTest {
                                         fieldWithPath("payments[].date").type(JsonFieldType.STRING).description("The given date of the payment."),
                                         fieldWithPath("payments[].sender").type(JsonFieldType.STRING).description("The sender of the payment."),
                                         fieldWithPath("payments[].recipient").type(JsonFieldType.STRING).description("The recipient of the payment."),
-                                        fieldWithPath("payments[].amount").type(JsonFieldType.NUMBER).description("The total of this payment. Interpreted in the currency of the nobt."),
+                                        fieldWithPath("payments[].amount").type(JsonFieldType.NUMBER).description("The total of this payment."),
                                         fieldWithPath("payments[].description").optional().type(JsonFieldType.STRING).description("An optional description of the payment."),
 
                                         fieldWithPath("participatingPersons").type(JsonFieldType.ARRAY).description("An array of persons participating in this nobt. Contains the explicit participants passed to the API on creation of the nobt and all persons that take part in this nobt either as debtee or as debtor. Each name is only contained once."),
 
-                                        fieldWithPath("transactions").type(JsonFieldType.ARRAY).description("Contains an array of transactions that need to be made so that all debts are paid."),
-                                        fieldWithPath("transactions[].debtor").type(JsonFieldType.STRING).description("The person who has to pay / give money in this transaction."),
-                                        fieldWithPath("transactions[].amount").type(JsonFieldType.NUMBER).description("The amount the debtor has to pay."),
-                                        fieldWithPath("transactions[].debtee").type(JsonFieldType.STRING).description("The person who receives the money.")
+                                        fieldWithPath("debts").type(JsonFieldType.ARRAY).description("Contains an array describing the current debts between the persons in the nobt."),
+                                        fieldWithPath("debts[].debtor").type(JsonFieldType.STRING).description("The person who has to pay / give money in this transaction."),
+                                        fieldWithPath("debts[].amount").type(JsonFieldType.NUMBER).description("The amount the debtor has to pay."),
+                                        fieldWithPath("debts[].debtee").type(JsonFieldType.STRING).description("The person who receives the money.")
                                 )
                         )
                 )
@@ -384,15 +427,5 @@ public class ApiDocumentationTest {
                 .then()
 
                 .statusCode(400);
-    }
-
-    @Test
-    public void shouldAddALotOfExpenses() throws Exception {
-
-        final String nobtId = client.createGrillfeierNobt();
-
-        IntStream.range(1, 100).forEach( i -> client.addFleischExpense(nobtId) );
-
-        client.getNobt(nobtId).then().body("expenses", response -> hasSize(99));
     }
 }
