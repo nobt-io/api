@@ -15,8 +15,8 @@ import static org.junit.Assert.assertThat;
 public class DebtTest {
 
 	@Test
-    @Parameters(source = TransactionTestCases.class)
-    public void testCombineTransactions(Debt first, Debt second, CombinationResult expected) throws Exception {
+    @Parameters(source = DebtTestCases.class)
+    public void testCombineDebts(Debt first, Debt second, CombinationResult expected) throws Exception {
 
         final CombinationResult result = first.combine(second);
 
