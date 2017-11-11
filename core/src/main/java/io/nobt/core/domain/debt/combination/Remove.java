@@ -20,8 +20,11 @@ public final class Remove implements CombinationResult {
     }
 
     @Override
-    public void applyTo(Collection<Debt> debts) {
-        debts.removeIf(transactionsToBeRemoved::contains);
+    public void applyTo(Collection<Debt> existingTransactions) {
+
+        for (Debt transactionToBeRemoved : transactionsToBeRemoved) {
+            existingTransactions.remove(transactionToBeRemoved);
+        }
     }
 
     @Override
