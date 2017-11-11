@@ -8,11 +8,11 @@ import java.util.List;
 import static io.nobt.core.domain.debt.Debt.debt;
 import static io.nobt.core.optimizer.Optimizer.MINIMAL_AMOUNT_V2;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
-import static io.nobt.test.domain.factories.ExpenseBuilderProvider.anExpense;
-import static io.nobt.test.domain.factories.NobtBuilderProvider.aNobt;
-import static io.nobt.test.domain.factories.PaymentDraftBuilderProvider.aPaymentDraft;
 import static io.nobt.test.domain.factories.ShareFactory.share;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
+import static io.nobt.test.domain.provider.ExpenseBuilderProvider.anExpense;
+import static io.nobt.test.domain.provider.NobtBuilderProvider.aNobt;
+import static io.nobt.test.domain.provider.PaymentDraftBuilderProvider.aPaymentDraft;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 

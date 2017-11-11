@@ -1,7 +1,8 @@
-package io.nobt.test.domain.factories;
+package io.nobt.test.domain.provider;
 
 import io.nobt.core.domain.ConversionInformation;
 import io.nobt.core.domain.CurrencyKey;
+import io.nobt.test.domain.builder.PaymentBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,7 +10,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import static io.nobt.test.domain.factories.IDProvider.nextId;
+import static io.nobt.test.domain.provider.IDProvider.nextId;
 
 public final class PaymentBuilderProvider {
 

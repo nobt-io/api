@@ -1,4 +1,4 @@
-package io.nobt.test.domain.factories;
+package io.nobt.test.domain.provider;
 
 import io.nobt.core.domain.CurrencyKey;
 

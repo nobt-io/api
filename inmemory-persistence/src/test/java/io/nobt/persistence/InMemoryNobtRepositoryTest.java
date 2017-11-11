@@ -5,8 +5,8 @@ import io.nobt.core.domain.NobtId;
 import org.junit.Before;
 import org.junit.Test;
 
-import static io.nobt.test.domain.factories.NobtBuilderProvider.aNobt;
 import static io.nobt.test.domain.matchers.NobtMatchers.hasId;
+import static io.nobt.test.domain.provider.NobtBuilderProvider.aNobt;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 

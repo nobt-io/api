@@ -1,4 +1,4 @@
-package io.nobt.test.domain.factories;
+package io.nobt.test.domain.builder;
 
 import io.nobt.core.domain.ConversionInformation;
 import io.nobt.core.domain.ExpenseDraft;

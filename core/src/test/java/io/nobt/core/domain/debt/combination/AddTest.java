@@ -6,9 +6,9 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import static io.nobt.core.domain.debt.combination.matchers.CombinationResultMatchers.hasChanges;
 import static io.nobt.test.domain.factories.StaticPersonFactory.matthias;
 import static io.nobt.test.domain.factories.StaticPersonFactory.thomas;
+import static io.nobt.test.domain.matchers.CombinationResultMatchers.hasChanges;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 

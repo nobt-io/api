@@ -5,10 +5,10 @@ import org.junit.Test;
 import java.math.BigDecimal;
 
 import static io.nobt.core.domain.ConversionInformation.defaultConversionInformation;
-import static io.nobt.test.domain.factories.CurrencyKeysProvider.EUR;
-import static io.nobt.test.domain.factories.CurrencyKeysProvider.USD;
 import static io.nobt.test.domain.matchers.ConversionInformationMatchers.hasRate;
 import static io.nobt.test.domain.matchers.ConversionInformationMatchers.isValid;
+import static io.nobt.test.domain.provider.CurrencyKeysProvider.EUR;
+import static io.nobt.test.domain.provider.CurrencyKeysProvider.USD;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;

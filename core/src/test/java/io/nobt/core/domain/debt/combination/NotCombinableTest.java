@@ -2,7 +2,7 @@ package io.nobt.core.domain.debt.combination;
 
 import org.junit.Test;
 
-import static io.nobt.core.domain.debt.combination.matchers.CombinationResultMatchers.hasChanges;
+import static io.nobt.test.domain.matchers.CombinationResultMatchers.hasChanges;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 

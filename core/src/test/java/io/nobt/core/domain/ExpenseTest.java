@@ -7,9 +7,9 @@ import java.util.Set;
 
 import static io.nobt.core.domain.debt.Debt.debt;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
-import static io.nobt.test.domain.factories.ExpenseBuilderProvider.anExpense;
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
+import static io.nobt.test.domain.provider.ExpenseBuilderProvider.anExpense;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 

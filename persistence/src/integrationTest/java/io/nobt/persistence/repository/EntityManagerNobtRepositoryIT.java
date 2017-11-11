@@ -25,13 +25,13 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import static io.nobt.test.domain.factories.AmountFactory.amount;
-import static io.nobt.test.domain.factories.ExpenseBuilderProvider.anExpense;
-import static io.nobt.test.domain.factories.NobtBuilderProvider.aNobt;
-import static io.nobt.test.domain.factories.PaymentBuilderProvider.aPayment;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.*;
 import static io.nobt.test.domain.matchers.NobtMatchers.*;
 import static io.nobt.test.domain.matchers.PaymentMatchers.*;
+import static io.nobt.test.domain.provider.ExpenseBuilderProvider.anExpense;
+import static io.nobt.test.domain.provider.NobtBuilderProvider.aNobt;
+import static io.nobt.test.domain.provider.PaymentBuilderProvider.aPayment;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;

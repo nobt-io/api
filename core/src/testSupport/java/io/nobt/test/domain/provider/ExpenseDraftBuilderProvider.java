@@ -1,5 +1,9 @@
-package io.nobt.test.domain.factories;
+package io.nobt.test.domain.provider;
 
+import io.nobt.core.domain.ConversionInformation;
+import io.nobt.test.domain.builder.ExpenseDraftBuilder;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -15,6 +19,7 @@ public class ExpenseDraftBuilderProvider {
         return new ExpenseDraftBuilder()
                 .withShares(emptyList())
                 .withDebtee(randomPerson())
+                .withConversionInformation(new ConversionInformation(CurrencyKeysProvider.EUR, BigDecimal.ONE))
                 .withName(UUID.randomUUID().toString())
                 .withSplitStrategy("EVENLY")
                 .happendOn(LocalDate.now().minusDays(1));

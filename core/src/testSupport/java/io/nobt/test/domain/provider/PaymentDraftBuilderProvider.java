@@ -1,4 +1,6 @@
-package io.nobt.test.domain.factories;
+package io.nobt.test.domain.provider;
+
+import io.nobt.test.domain.builder.PaymentDraftBuilder;
 
 import java.time.LocalDate;
 
