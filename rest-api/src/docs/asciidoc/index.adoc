@@ -8,7 +8,7 @@ This document describes the API of Nobt.io. There are 5 requests that can be mad
 
 * Create a new nobt
 * Add an expense to a given nobt
-* Add an payment to a given nobt
+* Add a payment to a given nobt
 * Retrieve the nobt
 * Delete an expense
 
@@ -105,6 +105,6 @@ Deleting an expense is as easy as sending a `DELETE` request to the `/expense` s
 
 include::{snippets}/delete-expense/http-request.adoc[]
 
-The response code is always `204 NO CONTENT`, even if there was no response with the specified ID.
+The response code is always `204 NO CONTENT`, even if there was no expense with the specified ID.
 
 include::{snippets}/delete-expense/http-response.adoc[]
