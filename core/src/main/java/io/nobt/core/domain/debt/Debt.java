@@ -50,9 +50,9 @@ public class Debt {
         boolean twoPersonsInDebtWithEachOther = debtor.equals(other.debtee) && debtee.equals(other.debtor);
         boolean threePersonsWithSameDebteeAndDebtor = debtee.equals(other.debtor);
         boolean threePersonsWithSameDebteeAndDebtorReversed = debtor.equals(other.debtee);
-        boolean sameTransactionWithDifferentAmount = debtor.equals(other.debtor) && debtee.equals(other.debtee);
-        boolean thisTransactionIsOnlyAboutOnePerson = debtee.equals(debtor);
-        boolean otherTransactionIsOnlyAboutOnePerson = other.debtee.equals(other.debtor);
+        boolean sameDebtWithDifferentAmount = debtor.equals(other.debtor) && debtee.equals(other.debtee);
+        boolean thisDebtIsOnlyAboutOnePerson = debtee.equals(debtor);
+        boolean otherDebtIsOnlyAboutOnePerson = other.debtee.equals(other.debtor);
         boolean combiningWithItself = this == other;
 
         if (combiningWithItself && participatingPersons.size() == 1) {
@@ -63,11 +63,11 @@ public class Debt {
             return new NotCombinable();
         }
 
-        if (thisTransactionIsOnlyAboutOnePerson) {
+        if (thisDebtIsOnlyAboutOnePerson) {
             return new Remove(this);
         }
 
-        if (otherTransactionIsOnlyAboutOnePerson) {
+        if (otherDebtIsOnlyAboutOnePerson) {
             return new Remove(other);
         }
 
@@ -152,7 +152,7 @@ public class Debt {
             }
         }
 
-        if (sameTransactionWithDifferentAmount) {
+        if (sameDebtWithDifferentAmount) {
             return new CompositeResult(
                     new Remove(this, other),
                     new Add(new Debt(debtor, amount.plus(other.amount), other.debtee))

@@ -8,10 +8,10 @@ import java.util.Objects;
 
 public final class Add implements CombinationResult {
 
-    private final Collection<Debt> transactionsToBeAdded;
+    private final Collection<Debt> debtsToBeAdded;
 
-    public Add(Debt... transactionsToBeAdded) {
-        this.transactionsToBeAdded = Arrays.asList(transactionsToBeAdded);
+    public Add(Debt... debtsToBeAdded) {
+        this.debtsToBeAdded = Arrays.asList(debtsToBeAdded);
     }
 
     @Override
@@ -21,7 +21,7 @@ public final class Add implements CombinationResult {
 
     @Override
     public void applyTo(Collection<Debt> debts) {
-        debts.addAll(transactionsToBeAdded);
+        debts.addAll(debtsToBeAdded);
     }
 
     @Override
@@ -29,17 +29,17 @@ public final class Add implements CombinationResult {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Add add = (Add) o;
-        return transactionsToBeAdded.containsAll(add.transactionsToBeAdded) &&
-                add.transactionsToBeAdded.containsAll(transactionsToBeAdded);
+        return debtsToBeAdded.containsAll(add.debtsToBeAdded) &&
+                add.debtsToBeAdded.containsAll(debtsToBeAdded);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(transactionsToBeAdded);
+        return Objects.hash(debtsToBeAdded);
     }
 
     @Override
     public String toString() {
-        return String.format("Add{%s}", transactionsToBeAdded);
+        return String.format("Add{%s}", debtsToBeAdded);
     }
 }

@@ -23,7 +23,7 @@ public class RemoveTest {
     }
 
     @Test
-    public void shouldRemoveTransactions() throws Exception {
+    public void shouldRemoveDebts() throws Exception {
 
 
         final Debt debt = debt(thomas, AmountFactory.amount(10), matthias);

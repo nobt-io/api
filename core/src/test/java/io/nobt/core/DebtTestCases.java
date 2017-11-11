@@ -33,13 +33,13 @@ public final class DebtTestCases {
 
     public static Object[] provideSelfCombiningExample() {
 
-        final Debt transaction = debt(jacqueline, amount(10), jacqueline);
+        final Debt debt = debt(jacqueline, amount(10), jacqueline);
 
         return $(
                 $(
-                        transaction,
-                        transaction,
-                        new Remove(transaction)
+                        debt,
+                        debt,
+                        new Remove(debt)
                 ),
                 $(
                         debt(matthias, amount(5), lukas),

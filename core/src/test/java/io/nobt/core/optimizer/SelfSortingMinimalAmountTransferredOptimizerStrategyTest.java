@@ -1,8 +1,6 @@
 package io.nobt.core.optimizer;
 
 import io.nobt.core.domain.debt.Debt;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +15,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
-    private static final Logger LOGGER = LogManager.getLogger();
 
     private SelfSortingMinimalAmountTransferredOptimizerStrategy sut;
 
@@ -27,9 +24,9 @@ public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
     }
 
     @Test
-    public void testShouldOptimizeTransactionList() {
+    public void testShouldOptimizeDebtList() {
 
-        List<Debt> transactionList = Arrays.asList(
+        List<Debt> debtList = Arrays.asList(
                 debt(matthias, amount(10), thomas),
                 debt(thomas, amount(3), david),
                 debt(thomas, amount(10), david),
@@ -42,9 +39,9 @@ public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
                 debt(david, amount(17), thomas)
         );
 
-        List<Debt> optimalTransactions = sut.optimize(transactionList);
+        List<Debt> optimalDebts = sut.optimize(debtList);
 
-        assertThat(optimalTransactions, allOf(
+        assertThat(optimalDebts, allOf(
                 Matchers.<Debt>iterableWithSize(6),
                 containsInAnyOrder(
                         debt(matthias, amount(2), thomas),
@@ -58,9 +55,9 @@ public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
     }
 
     @Test
-    public void orderOfTransactionsShouldNotInfluenceResults() {
+    public void orderOfDebtsShouldNotInfluenceResults() {
 
-        List<Debt> transactionListA = Arrays.asList(
+        List<Debt> debtListA = Arrays.asList(
                 debt(matthias, amount(10), thomas),
                 debt(thomas, amount(3), david),
                 debt(thomas, amount(10), david),
@@ -73,7 +70,7 @@ public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
                 debt(david, amount(17), thomas)
         );
 
-        List<Debt> transactionListB = Arrays.asList(
+        List<Debt> debtListB = Arrays.asList(
                 debt(david, amount(17), thomas),
                 debt(david, amount(13), thomasB),
                 debt(matthias, amount(4), jacqueline),
@@ -86,10 +83,10 @@ public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
                 debt(jacqueline, amount(5), thomasB)
         );
 
-        List<Debt> optimalTransactionsA = sut.optimize(transactionListA);
-        List<Debt> optimalTransactionsB = sut.optimize(transactionListB);
+        List<Debt> optimalDebtsA = sut.optimize(debtListA);
+        List<Debt> optimalDebtsB = sut.optimize(debtListB);
 
-        assertThat(optimalTransactionsA, equalTo(optimalTransactionsB));
+        assertThat(optimalDebtsA, equalTo(optimalDebtsB));
     }
 
 

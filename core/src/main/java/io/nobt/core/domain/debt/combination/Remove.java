@@ -8,10 +8,10 @@ import java.util.Objects;
 
 public final class Remove implements CombinationResult {
 
-    private final Collection<Debt> transactionsToBeRemoved;
+    private final Collection<Debt> debtsToBeRemoved;
 
-    public Remove(Debt... transactionsToBeRemoved) {
-        this.transactionsToBeRemoved = Arrays.asList(transactionsToBeRemoved);
+    public Remove(Debt... debtsToBeRemoved) {
+        this.debtsToBeRemoved = Arrays.asList(debtsToBeRemoved);
     }
 
     @Override
@@ -20,10 +20,10 @@ public final class Remove implements CombinationResult {
     }
 
     @Override
-    public void applyTo(Collection<Debt> existingTransactions) {
+    public void applyTo(Collection<Debt> existingDebts) {
 
-        for (Debt transactionToBeRemoved : transactionsToBeRemoved) {
-            existingTransactions.remove(transactionToBeRemoved);
+        for (Debt debtToBeRemoved : debtsToBeRemoved) {
+            existingDebts.remove(debtToBeRemoved);
         }
     }
 
@@ -32,17 +32,17 @@ public final class Remove implements CombinationResult {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Remove remove = (Remove) o;
-        return transactionsToBeRemoved.containsAll(remove.transactionsToBeRemoved) &&
-                remove.transactionsToBeRemoved.containsAll(transactionsToBeRemoved);
+        return debtsToBeRemoved.containsAll(remove.debtsToBeRemoved) &&
+                remove.debtsToBeRemoved.containsAll(debtsToBeRemoved);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(transactionsToBeRemoved);
+        return Objects.hash(debtsToBeRemoved);
     }
 
     @Override
     public String toString() {
-        return String.format("Remove{%s}", transactionsToBeRemoved);
+        return String.format("Remove{%s}", debtsToBeRemoved);
     }
 }

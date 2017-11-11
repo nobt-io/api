@@ -17,7 +17,7 @@ import static org.junit.Assert.assertThat;
 public class UsecaseTests {
 
     @Test
-    public void bug_singleBillWithSingleParticipantMustNotYieldTransaction() throws Exception {
+    public void bug_singleBillWithSingleParticipantMustNotYieldDebt() throws Exception {
 
         final Nobt nobt = aNobt()
                 .withOptimizer(MINIMAL_AMOUNT_V2)
