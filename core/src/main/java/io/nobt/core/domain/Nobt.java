@@ -106,12 +106,15 @@ public class Nobt {
     }
 
     private long getNextIdentifier() {
-        final long highestIdentifier = getAllCashFlows()
+        return getAllCashFlows()
                 .map(CashFlow::getId)
-                .max(comparingLong(l -> l))
+                .max(comparingLong(id -> id))
+                .map(Nobt::incrementByOne)
                 .orElse(1L);
+    }
 
-        return highestIdentifier + 1;
+    private static long incrementByOne(long value) {
+        return value + 1;
     }
 
     public void removeExpense(long expenseId) {

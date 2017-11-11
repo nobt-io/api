@@ -5,8 +5,6 @@ import io.nobt.test.domain.matchers.PaymentMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
 
@@ -26,7 +24,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
 public class NobtTest {
 
     @Rule
@@ -172,6 +169,18 @@ public class NobtTest {
                         )
                 )
         ));
+    }
+
+    @Test
+    public void shouldAssignOneAsTheFirstId() throws Exception {
+
+        final Nobt nobt = aNobt().build();
+
+
+        nobt.createExpenseFrom(anExpenseDraft().build());
+
+
+        assertThat(nobt, hasExpenses(hasItem(hasId(equalTo(1L)))));
     }
 
     @Test
