@@ -1,12 +1,16 @@
 package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
+import io.nobt.core.domain.debt.Debt;
 import io.nobt.test.domain.matchers.PaymentMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.InOrder;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
 
 import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.StaticPersonFactory.david;
@@ -21,8 +25,7 @@ import static io.nobt.test.domain.provider.NobtBuilderProvider.aNobt;
 import static io.nobt.test.domain.provider.PaymentDraftBuilderProvider.aPaymentDraft;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class NobtTest {
 
@@ -45,6 +48,35 @@ public class NobtTest {
 
         verify(firstExpense).getParticipants();
         verify(secondExpense).getParticipants();
+    }
+
+    @Test
+    public void shouldCalculateDebtsOfCashFlowSortedByCreatedOn() throws Exception {
+
+        final ZonedDateTime now = ZonedDateTime.now();
+
+        final Expense firstExpense = mock(Expense.class);
+        final Expense secondExpense = mock(Expense.class);
+        final Payment firstPayment = mock(Payment.class);
+
+        when(firstExpense.getCreatedOn()).thenReturn(now.minusDays(3));
+        when(firstPayment.getCreatedOn()).thenReturn(now.minusDays(2));
+        when(secondExpense.getCreatedOn()).thenReturn(now.minusDays(1));
+
+        final Nobt nobt = aNobt()
+                .withExpenses(firstExpense, secondExpense)
+                .withPayments(firstPayment)
+                .build();
+
+
+        final List<Debt> optimizedDebts = nobt.getOptimizedDebts();
+
+
+        final InOrder inOrder = inOrder(firstExpense, secondExpense, firstPayment);
+
+        inOrder.verify(firstExpense).calculateAccruingDebts();
+        inOrder.verify(firstPayment).calculateAccruingDebts();
+        inOrder.verify(secondExpense).calculateAccruingDebts();
     }
 
     @Test
