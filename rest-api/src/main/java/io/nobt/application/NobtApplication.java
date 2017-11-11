@@ -18,8 +18,10 @@ import spark.Service;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.io.Closeable;
+import java.io.IOException;
 
-public class NobtApplication {
+public class NobtApplication implements Closeable {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
@@ -29,11 +31,12 @@ public class NobtApplication {
     private final ObjectMapperFactory objectMapperFactory;
     private final ValidatorFactory validatorFactory;
     private final Config config;
+    private NobtRestApi api;
 
-    public NobtApplication(NobtRepositoryCommandInvokerFactory nobtRepositoryCommandInvokerFactory, ObjectMapperFactory objectMapperFactory, ValidatorFactory validatorFactory, Config config) {
-        this.nobtRepositoryCommandInvokerFactory = nobtRepositoryCommandInvokerFactory;
-        this.objectMapperFactory = objectMapperFactory;
-        this.validatorFactory = validatorFactory;
+    public NobtApplication(Config config) {
+        this.nobtRepositoryCommandInvokerFactory = new NobtRepositoryCommandInvokerFactory(config);
+        this.objectMapperFactory = new ObjectMapperFactory();
+        this.validatorFactory = Validation.buildDefaultValidatorFactory();
         this.config = config;
     }
 
@@ -44,12 +47,7 @@ public class NobtApplication {
                 .applyEnvironment(new RealEnvironment())
                 .build();
 
-        final NobtApplication application = new NobtApplication(
-                new NobtRepositoryCommandInvokerFactory(config),
-                new ObjectMapperFactory(),
-                Validation.buildDefaultValidatorFactory(),
-                config
-        );
+        final NobtApplication application = new NobtApplication(config);
 
         application.start();
     }
@@ -68,7 +66,7 @@ public class NobtApplication {
         final ObjectMapper objectMapper = objectMapperFactory.create();
         final Validator validator = validatorFactory.getValidator();
 
-        final NobtRestApi api = new NobtRestApi(
+        api = new NobtRestApi(
                 Service.ignite(),
                 nobtRepositoryCommandInvoker,
                 new BodyParser(objectMapper, validator),
@@ -86,5 +84,10 @@ public class NobtApplication {
 
         final MigrationService migrationService = new MigrationService(databaseConfig);
         migrationService.migrate();
+    }
+
+    @Override
+    public void close() throws IOException {
+        api.close();
     }
 }

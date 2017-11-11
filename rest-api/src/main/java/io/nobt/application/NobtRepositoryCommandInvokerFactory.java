@@ -1,15 +1,12 @@
 package io.nobt.application;
 
 import io.nobt.application.env.Config;
-import io.nobt.persistence.*;
-import io.nobt.persistence.cashflow.expense.ExpenseMapper;
-import io.nobt.persistence.cashflow.payment.PaymentMapper;
-import io.nobt.persistence.nobt.NobtMapper;
-import io.nobt.persistence.share.ShareMapper;
+import io.nobt.persistence.InMemoryNobtRepository;
+import io.nobt.persistence.InMemoryRepositoryCommandInvoker;
+import io.nobt.persistence.NobtRepositoryCommandInvoker;
+import io.nobt.persistence.TransactionalNobtRepositoryCommandInvoker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import javax.persistence.EntityManagerFactory;
 
 public class NobtRepositoryCommandInvokerFactory {
 
@@ -31,17 +28,12 @@ public class NobtRepositoryCommandInvokerFactory {
         }
     }
 
-    private static EntityManagerFactoryProvider entityManagerFactoryProvider = new EntityManagerFactoryProvider();
 
-    public NobtRepositoryCommandInvoker transactional() {
-
-        final DatabaseConfig databaseConfig = config.database();
-        final EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.create(databaseConfig);
-
-        return new TransactionalNobtRepositoryCommandInvoker(entityManagerFactory, (em) -> new NobtRepositoryImpl(em, new NobtMapper(new ExpenseMapper(new ShareMapper()), new PaymentMapper())));
+    private NobtRepositoryCommandInvoker transactional() {
+        return TransactionalNobtRepositoryCommandInvoker.forDatabaseConfig(config.database());
     }
 
-    public NobtRepositoryCommandInvoker inMemory() {
+    private NobtRepositoryCommandInvoker inMemory() {
         LOGGER.info("Using In-Memory database.");
         return new InMemoryRepositoryCommandInvoker(new InMemoryNobtRepository());
     }

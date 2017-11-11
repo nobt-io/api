@@ -6,7 +6,10 @@ import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
+
+import static java.util.stream.Collectors.toList;
 
 public class ExpenseDraftBuilder {
 
@@ -30,6 +33,10 @@ public class ExpenseDraftBuilder {
     public ExpenseDraftBuilder withDebtee(Person debtee) {
         this.debtee = debtee;
         return this;
+    }
+
+    public ExpenseDraftBuilder withShares(Share... shares) {
+        return withShares(Arrays.stream(shares).collect(toList()));
     }
 
     public ExpenseDraftBuilder withShares(List<Share> shares) {

@@ -10,12 +10,12 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Optional;
 
-public class NobtRepositoryImpl implements NobtRepository, Closeable {
+public class EntityManagerNobtRepository implements NobtRepository, Closeable {
 
     private final EntityManager em;
     private final DomainModelMapper<NobtEntity, Nobt> nobtMapper;
 
-    public NobtRepositoryImpl(EntityManager em, DomainModelMapper<NobtEntity, Nobt> nobtMapper) {
+    public EntityManagerNobtRepository(EntityManager em, DomainModelMapper<NobtEntity, Nobt> nobtMapper) {
         this.em = em;
         this.nobtMapper = nobtMapper;
     }

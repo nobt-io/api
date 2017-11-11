@@ -1,6 +1,8 @@
 package io.nobt.persistence;
 
-public interface NobtRepositoryCommandInvoker {
+import java.io.Closeable;
+
+public interface NobtRepositoryCommandInvoker extends Closeable {
 
     <T> T invoke(NobtRepositoryCommand<T> command);
 

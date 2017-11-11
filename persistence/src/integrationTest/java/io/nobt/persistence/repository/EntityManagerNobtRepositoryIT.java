@@ -6,22 +6,20 @@ import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
 import io.nobt.persistence.DatabaseConfig;
+import io.nobt.persistence.DefaultEntityManagerNobtRepositoryFactory;
 import io.nobt.persistence.EntityManagerFactoryProvider;
-import io.nobt.persistence.NobtRepository;
-import io.nobt.persistence.NobtRepositoryImpl;
-import io.nobt.persistence.cashflow.expense.ExpenseMapper;
-import io.nobt.persistence.cashflow.payment.PaymentMapper;
-import io.nobt.persistence.nobt.NobtMapper;
-import io.nobt.persistence.share.ShareMapper;
+import io.nobt.persistence.EntityManagerNobtRepository;
 import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
+import io.nobt.test.persistence.TransactionRule;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -38,55 +36,51 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
 
-public class NobtRepositoryIT {
-
-    private static DatabaseConfig databaseConfig;
-    private static MigrationService migrationService;
+public class EntityManagerNobtRepositoryIT {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
+    @Rule
+    public TransactionRule transactionRule;
 
     @ClassRule
     public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9.6");
 
     private static EntityManagerFactory entityManagerFactory;
-    private static EntityManager entityManager;
+    private static DefaultEntityManagerNobtRepositoryFactory entityManagerNobtRepositoryFactory;
 
-    private NobtRepository sut;
+    private EntityManagerNobtRepository sut;
 
     @BeforeClass
     public static void setupEnvironment() {
 
-        databaseConfig = new PostgreSQLContainerDatabaseConfig(postgreSQLContainer);
+        final DatabaseConfig databaseConfig = new PostgreSQLContainerDatabaseConfig(postgreSQLContainer);
 
-        migrationService = new MigrationService(databaseConfig);
-        migrationService.migrate();
+        new MigrationService(databaseConfig).migrate();
+
+        final EntityManagerFactoryProvider entityManagerFactoryProvider = new EntityManagerFactoryProvider();
+
+        entityManagerNobtRepositoryFactory = new DefaultEntityManagerNobtRepositoryFactory();
+        entityManagerFactory = entityManagerFactoryProvider.create(databaseConfig);
     }
 
     @AfterClass
-    public static void cleanupEnvironment() {
-        migrationService.clean();
+    public static void tearDownEnvironment() throws IOException {
+        entityManagerFactory.close();
     }
 
     @Before
     public void setUp() throws Exception {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
 
-        final EntityManagerFactoryProvider emfProvider = new EntityManagerFactoryProvider();
-
-        entityManagerFactory = emfProvider.create(databaseConfig);
-        entityManager = entityManagerFactory.createEntityManager();
-
-        final ShareMapper shareMapper = new ShareMapper();
-        final ExpenseMapper expenseMapper = new ExpenseMapper(shareMapper);
-        final NobtMapper nobtMapper = new NobtMapper(expenseMapper, new PaymentMapper());
-
-        sut = new NobtRepositoryImpl(entityManager, nobtMapper);
+        sut = entityManagerNobtRepositoryFactory.create(entityManager);
+        transactionRule = new TransactionRule(entityManager);
     }
 
     @After
-    public void closeEM() {
-        entityManager.close();
-        entityManagerFactory.close();
+    public void tearDown() throws Exception {
+        sut.close();
     }
 
     @Test
@@ -96,15 +90,16 @@ public class NobtRepositoryIT {
         final Person[] explicitParticipants = {thomas, david};
 
         final Nobt nobtToSave = aNobt()
+                .withId(null)
                 .withName(name)
                 .withParticipants(explicitParticipants)
                 .build();
 
-        final NobtId id = sut.save(nobtToSave);
+        final NobtId id = save(nobtToSave);
 
         assumeThat(id, is(notNullValue()));
 
-        final Nobt retrievedNobt = sut.getById(id);
+        final Nobt retrievedNobt = fetch(id);
 
         assertThat(retrievedNobt, allOf(
                 hasName(equalTo(name)),
@@ -118,7 +113,7 @@ public class NobtRepositoryIT {
         final NobtId unknownId = new NobtId(1234L);
 
         expectedException.expect(UnknownNobtException.class);
-        sut.getById(unknownId);
+        fetch(unknownId);
     }
 
     @Test
@@ -129,12 +124,13 @@ public class NobtRepositoryIT {
         final LocalDate expenseDate = LocalDate.now();
 
         final Nobt nobtToSave = aNobt()
+                .withId(null)
                 .withExpenses(anExpense().withDebtee(thomas).withShares(thomasShare, matthiasShare).happendOn(expenseDate))
                 .build();
 
-        final NobtId id = sut.save(nobtToSave);
+        final NobtId id = save(nobtToSave);
 
-        final Nobt retrievedNobt = sut.getById(id);
+        final Nobt retrievedNobt = fetch(id);
 
         assertThat(retrievedNobt, hasExpenses(
                 allOf(
@@ -151,29 +147,41 @@ public class NobtRepositoryIT {
     }
 
     @Test
-    public void shouldRemoveOrphanExpense() throws Exception {
+    public void savingAndFetchingResultsInDifferentInstance() throws Exception {
 
+        final Nobt nobtToSave = aNobt().withId(null).build();
+
+        final NobtId id = save(nobtToSave);
+
+        final Nobt fetchedNobt = fetch(id);
+
+        assertThat(nobtToSave == fetchedNobt, is(false));
+    }
+
+    @Test
+    public void shouldRemoveOrphanExpense() throws Exception {
 
         final Share thomasShare = ShareFactory.randomShare(thomas);
         final Share matthiasShare = ShareFactory.randomShare(matthias);
         final LocalDate expenseDate = LocalDate.now();
 
         final Nobt nobtToSave = aNobt()
+                .withId(null)
                 .withExpenses(anExpense().withDebtee(thomas).withShares(thomasShare, matthiasShare).happendOn(expenseDate))
                 .build();
 
-        final NobtId id = sut.save(nobtToSave);
+        final NobtId id = save(nobtToSave);
 
+        final Nobt retrievedNobt = fetch(id);
 
-        final Nobt retrievedNobt = sut.getById(id);
         final Long idOfFirstExpense = retrievedNobt.getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
 
         retrievedNobt.removeExpense(idOfFirstExpense);
 
-        sut.save(retrievedNobt);
+        save(retrievedNobt);
 
 
-        final Nobt nobtWithoutExpense = sut.getById(id);
+        final Nobt nobtWithoutExpense = fetch(id);
 
         assertThat(nobtWithoutExpense, hasExpenses(
                 iterableWithSize(0)
@@ -185,11 +193,14 @@ public class NobtRepositoryIT {
 
         final ZonedDateTime firstOf2017 = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
 
-        final Nobt nobtToSave = aNobt().onDate(firstOf2017).build();
+        final Nobt nobtToSave = aNobt()
+                .withId(null)
+                .onDate(firstOf2017)
+                .build();
 
-        final NobtId id = sut.save(nobtToSave);
+        final NobtId id = save(nobtToSave);
 
-        final Nobt loadedNobt = sut.getById(id);
+        final Nobt loadedNobt = fetch(id);
         final ZonedDateTime persistedTimestamp = loadedNobt.getCreatedOn();
 
         final ZonedDateTime expected = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
@@ -201,6 +212,7 @@ public class NobtRepositoryIT {
     public void shouldPersistPayment() throws Exception {
 
         final Nobt nobt = aNobt()
+                .withId(null)
                 .withParticipants(thomas, matthias)
                 .withPayments(
                         aPayment().withSender(thomas).withRecipient(matthias).withAmount(amount(3L))
@@ -208,15 +220,23 @@ public class NobtRepositoryIT {
                 .build();
 
 
-        final NobtId id = sut.save(nobt);
+        final NobtId id = save(nobt);
 
 
-        final Nobt retrievedNobt = sut.getById(id);
+        final Nobt retrievedNobt = fetch(id);
         assertThat(retrievedNobt, hasPayments(iterableWithSize(greaterThan(0))));
         assertThat(retrievedNobt.getPayments().iterator().next(), allOf(
                 hasSender(equalTo(thomas)),
                 hasRecipient(equalTo(matthias)),
                 hasAmount(equalTo(amount(3)))
         ));
+    }
+
+    private NobtId save(Nobt nobtToSave) {
+        return sut.save(nobtToSave);
+    }
+
+    private Nobt fetch(NobtId id) {
+        return sut.getById(id);
     }
 }

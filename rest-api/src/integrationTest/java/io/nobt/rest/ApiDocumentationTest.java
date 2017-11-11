@@ -1,26 +1,17 @@
 package io.nobt.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.restassured.builder.RequestSpecBuilder;
 import com.jayway.restassured.specification.RequestSpecification;
-import io.nobt.application.BodyParser;
-import io.nobt.application.NobtRepositoryCommandInvokerFactory;
-import io.nobt.application.ObjectMapperFactory;
+import io.nobt.application.NobtApplication;
 import io.nobt.application.env.Config;
 import io.nobt.application.env.ConfigBuilder;
 import io.nobt.application.env.RealEnvironment;
-import io.nobt.core.domain.NobtFactory;
-import io.nobt.persistence.NobtRepositoryCommandInvoker;
-import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
 import org.junit.*;
 import org.springframework.restdocs.JUnitRestDocumentation;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.testcontainers.containers.PostgreSQLContainer;
-import spark.Service;
 
-import javax.validation.Validation;
-import javax.validation.Validator;
 import java.io.IOException;
 
 import static com.jayway.restassured.RestAssured.given;
@@ -34,18 +25,15 @@ import static org.springframework.restdocs.restassured.operation.preprocess.Rest
 public class ApiDocumentationTest {
 
     private static final int DOCUMENTED_PORT = 80;
+    private static NobtApplication nobtApplication;
 
     @Rule
     public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
 
-
     @ClassRule
     public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9.6");
 
-    private static MigrationService migrationService;
-    private static Service http;
-
-    protected static Config config;
+    private static Config config;
 
     @BeforeClass
     public static void setupEnvironment() {
@@ -54,31 +42,17 @@ public class ApiDocumentationTest {
                 .newInstance()
                 .applyEnvironment(new RealEnvironment())
                 .overridePort(8080)
+                .overrideMigrateDatabaseAtStartup(true)
                 .overrideDatabase(new PostgreSQLContainerDatabaseConfig(postgreSQLContainer))
                 .build();
 
-        migrationService = new MigrationService(config.database());
-        migrationService.migrate();
-
-        final ObjectMapper objectMapper = new ObjectMapperFactory().create();
-        final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-        final NobtRepositoryCommandInvoker nobtRepositoryCommandInvoker = new NobtRepositoryCommandInvokerFactory(config).create();
-
-        http = Service.ignite();
-
-        new NobtRestApi(
-                http,
-                nobtRepositoryCommandInvoker,
-                new BodyParser(objectMapper, validator),
-                objectMapper,
-                new NobtFactory()
-        ).run(config.port());
+        nobtApplication = new NobtApplication(config);
+        nobtApplication.start();
     }
 
     @AfterClass
     public static void cleanupEnvironment() throws IOException {
-        http.stop();
-        migrationService.clean();
+        nobtApplication.close();
     }
 
     protected RequestSpecification documentationSpec;
