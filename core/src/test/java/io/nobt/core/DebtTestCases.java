@@ -60,6 +60,19 @@ public final class DebtTestCases {
                                 debt(thomas, amount(10), matthias),
                                 debt(matthias, amount(10), thomas)
                         )
+                ),
+                $(
+                        debt(matthias, amount(10), thomas),
+                        debt(thomas, amount(20), matthias),
+                        new CompositeResult(
+                                new Remove(
+                                        debt(matthias, amount(10), thomas),
+                                        debt(thomas, amount(20), matthias)
+                                ),
+                                new Add(
+                                        debt(thomas, amount(10), matthias)
+                                )
+                        )
                 )
         );
     }
