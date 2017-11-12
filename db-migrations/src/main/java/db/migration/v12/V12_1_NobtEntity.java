@@ -1,6 +1,5 @@
 package db.migration.v12;
 
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.nobt.persistence.JacksonUtil;
 import org.hibernate.annotations.Type;
 
@@ -15,18 +14,13 @@ import static java.util.stream.Collectors.toSet;
 public class V12_1_NobtEntity {
 
     static {
-        JacksonUtil.OBJECT_MAPPER.registerModule(new SimpleModule() {
-            @Override
-            public void setupModule(SetupContext context) {
-                setMixInAnnotation(V12Person.class, V12PersonMixin.class);
-            }
-        });
+        JacksonUtil.OBJECT_MAPPER.registerModule(new V12_1_NobtEntityModule());
     }
 
     @Id
     @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq")
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    public Long id;
 
     @Type(type = "io.nobt.persistence.JsonBinaryType")
     @Column(name = "explicitParticipants")

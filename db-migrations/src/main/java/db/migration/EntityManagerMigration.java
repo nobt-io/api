@@ -27,6 +27,10 @@ public abstract class EntityManagerMigration<T> implements ConfigurationAware, J
 
     protected abstract T performUpdate(T entity);
 
+    protected void assertState(List<T> t) {
+
+    }
+
     @Override
     public void migrate(Connection connection) throws Exception {
 
@@ -49,6 +53,16 @@ public abstract class EntityManagerMigration<T> implements ConfigurationAware, J
         } finally {
             entityManager.close();
             emf.close();
+        }
+
+        EntityManagerFactory emf2 = Persistence.createEntityManagerFactory("migration", properties);
+        final EntityManager entityManager2 = emf2.createEntityManager();
+
+        try {
+            assertState(retrieveEntities(entityManager2));
+        } finally {
+            entityManager2.close();
+            emf2.close();
         }
     }
 
