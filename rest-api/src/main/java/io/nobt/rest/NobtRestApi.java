@@ -51,6 +51,8 @@ public class NobtRestApi {
     public void run(int port) {
         http.port(port);
 
+        http.staticFiles.externalLocation("../docs");
+
         setupCORS();
 
         registerApplicationRoutes();
