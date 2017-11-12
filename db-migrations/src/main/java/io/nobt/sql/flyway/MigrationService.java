@@ -19,4 +19,8 @@ public class MigrationService {
     public void clean() {
         flyway.clean();
     }
+
+    public void setTargetVersion(String version) {
+        flyway.setTargetAsString(version);
+    }
 }
