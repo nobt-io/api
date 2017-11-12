@@ -55,7 +55,7 @@ dependencies {
     testCompile(group: 'commons-logging', name: 'commons-logging', version: '1.1.1')
 
     integrationTestCompile project(path: ':persistence', configuration: 'testSupport')
-    integrationTestCompile group: 'org.springframework.restdocs', name: 'spring-restdocs-restassured', version: '1.1.1.RELEASE'
+    integrationTestCompile project(path: ':spring-rest-docs')
 }
 
 distributions {
