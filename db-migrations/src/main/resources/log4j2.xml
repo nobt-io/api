@@ -9,5 +9,8 @@
         <Root level="INFO">
             <AppenderRef ref="Console" />
         </Root>
+        <Logger name="org.hibernate.SQL" level="DEBUG">
+
+        </Logger>
     </Loggers>
 </Configuration>
