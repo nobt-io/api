@@ -3,38 +3,35 @@ package io.nobt.sql.flyway;
 import db.migration.v12.V12Person;
 import db.migration.v12.V12_1_NobtEntity;
 import io.nobt.persistence.DatabaseConfig;
-import io.nobt.persistence.EntityManagerFactoryProvider;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import java.util.List;
 import java.util.Set;
 
-public class V12MigrationDao implements AutoCloseable {
-
-    private final EntityManager entityManager;
-    private final EntityManagerFactory entityManagerFactory;
+public class V12MigrationDao extends AbstractMigrationDao {
 
     public V12MigrationDao(DatabaseConfig databaseConfig) {
-        entityManagerFactory = new EntityManagerFactoryProvider().create("migration", databaseConfig);
-        entityManager = entityManagerFactory.createEntityManager();
+        super(databaseConfig);
     }
 
-    public List<V12_1_NobtEntity> getAllNobts() {
-        return entityManager.createQuery("SELECT n from V12_1_NobtEntity n", V12_1_NobtEntity.class).getResultList();
+    public Long insertNobtWithParticipants(String participants) {
+
+        final V12_1_NobtEntity entity = new V12_1_NobtEntity();
+        entity.setExplicitParticipants_legacy(participants);
+
+        doInTx(entityManager -> {
+            entityManager.persist(entity);
+            return null;
+        });
+
+        return entity.id;
     }
 
     public Set<V12Person> getParticipantsOfNobt(long id) {
-        return entityManager
+        return doInTx(entityManager -> entityManager
                 .createQuery("SELECT n from V12_1_NobtEntity n WHERE n.id = :id", V12_1_NobtEntity.class)
                 .setParameter("id", id)
                 .getSingleResult()
-                .getExplicitParticipants();
+                .getExplicitParticipants()
+        );
     }
 
-    @Override
-    public void close() throws Exception {
-        entityManager.close();
-        entityManagerFactory.close();
-    }
 }

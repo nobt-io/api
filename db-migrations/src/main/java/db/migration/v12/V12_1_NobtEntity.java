@@ -4,6 +4,7 @@ import io.nobt.persistence.JacksonUtil;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -13,13 +14,18 @@ import static java.util.stream.Collectors.toSet;
 @Entity
 public class V12_1_NobtEntity {
 
+    /**
+     * Need value 2 for backwards compatibility with V4.1__insert_data.sql
+     */
+    private static final int INITIAL_SEQUENCE_VALUE = 2;
+
     static {
         JacksonUtil.OBJECT_MAPPER.registerModule(new V12_1_NobtEntityModule());
     }
 
     @Id
-    @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq", initialValue = INITIAL_SEQUENCE_VALUE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "nobts_seq")
     public Long id;
 
     @Type(type = "io.nobt.persistence.JsonBinaryType")
@@ -28,6 +34,15 @@ public class V12_1_NobtEntity {
 
     @Column(name = "explicitParticipants_legacy")
     private String explicitParticipants_legacy;
+
+    @Column(name = "nobtName", nullable = false, length = 50)
+    private String name = "Test";
+
+    @Column(name = "currency", nullable = false, length = 3)
+    private String currency = "EUR";
+
+    @Column(name = "createdOn", nullable = false)
+    private ZonedDateTime createdOn = ZonedDateTime.now();
 
     public void convert() {
 
@@ -51,4 +66,6 @@ public class V12_1_NobtEntity {
     public void setExplicitParticipants_legacy(String explicitParticipants_legacy) {
         this.explicitParticipants_legacy = explicitParticipants_legacy;
     }
+
+
 }

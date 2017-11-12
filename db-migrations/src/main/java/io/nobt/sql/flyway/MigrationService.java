@@ -2,6 +2,7 @@ package io.nobt.sql.flyway;
 
 import io.nobt.persistence.DatabaseConfig;
 import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.MigrationVersion;
 
 public class MigrationService {
 
@@ -13,14 +14,19 @@ public class MigrationService {
     }
 
     public void migrate() {
-        flyway.migrate();
+        migrate(MigrationVersion.LATEST);
+    }
+
+    public void migrate(String version) {
+        migrate(MigrationVersion.fromVersion(version));
     }
 
     public void clean() {
         flyway.clean();
     }
 
-    public void setTargetVersion(String version) {
-        flyway.setTargetAsString(version);
+    private void migrate(MigrationVersion migrationVersion) {
+        flyway.setTarget(migrationVersion);
+        flyway.migrate();
     }
 }

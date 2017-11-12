@@ -9,7 +9,10 @@ import org.apache.logging.log4j.Logger;
 import org.junit.*;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import static org.hamcrest.Matchers.*;
+import java.util.Set;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 public class MigrationServiceIT {
@@ -44,21 +47,26 @@ public class MigrationServiceIT {
     @Test
     public void shouldCorrectlyMigrateExplicitParticipantsToJSONB() throws Exception {
 
-        sut.setTargetVersion("12.1");
-        sut.migrate();
+        sut.migrate("12.0");
 
         try (final V12MigrationDao dao = new V12MigrationDao(databaseConfig)) {
 
-            assertThat("We want at least 3 instances after the migration", dao.getAllNobts(), hasSize(anyOf(
-                    greaterThan(3),
-                    equalTo(3)
-            )));
+            final Long firstId = dao.insertNobtWithParticipants("");
+            final Long secondId = dao.insertNobtWithParticipants("Thomas;David;Lukas");
 
-            assertThat("Each participant should be an item of the set", dao.getParticipantsOfNobt(2), hasSize(5));
+            sut.migrate("12.1");
 
-            assertThat("Name should now be present in the set", dao.getParticipantsOfNobt(3), is(Sets.newHashSet(V12Person.forName("Anna"))));
+            final Set<V12Person> participantsOfFirstNobt = dao.getParticipantsOfNobt(firstId);
+            assertThat(participantsOfFirstNobt, hasSize(0));
 
-            assertThat("No participants should result in empty set", dao.getParticipantsOfNobt(4), is(empty()));
+            final Set<V12Person> participantsOfSecondNobt = dao.getParticipantsOfNobt(secondId);
+            assertThat(participantsOfSecondNobt, is(
+                    Sets.newHashSet(
+                            V12Person.forName("Thomas"),
+                            V12Person.forName("David"),
+                            V12Person.forName("Lukas")
+                    )
+            ));
         }
     }
 
