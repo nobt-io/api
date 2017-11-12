@@ -1,4 +1,4 @@
-package db.migration;
+package io.nobt.sql.flyway;
 
 import org.flywaydb.core.api.configuration.ConfigurationAware;
 import org.flywaydb.core.api.configuration.FlywayConfiguration;
@@ -12,9 +12,8 @@ import javax.persistence.Persistence;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.HashMap;
-import java.util.List;
 
-public abstract class EntityManagerMigration<T> implements ConfigurationAware, JdbcMigration {
+public abstract class EntityManagerBasedMigrationTestBase<T> implements ConfigurationAware, JdbcMigration {
 
     private DataSource dataSource;
 
@@ -23,9 +22,9 @@ public abstract class EntityManagerMigration<T> implements ConfigurationAware, J
         dataSource = flywayConfiguration.getDataSource();
     }
 
-    protected abstract List<T> retrieveEntities(EntityManager entityManager);
+    protected void assertState(EntityManager entityManager) {
 
-    protected abstract T performUpdate(T entity);
+    }
 
     @Override
     public void migrate(Connection connection) throws Exception {
@@ -38,29 +37,12 @@ public abstract class EntityManagerMigration<T> implements ConfigurationAware, J
         final EntityManager entityManager = emf.createEntityManager();
         final EntityTransaction tx = entityManager.getTransaction();
 
-        tx.begin();
         try {
-            doBatchUpdate(entityManager);
-            entityManager.flush();
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            throw e;
+            assertState(entityManager);
         } finally {
             entityManager.close();
             emf.close();
         }
     }
 
-    private void doBatchUpdate(EntityManager entityManager) {
-
-        final List<T> entities = retrieveEntities(entityManager);
-
-        for (final T entity : entities) {
-
-            final T newEntity = performUpdate(entity);
-
-            entityManager.persist(newEntity);
-        }
-    }
 }
