@@ -1,9 +1,10 @@
 package io.nobt.core.domain;
 
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Person {
+public class Person implements Serializable {
 
 	@Pattern(regexp = "[^;]+")
 	private String name;
