@@ -1,4 +1,4 @@
-package db.migration.v12_2;
+package db.migration.v15_2;
 
 import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.spring.SpringJdbcMigration;
@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
-public class V12_2__Persist_Nobt_IDs_in_DB implements SpringJdbcMigration, MigrationChecksumProvider {
+public class V15_2__Persist_Nobt_IDs_in_DB implements SpringJdbcMigration, MigrationChecksumProvider {
 
     @Override
     public void migrate(JdbcTemplate jdbcTemplate) throws Exception {
@@ -37,6 +37,6 @@ public class V12_2__Persist_Nobt_IDs_in_DB implements SpringJdbcMigration, Migra
 
     @Override
     public Integer getChecksum() {
-        return V12_2__Persist_Nobt_IDs_in_DB.class.getName().hashCode();
+        return V15_2__Persist_Nobt_IDs_in_DB.class.getName().hashCode();
     }
 }
