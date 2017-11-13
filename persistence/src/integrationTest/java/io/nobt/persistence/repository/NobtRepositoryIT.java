@@ -1,7 +1,5 @@
 package io.nobt.persistence.repository;
 
-import io.nobt.application.env.Config;
-import io.nobt.application.env.RealEnvironment;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.domain.*;
 import io.nobt.persistence.*;
@@ -11,10 +9,11 @@ import io.nobt.persistence.mapping.NobtMapper;
 import io.nobt.persistence.mapping.ShareMapper;
 import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.domain.factories.ShareFactory;
-import io.nobt.test.persistence.DatabaseAvailabilityCheck;
+import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
 import io.nobt.util.Sets;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.persistence.EntityManagerFactory;
 import java.time.*;
@@ -24,7 +23,6 @@ import static io.nobt.test.domain.Currencies.EUR;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.*;
 import static io.nobt.test.domain.matchers.NobtMatchers.*;
-import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assume.assumeThat;
@@ -37,6 +35,9 @@ public class NobtRepositoryIT {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
+    @ClassRule
+    public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9.6");
+
     private static EntityManagerFactory entityManagerFactory;
 
     private NobtFactory nobtFactory;
@@ -46,13 +47,9 @@ public class NobtRepositoryIT {
     @BeforeClass
     public static void setupEnvironment() {
 
-        final Config config = Config.from(new RealEnvironment());
-        databaseConfig = config.database();
+        databaseConfig = new PostgreSQLContainerDatabaseConfig(postgreSQLContainer);
+
         migrationService = new MigrationService(databaseConfig);
-
-        DatabaseAvailabilityCheck availabilityCheck = new DatabaseAvailabilityCheck(databaseConfig);
-        await().until(availabilityCheck::isDatabaseUp);
-
         migrationService.migrate();
     }
 
