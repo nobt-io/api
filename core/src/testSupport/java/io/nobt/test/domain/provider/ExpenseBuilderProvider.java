@@ -1,6 +1,7 @@
 package io.nobt.test.domain.provider;
 
 import io.nobt.core.domain.ConversionInformation;
+import io.nobt.test.domain.builder.EvenlySplitExpenseBuilder;
 import io.nobt.test.domain.builder.ExpenseBuilder;
 
 import java.math.BigDecimal;
@@ -26,5 +27,9 @@ public final class ExpenseBuilderProvider {
                 .withConversionInformation(new ConversionInformation(CurrencyKeysProvider.EUR, BigDecimal.ONE))
                 .happendOn(LocalDate.now().minusDays(1))
                 .createdOn(ZonedDateTime.now(ZoneOffset.UTC));
+    }
+
+    public static EvenlySplitExpenseBuilder anEvenlySplitExpense() {
+        return new EvenlySplitExpenseBuilder(anExpense());
     }
 }

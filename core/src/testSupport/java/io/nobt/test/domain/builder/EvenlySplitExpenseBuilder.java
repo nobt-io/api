@@ -1,4 +1,4 @@
-package io.nobt.test.domain.factories;
+package io.nobt.test.domain.builder;
 
 import io.nobt.core.domain.Amount;
 import io.nobt.core.domain.Expense;
@@ -15,12 +15,21 @@ import static java.util.stream.Collectors.toSet;
 
 public class EvenlySplitExpenseBuilder {
 
-    private Person debtee;
+    private final ExpenseBuilder expenseBuilder;
+
+    public EvenlySplitExpenseBuilder(ExpenseBuilder expenseBuilder) {
+        this.expenseBuilder = expenseBuilder;
+    }
+
+    public EvenlySplitExpenseBuilder() {
+        expenseBuilder = new ExpenseBuilder();
+    }
+
     private Set<Person> debtors;
     private Amount total;
 
     public EvenlySplitExpenseBuilder withDebtee(Person debtee) {
-        this.debtee = debtee;
+        expenseBuilder.withDebtee(debtee);
         return this;
     }
 
@@ -40,16 +49,10 @@ public class EvenlySplitExpenseBuilder {
                 .map(debtor -> share(debtor, total.divideBy(BigDecimal.valueOf(debtors.size()))))
                 .collect(toSet());
 
-        return new Expense(
-                null,
-                null,
-                "EVENLY",
-                debtee,
-                null,
-                shares,
-                null,
-                null
-        );
+        expenseBuilder
+                .withShares(shares)
+                .withSplitStrategy("EVENLY");
 
+        return expenseBuilder.build();
     }
 }
