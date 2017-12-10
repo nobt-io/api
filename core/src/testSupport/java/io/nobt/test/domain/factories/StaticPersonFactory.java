@@ -10,6 +10,7 @@ public final class StaticPersonFactory {
 	public static Person thomas = Person.forName("Thomas");
 	public static Person matthias = Person.forName("Matthias");
 	public static Person simon = Person.forName("Simon");
+    public static Person eva = Person.forName("Eva");
 	public static Person lukas = Person.forName("Lukas");
 	public static Person thomasB = Person.forName("Thomas B.");
 	public static Person jacqueline = Person.forName("Jacqueline");

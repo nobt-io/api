@@ -1,19 +1,25 @@
 package io.nobt.persistence.nobt;
 
+import io.nobt.core.domain.Person;
 import io.nobt.core.optimizer.Optimizer;
+import io.nobt.persistence.JacksonUtil;
 import io.nobt.persistence.cashflow.expense.ExpenseEntity;
 import io.nobt.persistence.cashflow.payment.PaymentEntity;
-import io.nobt.util.Sets;
+import io.nobt.persistence.json.NobtEntityModule;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 @Table(name = "nobts")
 @Entity
 public class NobtEntity {
+
+    static {
+        JacksonUtil.OBJECT_MAPPER.registerModule(new NobtEntityModule());
+    }
 
     @Id
     @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq")
@@ -26,8 +32,9 @@ public class NobtEntity {
     @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
+    @Type(type = "io.nobt.persistence.JsonBinaryType")
     @Column(name = "explicitParticipants")
-    private String explicitParticipants;
+    private Set<Person> explicitParticipants = new HashSet<>();
 
     @Column(name = "createdOn", nullable = false)
     private ZonedDateTime createdOn;
@@ -83,16 +90,12 @@ public class NobtEntity {
         expense.setNobt(this);
     }
 
-    public void addExplicitParticipant(String participant) {
-        if (explicitParticipants == null) {
-            explicitParticipants = participant;
-        } else {
-            explicitParticipants = explicitParticipants + ";" + participant;
-        }
+    public void setExplicitParticipant(Set<Person> participants) {
+        explicitParticipants = participants;
     }
 
-    public Set<String> getExplicitParticipants() {
-        return explicitParticipants != null ? Sets.newHashSet(explicitParticipants.split(";")) : Collections.emptySet();
+    public Set<Person> getExplicitParticipants() {
+        return explicitParticipants;
     }
 
     public void setId(Long id) {

@@ -7,16 +7,22 @@ import io.nobt.application.env.Config;
 import io.nobt.application.env.ConfigBuilder;
 import io.nobt.application.env.RealEnvironment;
 import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
+import org.jetbrains.annotations.NotNull;
 import org.junit.*;
 import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.restassured.operation.preprocess.UriModifyingOperationPreprocessor;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import static com.jayway.restassured.RestAssured.given;
+import static io.nobt.rest.docs.Preprocessors.replacePatternInHeader;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
@@ -74,7 +80,13 @@ public class ApiDocumentationTest {
                 .port(config.port())
                 .filter(
                         document("create-nobt",
-                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
+                                preprocessRequest(
+                                        configureHost(),
+                                        replaceLocalhost()
+                                ),
+                                preprocessResponse(
+                                        replaceLocalhost()
+                                ),
                                 requestFields(
                                         fieldWithPath("nobtName").description("The name of the nobt."),
                                         fieldWithPath("currency").description("The currency of this nobt."),
@@ -112,7 +124,13 @@ public class ApiDocumentationTest {
                 .port(config.port())
                 .filter(
                         document("create-expense",
-                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
+                                preprocessRequest(
+                                        configureHost(),
+                                        replaceLocalhost()
+                                ),
+                                preprocessResponse(
+                                        replaceLocalhost()
+                                ),
                                 requestFields(
                                         fieldWithPath("name").description("Human readable description of the expense."),
                                         fieldWithPath("debtee").description("The name of the person who made the expense."),
@@ -215,7 +233,13 @@ public class ApiDocumentationTest {
                 .port(config.port())
                 .filter(
                         document("get-nobt",
-                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
+                                preprocessRequest(
+                                        configureHost(),
+                                        replaceLocalhost()
+                                ),
+                                preprocessResponse(
+                                        replaceLocalhost()
+                                ),
                                 responseFields(
                                         fieldWithPath("id").type(JsonFieldType.STRING).description("The id of the nobt. Can be used to construct URIs to the various endpoints of the API."),
                                         fieldWithPath("name").type(JsonFieldType.STRING).description("The name of the nobt."),
@@ -274,7 +298,13 @@ public class ApiDocumentationTest {
                 .port(config.port())
                 .filter(
                         document("delete-expense",
-                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT))
+                                preprocessRequest(
+                                        configureHost(),
+                                        replaceLocalhost()
+                                ),
+                                preprocessResponse(
+                                        replaceLocalhost()
+                                )
                         )
                 )
 
@@ -285,7 +315,6 @@ public class ApiDocumentationTest {
                 .then()
 
                 .statusCode(204);
-
 
 
         client.getNobt(nobtId)
@@ -320,7 +349,13 @@ public class ApiDocumentationTest {
                 .port(config.port())
                 .filter(
                         document("duplicate-debtor",
-                                preprocessRequest(modifyUris().scheme("http").host("localhost").port(DOCUMENTED_PORT)),
+                                preprocessRequest(
+                                        configureHost(),
+                                        replaceLocalhost()
+                                ),
+                                preprocessResponse(
+                                        replaceLocalhost()
+                                ),
                                 responseFields(
                                         fieldWithPath("title").description("A short description of the error."),
                                         fieldWithPath("status").description("The status code for this error."),
@@ -401,5 +436,15 @@ public class ApiDocumentationTest {
                 .then()
 
                 .statusCode(400);
+    }
+
+    @NotNull
+    private UriModifyingOperationPreprocessor configureHost() {
+        return modifyUris().scheme("http").host("api.nobt.io").removePort();
+    }
+
+    @NotNull
+    private OperationPreprocessor replaceLocalhost() {
+        return replacePatternInHeader(Pattern.compile("(http://localhost:8080)/.*"), "http://api.nobt.io");
     }
 }

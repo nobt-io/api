@@ -51,6 +51,8 @@ public class NobtRestApi implements Closeable {
     public void run(int port) {
         http.port(port);
 
+        http.staticFiles.externalLocation("../docs");
+
         setupCORS();
 
         registerApplicationRoutes();
@@ -169,11 +171,7 @@ public class NobtRestApi implements Closeable {
     }
 
     private void setupCORS() {
-        http.before((req, res) -> {
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Request-Method", "*");
-            res.header("Access-Control-Allow-Headers", "*");
-        });
+        http.before(new CORSHandler());
 
         http.options("/*", (req, res) -> {
             String accessControlRequestHeaders = req.headers("Access-Control-Request-Headers");

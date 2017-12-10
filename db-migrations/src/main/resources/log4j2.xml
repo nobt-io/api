@@ -9,5 +9,11 @@
         <Root level="INFO">
             <AppenderRef ref="Console" />
         </Root>
+        <Logger name="org.hibernate.SQL" level="DEBUG">
+
+        </Logger>
+        <Logger name="io.nobt.sql.flyway" level="DEBUG">
+
+        </Logger>
     </Loggers>
 </Configuration>

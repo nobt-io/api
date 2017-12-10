@@ -8,6 +8,7 @@ import java.util.List;
 import static io.nobt.core.domain.debt.Debt.debt;
 import static io.nobt.core.optimizer.Optimizer.MINIMAL_AMOUNT_V2;
 import static io.nobt.test.domain.factories.AmountFactory.amount;
+import static io.nobt.test.domain.factories.ExpenseDataProvider.anEvenlySplitExpense;
 import static io.nobt.test.domain.factories.ShareFactory.randomShare;
 import static io.nobt.test.domain.factories.ShareFactory.share;
 import static io.nobt.test.domain.factories.StaticPersonFactory.*;
@@ -69,6 +70,39 @@ public class UsecaseTests {
         assertThat(optimizedDebts, allOf(
                 iterableWithSize(1),
                 hasItem(debt(matthias, amount(5), thomas))
+        ));
+    }
+
+    @Test
+    public void bug_invalidCalculationWithMissingTransaction() throws Exception {
+
+        final Nobt nobt = aNobt()
+                .withExpenses(
+                        anEvenlySplitExpense()
+                                .withDebtee(simon)
+                                .withDebtors(simon, thomas, eva, matthias)
+                                .withTotal(10)
+                                .build(),
+                        anEvenlySplitExpense()
+                                .withDebtee(eva)
+                                .withDebtors(simon, thomas, eva, matthias)
+                                .withTotal(30)
+                                .build(),
+                        anEvenlySplitExpense()
+                                .withDebtee(matthias)
+                                .withDebtors(simon, thomas, eva, matthias)
+                                .withTotal(5)
+                                .build()
+                )
+                .build();
+
+
+        final List<Debt> optimizedDebts = nobt.getOptimizedDebts();
+
+        assertThat(optimizedDebts, containsInAnyOrder(
+                debt(simon, amount(1.25), eva),
+                debt(thomas, amount(11.25), eva),
+                debt(matthias, amount(6.25), eva)
         ));
     }
 }

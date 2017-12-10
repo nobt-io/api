@@ -22,7 +22,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
     @Override
     public Nobt mapToDomainModel(NobtEntity databaseModel) {
 
-        final Set<Person> explicitParticipants = databaseModel.getExplicitParticipants().stream().map(Person::forName).collect(toSet());
+        final Set<Person> explicitParticipants = databaseModel.getExplicitParticipants();
         final Set<Expense> expenses = databaseModel.getExpenses().stream().map(expenseMapper::mapToDomainModel).collect(toSet());
         final Set<Payment> payments = databaseModel.getPayments().stream().map(paymentMapper::mapToDomainModel).collect(toSet());
 
@@ -51,8 +51,8 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         nobtEntity.setCurrency(domainModel.getCurrencyKey().getKey());
         nobtEntity.setCreatedOn(domainModel.getCreatedOn());
         nobtEntity.setOptimizer(domainModel.getOptimizer());
+        nobtEntity.setExplicitParticipant(domainModel.getParticipatingPersons());
 
-        domainModel.getParticipatingPersons().stream().map(Person::getName).forEach(nobtEntity::addExplicitParticipant);
         domainModel.getExpenses().stream().map(expenseMapper::mapToDatabaseModel).forEach(nobtEntity::addExpense);
         domainModel.getPayments().stream().map(paymentMapper::mapToDatabaseModel).forEach(nobtEntity::addPayment);
 

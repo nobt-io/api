@@ -13,6 +13,10 @@ public final class ShareFactory {
     }
 
     public static Share share(Person person, double amount) {
-        return new Share(person, Amount.fromDouble(amount));
+        return share(person, AmountFactory.amount(amount));
+    }
+
+    public static Share share(Person person, Amount amount) {
+        return new Share(person, amount);
     }
 }
