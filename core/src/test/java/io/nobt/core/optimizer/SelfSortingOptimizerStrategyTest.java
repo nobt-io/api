@@ -5,7 +5,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static io.nobt.core.domain.transaction.Transaction.transaction;
@@ -83,20 +82,5 @@ public class SelfSortingOptimizerStrategyTest {
         List<Transaction> optimalTransactionsB = sut.optimize(transactionListB);
 
         assertThat(optimalTransactionsA, equalTo(optimalTransactionsB));
-    }
-
-    @Test
-    public void multipleSimilarTransactionsCanBeHandled() {
-
-        List<Transaction> containingSimilarTransactions = Arrays.asList(
-                transaction("Thomas", 2.5, "Simon"),
-                transaction("Simon", 2.5, "Thomas"),
-                transaction("Simon", 2.5, "Thomas")
-        );
-
-        List<Transaction> optimalTransactions = sut.optimize(containingSimilarTransactions);
-
-        List<Transaction> expectedTransactions = Collections.singletonList(transaction("Simon", 2.5, "Thomas"));
-        assertThat(optimalTransactions, equalTo(expectedTransactions));
     }
 }
