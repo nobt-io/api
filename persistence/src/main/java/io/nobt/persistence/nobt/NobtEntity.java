@@ -25,8 +25,8 @@ public class NobtEntity {
     }
 
     @Id
-    @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "nobts_seq")
     private Long id;
 
     @Column(name = "nobtName", nullable = false, length = 50)
