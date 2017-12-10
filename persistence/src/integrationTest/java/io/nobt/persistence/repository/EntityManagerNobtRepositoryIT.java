@@ -13,7 +13,6 @@ import io.nobt.persistence.TransactionalNobtRepositoryCommandInvoker;
 import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
-import io.nobt.test.persistence.TransactionRule;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -44,8 +43,6 @@ public class EntityManagerNobtRepositoryIT {
     private static TransactionalNobtRepositoryCommandInvoker invoker;
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-    @Rule
-    public TransactionRule transactionRule;
 
     @BeforeClass
     public static void setupEnvironment() {

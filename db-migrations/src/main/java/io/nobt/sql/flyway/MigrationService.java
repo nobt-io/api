@@ -6,11 +6,13 @@ import org.flywaydb.core.api.MigrationVersion;
 
 public class MigrationService {
 
-    private final Flyway flyway;
+    private final Flyway flyway = new Flyway();
 
     public MigrationService(DatabaseConfig config) {
-        this.flyway = new Flyway();
-        this.flyway.setDataSource(config.url(), config.username(), config.password());
+        flyway.setDataSource(config.url(), config.username(), config.password());
+
+        flyway.setBaselineOnMigrate(true);
+        flyway.setBaselineVersionAsString("1");
     }
 
     public void migrate() {
