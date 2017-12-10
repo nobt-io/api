@@ -1,7 +1,3 @@
-environment-defaults:
-  api-dev:
-    branch: null
-    repository: null
 global:
   application_name: api
   default_ec2_keyname: aws-eb
@@ -15,4 +11,4 @@ global:
   sc: git
   workspace_type: Application
 deploy:
-  artifact: rest-api/build/distributions/rest-api.zip
+  artifact: rest-api/build/distributions/rest-api-latest

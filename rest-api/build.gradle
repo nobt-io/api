@@ -1,3 +1,6 @@
+import java.nio.file.Files
+import java.nio.file.Paths
+
 buildscript {
     repositories {
         mavenCentral()
@@ -80,6 +83,18 @@ distTar {
 distZip {
     dependsOn asciidoctor
 }
+
+task createSymbolicLink(dependsOn: 'distZip') << {
+
+    def distributionsDir = distZip.destinationDir.path
+
+    def link = Paths.get(distributionsDir, "rest-api-latest")
+    def target = Paths.get(distributionsDir, distZip.archiveName)
+
+    Files.createSymbolicLink(link, target)
+}
+
+build.dependsOn createSymbolicLink
 
 task runLocal(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath

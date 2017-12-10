@@ -4,9 +4,7 @@ sudo: required
 services:
   - docker
 
-before_install:
-  - sudo apt-get -y install python3-pip
-  - pip install awsebcli --upgrade --user
+install: true
 
 script:
   - ./gradlew clean build
@@ -17,8 +15,13 @@ addons:
     paths:
       - "rest-api/build/distributions/rest-api-*.zip"
 
+before_deploy:
+- pip install --user awscli
+
 deploy:
   provider: script
+  skip_cleanup: true
   script: .aws/deploy api-prod
   on:
     branch: master
+    repo: nobt-io/api
