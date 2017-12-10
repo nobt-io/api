@@ -1,11 +1,11 @@
 package io.nobt.core.optimizer;
 
-import io.nobt.core.domain.transaction.Transaction;
+import io.nobt.core.domain.debt.Debt;
 
 import java.util.List;
 
 public interface OptimizerStrategy {
 
-	List<Transaction> optimize(List<Transaction> unoptimizedTransactions);
+    List<Debt> optimize(List<Debt> debts);
 
 }

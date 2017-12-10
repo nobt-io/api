@@ -5,8 +5,9 @@
     <persistence-unit name="persistence">
 
 		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-		<class>io.nobt.persistence.entity.ExpenseEntity</class>
-		<class>io.nobt.persistence.entity.NobtEntity</class>
+        <class>io.nobt.persistence.cashflow.expense.ExpenseEntity</class>
+        <class>io.nobt.persistence.cashflow.payment.PaymentEntity</class>
+        <class>io.nobt.persistence.nobt.NobtEntity</class>
 
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />

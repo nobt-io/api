@@ -62,4 +62,13 @@ public final class NobtMatchers {
             }
         };
     }
+
+    public static Matcher<Nobt> hasPayments(final Matcher<? super Iterable<Payment>> subMatcher) {
+        return new FeatureMatcher<Nobt, Set<Payment>>(subMatcher, "payments", "payments") {
+            @Override
+            protected Set<Payment> featureValueOf(Nobt actual) {
+                return actual.getPayments();
+            }
+        };
+    }
 }

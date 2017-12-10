@@ -1,6 +1,6 @@
 package io.nobt.persistence.mapping;
 
-import io.nobt.persistence.entity.NobtEntity;
+import io.nobt.persistence.nobt.NobtEntity;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;

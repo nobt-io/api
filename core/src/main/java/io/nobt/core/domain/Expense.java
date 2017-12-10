@@ -1,25 +1,25 @@
 package io.nobt.core.domain;
 
-import io.nobt.core.domain.transaction.Transaction;
+import io.nobt.core.ConversionInformationInconsistentException;
+import io.nobt.core.domain.debt.Debt;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-import static io.nobt.core.domain.transaction.Transaction.transaction;
-import static java.util.stream.Collectors.toList;
+import static io.nobt.core.domain.ConversionInformation.defaultConversionInformation;
 import static java.util.stream.Collectors.toSet;
 
 /**
  * An expense represents a domain entity that describes a payment of some sort done by one person ({@link Expense#debtee})
  * where several other persons take part it. (specified through the {@link Expense#shares} collection.)
  */
-public class Expense {
+public class Expense implements CashFlow {
 
-    private final Long id;
+    private final long id;
     private final String name;
     private final Person debtee;
     private final String splitStrategy;
@@ -28,7 +28,7 @@ public class Expense {
     private final LocalDate date;
     private final ZonedDateTime createdOn;
 
-    public Expense(Long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, ZonedDateTime createdOn) {
+    public Expense(long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, ZonedDateTime createdOn) {
         this.id = id;
         this.name = name;
         this.splitStrategy = splitStrategy;
@@ -39,7 +39,25 @@ public class Expense {
         this.createdOn = createdOn;
     }
 
-    public Long getId() {
+    private Expense(long id, ExpenseDraft draft, ConversionInformation conversionInformation) {
+        this(id, draft.getName(), draft.getSplitStrategy(), draft.getDebtee(), conversionInformation, new HashSet<>(draft.getShares()), draft.getDate(), ZonedDateTime.now(ZoneOffset.UTC));
+    }
+
+    public static Expense fromDraft(long id, CurrencyKey nobtCurrency, ExpenseDraft draft) {
+
+        final ConversionInformation conversionInformation = draft
+                .getConversionInformation()
+                .orElse(defaultConversionInformation(nobtCurrency));
+
+        if (!conversionInformation.isValid(nobtCurrency)) {
+            throw new ConversionInformationInconsistentException(conversionInformation, nobtCurrency);
+        }
+
+        return new Expense(id, draft, conversionInformation);
+    }
+
+    @Override
+    public long getId() {
         return id;
     }
 
@@ -63,6 +81,14 @@ public class Expense {
         return date;
     }
 
+    @Override
+    public Set<Debt> calculateAccruingDebts() {
+        return shares
+                .stream()
+                .map(share -> Debt.debt(share.getDebtor(), share.getAmount(), debtee))
+                .collect(toSet());
+    }
+
     public ZonedDateTime getCreatedOn() {
         return createdOn;
     }
@@ -71,6 +97,7 @@ public class Expense {
         return conversionInformation;
     }
 
+    @Override
     public Set<Person> getParticipants() {
         final Set<Person> debtors = shares.stream().map(Share::getDebtor).collect(toSet());
 
@@ -78,12 +105,5 @@ public class Expense {
         copyOfDebtors.add(debtee);
 
         return copyOfDebtors;
-    }
-
-    public List<Transaction> getTransactions() {
-        return shares
-                .stream()
-                .map(share -> transaction(share.getDebtor(), share.getAmount(), debtee))
-                .collect(toList());
     }
 }

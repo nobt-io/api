@@ -4,10 +4,11 @@ Thomas Eizinger;
 :icons: font
 :source-highlighter: highlightjs
 
-This document describes the API of Nobt.io. There are 4 requests that can be made at the moment:
+This document describes the API of Nobt.io. There are 5 requests that can be made at the moment:
 
 * Create a new nobt
 * Add an expense to a given nobt
+* Add a payment to a given nobt
 * Retrieve the nobt
 * Delete an expense
 
@@ -28,7 +29,7 @@ The response looks like this:
 
 include::{snippets}/create-nobt/http-response.adoc[]
 
-In addition to the information that was sent to the API, two arrays are returned. `expenses` and `transaction`. We will look into those further after we have added an expense to this nobt and retrieved it again.
+In addition to the information that was sent to the API, three arrays are returned. `expenses`, `payments` and `debts`. We will look into those further after we have added an expense to this nobt and retrieved it again.
 
 == Add an expense to a nobt
 
@@ -73,13 +74,27 @@ The response in the case of an validation failure is:
 include::{snippets}/duplicate-debtor/http-response.adoc[]
 include::{snippets}/duplicate-debtor/response-fields.adoc[]
 
+== Add a payment
+
+After an expense was added to the Nobt the current debts are included in the response of the nobt. See the output below.
+
+In order to settle one of these debts, payments can be added. A payment is a flow of money from one person to another that can contain a description. Payments may also be made in other currencies. For more information on currency conversion, see the section Currencies above.
+
+The following example request shows, how to add a payment.
+
+include::{snippets}/add-payment/http-request.adoc[]
+
+Equivalently to expenses, a `201 CREATED` is returned.
+
+include::{snippets}/add-payment/http-response.adoc[]
+
 == Retrieve the nobt
 
 Once we add at least one expense, it makes sense to re-retrieve the nobt we created before.
 
 include::{snippets}/get-nobt/http-request.adoc[]
 
-This time, the response is way more interesting, as it includes transactions.
+This time, the response is way more interesting, as it includes debts. Note that we also already added payment, which is immediately reflected in the resulting debts.
 
 include::{snippets}/get-nobt/http-response.adoc[]
 include::{snippets}/get-nobt/response-fields.adoc[]
@@ -90,6 +105,6 @@ Deleting an expense is as easy as sending a `DELETE` request to the `/expense` s
 
 include::{snippets}/delete-expense/http-request.adoc[]
 
-The response code is always `204 NO CONTENT`, even if there was no response with the specified ID.
+The response code is always `204 NO CONTENT`, even if there was no expense with the specified ID.
 
 include::{snippets}/delete-expense/http-response.adoc[]

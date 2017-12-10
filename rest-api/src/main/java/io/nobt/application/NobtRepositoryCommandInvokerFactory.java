@@ -1,15 +1,12 @@
 package io.nobt.application;
 
 import io.nobt.application.env.Config;
-import io.nobt.persistence.*;
-import io.nobt.persistence.mapping.EntityManagerNobtDatabaseIdResolver;
-import io.nobt.persistence.mapping.ExpenseMapper;
-import io.nobt.persistence.mapping.NobtMapper;
-import io.nobt.persistence.mapping.ShareMapper;
+import io.nobt.persistence.InMemoryNobtRepository;
+import io.nobt.persistence.InMemoryRepositoryCommandInvoker;
+import io.nobt.persistence.NobtRepositoryCommandInvoker;
+import io.nobt.persistence.TransactionalNobtRepositoryCommandInvoker;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import javax.persistence.EntityManagerFactory;
 
 public class NobtRepositoryCommandInvokerFactory {
 
@@ -31,25 +28,8 @@ public class NobtRepositoryCommandInvokerFactory {
         }
     }
 
-    private static EntityManagerFactoryProvider entityManagerFactoryProvider = new EntityManagerFactoryProvider();
-
     private NobtRepositoryCommandInvoker transactional() {
-
-        final DatabaseConfig databaseConfig = config.database();
-        final EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.create(databaseConfig);
-
-        return new TransactionalNobtRepositoryCommandInvoker(
-                entityManagerFactory,
-                (entityManager) -> new EntityManagerNobtRepository(
-                        entityManager,
-                        new NobtMapper(
-                                new EntityManagerNobtDatabaseIdResolver(entityManager),
-                                new ExpenseMapper(
-                                        new ShareMapper()
-                                )
-                        )
-                )
-        );
+        return TransactionalNobtRepositoryCommandInvoker.forDatabaseConfig(config.database());
     }
 
     private NobtRepositoryCommandInvoker inMemory() {

@@ -44,7 +44,7 @@ public final class Amount {
         return fromBigDecimal(value.add(other.value));
     }
 
-    public Amount divide(BigDecimal other) {
+    public Amount divideBy(BigDecimal other) {
         return fromBigDecimal(value.divide(other, INTERNAL_SCALE, HALF_UP));
     }
 
