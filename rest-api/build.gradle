@@ -47,6 +47,7 @@ dependencies {
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.7.5'
     compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.7.5'
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jdk8', version: '2.7.5'
 
     testCompile project(path: ':core', configuration: 'testSupport')
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
@@ -67,6 +68,10 @@ distributions {
         }
     }
 }
+
+applicationDefaultJvmArgs = [
+        "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
+]
 
 test {
     useJUnit {

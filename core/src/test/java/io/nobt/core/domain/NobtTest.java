@@ -1,78 +1,134 @@
 package io.nobt.core.domain;
 
 import io.nobt.core.ConversionInformationInconsistentException;
-import io.nobt.util.Sets;
-import org.junit.Before;
+import io.nobt.core.domain.debt.Debt;
+import io.nobt.test.domain.matchers.PaymentMatchers;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.rules.ExpectedException;
+import org.mockito.InOrder;
 
 import java.math.BigDecimal;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
 
-import static io.nobt.test.domain.factories.ShareFactory.randomShare;
-import static io.nobt.test.domain.factories.StaticPersonFactory.*;
-import static java.util.Collections.*;
-import static io.nobt.test.domain.matchers.NobtMatchers.*;
+import static io.nobt.test.domain.factories.AmountFactory.amount;
+import static io.nobt.test.domain.factories.StaticPersonFactory.david;
+import static io.nobt.test.domain.factories.StaticPersonFactory.thomas;
+import static io.nobt.test.domain.matchers.ExpenseMatchers.hasId;
+import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
+import static io.nobt.test.domain.matchers.NobtMatchers.hasPayments;
+import static io.nobt.test.domain.matchers.PaymentMatchers.*;
+import static io.nobt.test.domain.provider.ExpenseBuilderProvider.anExpense;
+import static io.nobt.test.domain.provider.ExpenseDraftBuilderProvider.anExpenseDraft;
+import static io.nobt.test.domain.provider.NobtBuilderProvider.aNobt;
+import static io.nobt.test.domain.provider.PaymentDraftBuilderProvider.aPaymentDraft;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
 public class NobtTest {
 
-    private Nobt sut;
-
-    @Mock
-    private Expense firstExpense;
-
-    @Mock
-    private Expense secondExpense;
-
-    private NobtFactory nobtFactory = new NobtFactory();
-
-    @Before
-    public void setUp() throws Exception {
-
-        sut = new Nobt(null, new CurrencyKey("EUR"), "Something", Sets.newHashSet(thomas), Sets.newHashSet(firstExpense, secondExpense), ZonedDateTime.now(ZoneOffset.UTC), null);
-
-        when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
-                randomShare(david),
-                randomShare(lukas)
-        ));
-
-        when(firstExpense.getShares()).thenReturn(Sets.newHashSet(
-                randomShare(matthias),
-                randomShare(simon)
-        ));
-    }
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void shouldBuildListOfPersonsFromEveryExpense() throws Exception {
 
-        sut.getParticipatingPersons();
+        final Expense firstExpense = mock(Expense.class);
+        final Expense secondExpense = mock(Expense.class);
+
+        final Nobt nobt = aNobt()
+                .withExpenses(firstExpense, secondExpense)
+                .build();
+
+
+        nobt.getParticipatingPersons();
+
 
         verify(firstExpense).getParticipants();
         verify(secondExpense).getParticipants();
     }
 
-    @Test(expected = ConversionInformationInconsistentException.class)
+    @Test
+    public void shouldCalculateDebtsOfCashFlowSortedByCreatedOn() throws Exception {
+
+        final ZonedDateTime now = ZonedDateTime.now();
+
+        final Expense firstExpense = mock(Expense.class);
+        final Expense secondExpense = mock(Expense.class);
+        final Payment firstPayment = mock(Payment.class);
+
+        when(firstExpense.getCreatedOn()).thenReturn(now.minusDays(3));
+        when(firstPayment.getCreatedOn()).thenReturn(now.minusDays(2));
+        when(secondExpense.getCreatedOn()).thenReturn(now.minusDays(1));
+
+        final Nobt nobt = aNobt()
+                .withExpenses(firstExpense, secondExpense)
+                .withPayments(firstPayment)
+                .build();
+
+
+        final List<Debt> optimizedDebts = nobt.getOptimizedDebts();
+
+
+        final InOrder inOrder = inOrder(firstExpense, secondExpense, firstPayment);
+
+        inOrder.verify(firstExpense).calculateAccruingDebts();
+        inOrder.verify(firstPayment).calculateAccruingDebts();
+        inOrder.verify(secondExpense).calculateAccruingDebts();
+    }
+
+    @Test
     public void shouldThrowExceptionIfConversionInformationIsNotConsistent() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt()
+                .withCurrency(new CurrencyKey("EUR"))
+                .build();
 
-        nobt.addExpense(null, null, david, emptySet(), null, new ConversionInformation(new CurrencyKey("EUR"), BigDecimal.TEN));
+        final ExpenseDraft expenseDraft = anExpenseDraft()
+                .withConversionInformation(new ConversionInformation(new CurrencyKey("EUR"), BigDecimal.TEN))
+                .build();
+
+
+        expectedException.expect(ConversionInformationInconsistentException.class);
+        nobt.createExpenseFrom(expenseDraft);
+    }
+
+    @Test
+    public void shouldAddPaymentToTheListOfPayments() throws Exception {
+
+        final Nobt nobt = aNobt().build();
+
+        final PaymentDraft paymentDraft = aPaymentDraft()
+                .withSender(thomas)
+                .withRecipient(david)
+                .withAmount(amount(5))
+                .build();
+
+        nobt.createPaymentFrom(paymentDraft);
+
+
+        assertThat(nobt, hasPayments(
+                hasItem(
+                        allOf(
+                                hasSender(equalTo(thomas)),
+                                hasRecipient(equalTo(david)),
+                                hasAmount(equalTo(amount(5)))
+                        )
+                )
+        ));
     }
 
     @Test
     public void shouldUseDefaultConversionInformationIfNonGiven() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt().build();
+        final ExpenseDraft expenseDraft = anExpenseDraft().build();
 
-        nobt.addExpense("Test", "Some strategy", david, emptySet(), null, null);
+
+        nobt.createExpenseFrom(expenseDraft);
+
 
         final Expense expense = nobt.getExpenses().stream().findAny().orElseThrow(IllegalStateException::new);
 
@@ -83,19 +139,95 @@ public class NobtTest {
     @Test
     public void shouldAddExpenseIfConversionInformationIsConsistent() throws Exception {
 
-        final Nobt nobt = nobtFactory.create("Test", emptySet(), new CurrencyKey("EUR"));
+        final Nobt nobt = aNobt()
+                .withCurrency(new CurrencyKey("EUR"))
+                .build();
 
-        nobt.addExpense(null, null, david, emptySet(), null, new ConversionInformation(new CurrencyKey("USD"), BigDecimal.TEN));
+        final ExpenseDraft expenseDraft = anExpenseDraft()
+                .withConversionInformation(new ConversionInformation(new CurrencyKey("USD"), BigDecimal.TEN))
+                .build();
+
+
+        nobt.createExpenseFrom(expenseDraft);
     }
 
     @Test
     public void shouldRemoveExpenseById() throws Exception {
 
-        when(firstExpense.getId()).thenReturn(1L);
-        when(secondExpense.getId()).thenReturn(2L);
+        final Nobt nobt = aNobt()
+                .withExpenses(anExpense().withId(1L))
+                .build();
 
-        sut.removeExpense(1L);
 
-        assertThat(sut, hasExpenses(iterableWithSize(1)));
+        nobt.removeExpense(1L);
+
+
+        assertThat(nobt, hasExpenses(iterableWithSize(0)));
+    }
+
+    @Test
+    public void shouldAssignIdToExpense() throws Exception {
+
+        final Nobt nobt = aNobt().build();
+
+
+        nobt.createExpenseFrom(anExpenseDraft().build());
+
+
+        assertThat(nobt, hasExpenses(
+                allOf(
+                        iterableWithSize(greaterThan(0)),
+                        everyItem(
+                                hasId(notNullValue(Long.class))
+                        )
+                )
+        ));
+    }
+
+    @Test
+    public void shouldAssignIdToPayment() throws Exception {
+
+        final Nobt nobt = aNobt().build();
+
+
+        nobt.createPaymentFrom(aPaymentDraft().build());
+
+
+        assertThat(nobt, hasPayments(
+                allOf(
+                        iterableWithSize(greaterThan(0)),
+                        everyItem(
+                                PaymentMatchers.hasId(notNullValue(Long.class))
+                        )
+                )
+        ));
+    }
+
+    @Test
+    public void shouldAssignOneAsTheFirstId() throws Exception {
+
+        final Nobt nobt = aNobt().build();
+
+
+        nobt.createExpenseFrom(anExpenseDraft().build());
+
+
+        assertThat(nobt, hasExpenses(hasItem(hasId(equalTo(1L)))));
+    }
+
+    @Test
+    public void shouldNotAssignSameIdsToExpensesAndPayments() throws Exception {
+
+        final Nobt nobt = aNobt().build();
+
+
+        nobt.createExpenseFrom(anExpenseDraft().build());
+        nobt.createPaymentFrom(aPaymentDraft().build());
+
+
+        final Payment payment = nobt.getPayments().iterator().next();
+        final Expense expense = nobt.getExpenses().iterator().next();
+
+        assertThat(payment, PaymentMatchers.hasId(not(equalTo(expense.getId()))));
     }
 }

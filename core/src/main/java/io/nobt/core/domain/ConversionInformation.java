@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 
 public final class ConversionInformation {
 
+    private static final BigDecimal DEFAULT_RATE = BigDecimal.ONE;
+
     @NotNull
     @Valid
     private final CurrencyKey foreignCurrencyKey;
@@ -20,15 +22,12 @@ public final class ConversionInformation {
         this.rate = rate;
     }
 
-    public static ConversionInformation sameCurrencyAs(Nobt nobt) {
-        return new ConversionInformation(
-                nobt.getCurrencyKey(),
-                BigDecimal.ONE
-        );
+    public static ConversionInformation defaultConversionInformation(CurrencyKey currencyKey) {
+        return new ConversionInformation(currencyKey, DEFAULT_RATE);
     }
 
-    public boolean hasDefaultRate() {
-        return rate.equals(BigDecimal.ONE);
+    public boolean isValid(CurrencyKey nobtCurrency) {
+        return isSameCurrency(nobtCurrency) == hasDefaultRate();
     }
 
     public CurrencyKey getForeignCurrencyKey() {
@@ -37,5 +36,13 @@ public final class ConversionInformation {
 
     public BigDecimal getRate() {
         return rate;
+    }
+
+    private boolean isSameCurrency(CurrencyKey nobtCurrency) {
+        return nobtCurrency.equals(foreignCurrencyKey);
+    }
+
+    private boolean hasDefaultRate() {
+        return DEFAULT_RATE.equals(rate);
     }
 }

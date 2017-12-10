@@ -1,7 +1,7 @@
 package io.nobt.core.domain;
 
-import io.nobt.core.domain.transaction.Transaction;
-import io.nobt.core.domain.transaction.combination.CombinationResult;
+import io.nobt.core.domain.debt.Debt;
+import io.nobt.core.domain.debt.combination.CombinationResult;
 
 import java.util.Collection;
 
@@ -12,7 +12,7 @@ public class HasChangesResult implements CombinationResult {
     }
 
     @Override
-    public void applyTo(Collection<Transaction> transactions) {
+    public void applyTo(Collection<Debt> debts) {
 
     }
 }

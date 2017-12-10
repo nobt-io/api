@@ -1,18 +1,15 @@
 package io.nobt.core.domain;
 
-import io.nobt.core.ConversionInformationInconsistentException;
-import io.nobt.core.domain.transaction.Transaction;
+import io.nobt.core.domain.debt.Debt;
 import io.nobt.core.optimizer.Optimizer;
 
-import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingLong;
+import static java.util.stream.Collectors.*;
 
 public class Nobt {
 
@@ -21,17 +18,19 @@ public class Nobt {
     private final String name;
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
+    private final Set<Payment> payments;
     private final ZonedDateTime createdOn;
     private final Optimizer optimizer;
 
-    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn, Optimizer optimizer) {
+    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, Set<Payment> payments, ZonedDateTime createdOn, Optimizer optimizer) {
         this.id = id;
         this.currencyKey = currencyKey;
         this.name = name;
         this.explicitParticipants = new HashSet<>(explicitParticipants);
         this.expenses = new HashSet<>(expenses);
+        this.payments = new HashSet<>(payments);
         this.createdOn = createdOn;
-	    this.optimizer = optimizer;
+        this.optimizer = optimizer;
     }
 
     public NobtId getId() {
@@ -46,58 +45,79 @@ public class Nobt {
         return name;
     }
 
-	public Optimizer getOptimizer() {
-		return optimizer;
-	}
+    public Optimizer getOptimizer() {
+        return optimizer;
+    }
 
-	public Set<Expense> getExpenses() {
+    public Set<Expense> getExpenses() {
         return Collections.unmodifiableSet(expenses);
+    }
+
+    public Set<Payment> getPayments() {
+        return payments;
     }
 
     public Set<Person> getParticipatingPersons() {
 
-        final HashSet<Person> allPersons = new HashSet<>(explicitParticipants);
+        final Set<Person> participantsFromCashFlows = Stream.of(expenses, payments)
+                .flatMap(Collection::stream)
+                .map(CashFlow::getParticipants)
+                .flatMap(Collection::stream)
+                .collect(toSet());
 
-        expenses.stream()
-                .flatMap(expense -> expense.getParticipants().stream() )
-                .forEach(allPersons::add);
-
-        return allPersons;
+        return Stream.of(explicitParticipants, participantsFromCashFlows)
+                .flatMap(Collection::stream)
+                .collect(toCollection(HashSet::new));
     }
 
-    public List<Transaction> getOptimalTransactions() {
-        return optimizer.apply(getAllTransactions());
+    private Stream<CashFlow> getAllCashFlows() {
+        return Stream.of(expenses, payments).flatMap(Collection::stream);
     }
 
-	private List<Transaction> getAllTransactions() {
-		return expenses
-				.stream()
-				.flatMap(expense -> expense.getTransactions().stream())
-				.collect(toList());
-	}
+    public List<Debt> getOptimizedDebts() {
+        return optimizer.apply(getAllDebts());
+    }
+
+    private List<Debt> getAllDebts() {
+        return getAllCashFlows()
+                .sorted(comparing(CashFlow::getCreatedOn))
+                .map(CashFlow::calculateAccruingDebts)
+                .sequential()
+                .flatMap(Collection::stream)
+                .collect(toList());
+    }
 
     public ZonedDateTime getCreatedOn() {
         return createdOn;
     }
 
-    public void addExpense(String name, String splitStrategy, Person debtee, Set<Share> shares, LocalDate date, ConversionInformation conversionInformation) {
+    public void createExpenseFrom(ExpenseDraft expenseDraft) {
 
-        if (conversionInformation == null) {
-            conversionInformation = ConversionInformation.sameCurrencyAs(this);
-        }
+        final Expense expense = Expense.fromDraft(getNextIdentifier(), currencyKey, expenseDraft);
 
-        final boolean isSameCurrency = conversionInformation.getForeignCurrencyKey().equals(currencyKey);
-
-        if (isSameCurrency && !conversionInformation.hasDefaultRate()) {
-            throw new ConversionInformationInconsistentException(this, conversionInformation);
-        }
-
-        final Expense newExpense = new Expense(null, name, splitStrategy, debtee, conversionInformation, shares, date, ZonedDateTime.now(ZoneOffset.UTC));
-
-        expenses.add(newExpense);
+        expenses.add(expense);
     }
 
-    public void removeExpense(Long expenseId) {
-        this.expenses.removeIf( e -> e.getId().equals(expenseId) );
+    public void createPaymentFrom(PaymentDraft paymentDraft) {
+
+        final Payment payment = Payment.fromDraft(getNextIdentifier(), currencyKey, paymentDraft);
+
+        payments.add(payment);
+    }
+
+    private long getNextIdentifier() {
+        return getAllCashFlows()
+                .map(CashFlow::getId)
+                .max(comparingLong(id -> id))
+                .map(Nobt::incrementByOne)
+                .orElse(1L);
+    }
+
+    private static long incrementByOne(long value) {
+        return value + 1;
+    }
+
+    public void removeExpense(long expenseId) {
+        this.expenses.removeIf(e -> e.getId() == expenseId);
     }
 }

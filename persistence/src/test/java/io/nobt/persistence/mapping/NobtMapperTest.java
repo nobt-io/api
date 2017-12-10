@@ -1,14 +1,16 @@
 package io.nobt.persistence.mapping;
 
-import io.nobt.persistence.entity.ExpenseEntity;
-import io.nobt.persistence.entity.NobtEntity;
+import io.nobt.persistence.cashflow.expense.ExpenseEntity;
+import io.nobt.persistence.cashflow.expense.ExpenseMapper;
+import io.nobt.persistence.cashflow.payment.PaymentMapper;
+import io.nobt.persistence.nobt.NobtEntity;
+import io.nobt.persistence.nobt.NobtMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static java.util.Collections.emptySet;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -21,7 +23,7 @@ public class NobtMapperTest {
 
     @Before
     public void setUp() throws Exception {
-        sut = new NobtMapper(expenseMapper);
+        sut = new NobtMapper(expenseMapper, new PaymentMapper());
     }
 
     @Test

@@ -6,13 +6,12 @@ import io.nobt.application.BodyParser;
 import io.nobt.application.NobtApplication;
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.UnknownNobtException;
-import io.nobt.core.domain.Nobt;
-import io.nobt.core.domain.NobtFactory;
-import io.nobt.core.domain.NobtId;
-import io.nobt.persistence.NobtRepository;
-import io.nobt.persistence.NobtRepositoryCommand;
+import io.nobt.core.commands.CreateExpenseCommand;
+import io.nobt.core.commands.CreatePaymentCommand;
+import io.nobt.core.commands.DeleteExpenseCommand;
+import io.nobt.core.commands.RetrieveNobtCommand;
+import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
-import io.nobt.rest.payloads.CreateExpenseInput;
 import io.nobt.rest.payloads.CreateNobtInput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,12 +24,13 @@ import spark.Service;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import java.util.HashSet;
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Set;
 
 import static javax.ws.rs.core.Response.Status.*;
 
-public class NobtRestApi {
+public class NobtRestApi implements Closeable {
 
     private static final Logger LOGGER = LogManager.getLogger(NobtRestApi.class);
 
@@ -58,32 +58,8 @@ public class NobtRestApi {
         registerApplicationRoutes();
         registerTestFailRoute();
 
-        http.exception(UnknownNobtException.class, (e, request, response) -> {
-
-            final ThrowableProblem problem = Problem.builder()
-                    .withStatus(NOT_FOUND)
-                    .withDetail("The nobt you are looking for cannot be found.")
-                    .build();
-
-            writeProblemAsJsonToResponse(response, problem);
-        });
-
-        http.exception(ConversionInformationInconsistentException.class, (e, request, response) -> {
-
-            final ConversionInformationInconsistentException exception = (ConversionInformationInconsistentException) e;
-
-            final ThrowableProblem problem = Problem.builder()
-                    .withStatus(BAD_REQUEST)
-                    .withTitle("The supplied conversion information is inconsistent.")
-                    .withDetail("Either supply a foreign currency different from the nobt-currency or a rate of 1.")
-                    .with("nobtCurrency", exception.getNobtCurrencyKey())
-                    .with("foreignCurrency", exception.getForeignCurrencyKey().getForeignCurrencyKey())
-                    .with("foreignCurrencyRate", exception.getForeignCurrencyKey().getRate())
-                    .build();
-
-            writeProblemAsJsonToResponse(response, problem);
-        });
-
+        registerUnknownNobtExceptionHandler();
+        registerConversionInformationInconsistentExceptionHandler();
         registerValidationErrorExceptionHandler();
         registerUncaughtExceptionHandler();
     }
@@ -92,29 +68,36 @@ public class NobtRestApi {
         registerCreateNobtRoute();
         registerRetrieveNobtRoute();
         registerCreateExpenseRoute();
+        registerCreatePaymentRoute();
         registerDeleteExpenseRoute();
     }
 
     private void registerCreateExpenseRoute() {
         http.post("/nobts/:nobtId/expenses", "application/json", (req, resp) -> {
 
-            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
-            final CreateExpenseInput input = bodyParser.parseBodyAs(req, CreateExpenseInput.class);
+            final NobtId nobtId = decodeNobtIdentifierToDatabaseId(req);
+            final ExpenseDraft expenseDraft = bodyParser.parseBodyAs(req, ExpenseDraft.class);
 
 
-            nobtRepositoryCommandInvoker.invoke(new NobtRepositoryCommand<Void>() {
-                @Override
-                public Void execute(NobtRepository repository) {
-
-                    final Nobt nobt = repository.getById(databaseId);
-                    nobt.addExpense(input.name, input.splitStrategy, input.debtee, new HashSet<>(input.shares), input.date, input.conversionInformation);
-                    repository.save(nobt);
-
-                    return null;
-                }
-            });
+            nobtRepositoryCommandInvoker.invoke(new CreateExpenseCommand(nobtId, expenseDraft));
 
             // TODO return id of expense
+            resp.status(201);
+
+            return "";
+        });
+    }
+
+    private void registerCreatePaymentRoute() {
+        http.post("/nobts/:nobtId/payments", "application/json", (req, resp) -> {
+
+            final NobtId nobtId = decodeNobtIdentifierToDatabaseId(req);
+            final PaymentDraft paymentDraft = bodyParser.parseBodyAs(req, PaymentDraft.class);
+
+
+            nobtRepositoryCommandInvoker.invoke(new CreatePaymentCommand(nobtId, paymentDraft));
+
+            // TODO return id of payment
             resp.status(201);
 
             return "";
@@ -125,21 +108,11 @@ public class NobtRestApi {
 
         http.delete("/nobts/:nobtId/expenses/:expenseId", (req, res) -> {
 
-            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
+            final NobtId nobtId = decodeNobtIdentifierToDatabaseId(req);
             final Long expenseId = Long.parseLong(req.params(":expenseId"));
 
 
-            nobtRepositoryCommandInvoker.invoke(new NobtRepositoryCommand<Void>() {
-                @Override
-                public Void execute(NobtRepository repository) {
-
-                    final Nobt nobt = repository.getById(databaseId);
-                    nobt.removeExpense(expenseId);
-                    repository.save(nobt);
-
-                    return null;
-                }
-            });
+            nobtRepositoryCommandInvoker.invoke(new DeleteExpenseCommand(nobtId, expenseId));
 
 
             res.status(204);
@@ -151,10 +124,10 @@ public class NobtRestApi {
     private void registerRetrieveNobtRoute() {
         http.get("/nobts/:nobtId", (req, res) -> {
 
-            final NobtId databaseId = decodeNobtIdentifierToDatabaseId(req);
+            final NobtId nobtId = decodeNobtIdentifierToDatabaseId(req);
 
 
-            final Nobt nobt = nobtRepositoryCommandInvoker.invoke(repository -> repository.getById(databaseId));
+            final Nobt nobt = nobtRepositoryCommandInvoker.invoke(new RetrieveNobtCommand(nobtId));
 
 
             res.header("Content-Type", "application/json");
@@ -214,6 +187,36 @@ public class NobtRestApi {
         });
     }
 
+    private void registerUnknownNobtExceptionHandler() {
+        http.exception(UnknownNobtException.class, (e, request, response) -> {
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(NOT_FOUND)
+                    .withDetail("The nobt you are looking for cannot be found.")
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
+        });
+    }
+
+    private void registerConversionInformationInconsistentExceptionHandler() {
+        http.exception(ConversionInformationInconsistentException.class, (e, request, response) -> {
+
+            final ConversionInformationInconsistentException exception = (ConversionInformationInconsistentException) e;
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(BAD_REQUEST)
+                    .withTitle("The supplied conversion information is inconsistent.")
+                    .withDetail("Either supply a foreign currency different from the nobt-currency or a rate of 1.")
+                    .with("nobtCurrency", exception.getNobtCurrencyKey())
+                    .with("foreignCurrency", exception.getConversionInformation().getForeignCurrencyKey())
+                    .with("foreignCurrencyRate", exception.getConversionInformation().getRate())
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
+        });
+    }
+
     private void registerValidationErrorExceptionHandler() {
         http.exception(ConstraintViolationException.class, (ve, request, response) -> {
 
@@ -226,6 +229,12 @@ public class NobtRestApi {
     private void registerUncaughtExceptionHandler() {
         http.exception(Exception.class, new UncaughtExceptionHandler());
         http.exception(RuntimeException.class, new UncaughtExceptionHandler());
+    }
+
+    @Override
+    public void close() throws IOException {
+        http.stop();
+        nobtRepositoryCommandInvoker.close();
     }
 
     private class UncaughtExceptionHandler implements ExceptionHandler {

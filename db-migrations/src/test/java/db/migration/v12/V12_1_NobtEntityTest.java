@@ -15,7 +15,7 @@ public class V12_1_NobtEntityTest {
         entity.setExplicitParticipants_legacy("Thomas;David");
 
 
-        entity.convert();
+        entity.migrate();
 
 
         assertThat(entity.getExplicitParticipants(), is(Sets.newHashSet(
@@ -31,7 +31,7 @@ public class V12_1_NobtEntityTest {
         entity.setExplicitParticipants_legacy(";David;;");
 
 
-        entity.convert();
+        entity.migrate();
 
 
         assertThat(entity.getExplicitParticipants(), is(Sets.newHashSet(
