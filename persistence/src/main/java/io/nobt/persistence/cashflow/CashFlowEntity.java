@@ -20,7 +20,7 @@ public abstract class CashFlowEntity {
     @JoinColumn(name = "nobtId", nullable = false, insertable = false, updatable = false)
     private NobtEntity nobt;
 
-    @Column(name = "createdOn", nullable = false)
+    @Column(name = "createdOn", nullable = false, updatable = false)
     private ZonedDateTime createdOn;
 
     public NobtEntity getNobt() {

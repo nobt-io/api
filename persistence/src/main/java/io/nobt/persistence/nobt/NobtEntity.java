@@ -25,8 +25,8 @@ public class NobtEntity {
     }
 
     @Id
-    @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq")
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "nobts_seq", sequenceName = "nobts_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "nobts_seq")
     private Long id;
 
     @Column(name = "nobtName", nullable = false, length = 50)
@@ -39,7 +39,7 @@ public class NobtEntity {
     @Column(name = "explicitParticipants")
     private Set<Person> explicitParticipants = new HashSet<>();
 
-    @Column(name = "createdOn", nullable = false)
+    @Column(name = "createdOn", nullable = false, updatable = false)
     private ZonedDateTime createdOn;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true)
