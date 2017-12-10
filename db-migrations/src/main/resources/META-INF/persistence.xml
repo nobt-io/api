@@ -6,11 +6,12 @@
 
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class>db.migration.v12.V12_1_NobtEntity</class>
+        <class>db.migration.v15_2.V15_2_NobtEntity</class>
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL92Dialect"/>
-            <property name="hibernate.hbm2ddl.auto" value="validate"/>
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
             <property name="hibernate.show_sql" value="false"/>
             <property name="hibernate.format_sql" value="false"/>
         </properties>
