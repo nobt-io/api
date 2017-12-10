@@ -16,7 +16,7 @@ addons:
       - "rest-api/build/distributions/rest-api-*.zip"
 
 before_deploy:
-- pip install --user awscli
+- pip install --user awsebcli
 
 deploy:
   provider: script

@@ -1,12 +1,16 @@
-# Download
+# Nobt.io API
+
+[![Build Status](https://travis-ci.org/nobt-io/api.svg?branch=master)](https://travis-ci.org/nobt-io/api)
+
+## Download
 
 The latest pre-built package is available [here](https://gitlab.com/nobt-io/api/builds/artifacts/master/file/rest-api/build/distributions/rest-api.zip?job=build_rest-api).
 
-# Run
+## Run
 
 To run the API, simply run either the `run-minimal` Batch- or Shell-Skript in the `bin/` folder.
 
-# Configuration
+## Configuration
 
 All configuration values have to be set as environment variables. Take a look at the `run-minimal`-scripts on how to do that.
 
@@ -19,23 +23,23 @@ Available configuration values:
 |MIGRATE_DATABASE_AT_STARTUP|bool|Migrates the defined database to the latest version. Incompatible with `USE_IN_MEMORY_DATABASE`.|false|
 |DATABASE_CONNECTION_STRING|string|The connection string the application should use to connect to a database.|-|
 
-# Documentation
+## Documentation
 
-## General
+### General
 
 There is a general documentation about the API which describes the endpoints and their functionality. You can find it under the `/docs` folder of the artifact. 
 
-# Building from source
+## Building from source
 
 To build the project from source, simply issue the following command: `./gradlew clean build`.
 This runs all the tests and packages the API into a shippable bundle.
 
 The ready-to-run API can be found under `build/distributions`.
 
-## Testing
+### Testing
 
 Unit tests can be run with the `test` command: `./gradlew test` 
 
-## Integration tests
+### Integration tests
 
 Docker has to be installed and running in order to execute the integration tests.
