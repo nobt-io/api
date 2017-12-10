@@ -198,11 +198,7 @@ public class NobtRestApi {
     }
 
     private void setupCORS() {
-        http.before((req, res) -> {
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Request-Method", "*");
-            res.header("Access-Control-Allow-Headers", "*");
-        });
+        http.before(new CORSHandler());
 
         http.options("/*", (req, res) -> {
             String accessControlRequestHeaders = req.headers("Access-Control-Request-Headers");
