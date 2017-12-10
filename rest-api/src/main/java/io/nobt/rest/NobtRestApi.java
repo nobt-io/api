@@ -69,7 +69,6 @@ public class NobtRestApi implements Closeable {
         registerRetrieveNobtRoute();
         registerCreateExpenseRoute();
         registerCreatePaymentRoute();
-        registerDeleteExpenseRoute();
     }
 
     private void registerCreateExpenseRoute() {
@@ -98,23 +97,6 @@ public class NobtRestApi implements Closeable {
 
             // TODO return id of payment
             resp.status(201);
-
-            return "";
-        });
-    }
-
-    private void registerDeleteExpenseRoute() {
-
-        http.delete("/nobts/:nobtId/expenses/:expenseId", (req, res) -> {
-
-            final NobtId nobtId = extractNobtId(req);
-            final Long expenseId = Long.parseLong(req.params(":expenseId"));
-
-
-            nobtRepositoryCommandInvoker.invoke(new DeleteExpenseCommand(nobtId, expenseId));
-
-
-            res.status(204);
 
             return "";
         });

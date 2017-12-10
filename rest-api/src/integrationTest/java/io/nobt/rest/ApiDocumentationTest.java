@@ -284,61 +284,6 @@ public class ApiDocumentationTest {
     }
 
     @Test
-    public void shouldDeleteExpense() throws Exception {
-
-        final String nobtId = client.createGrillfeierNobt();
-        client.addFleischExpense(nobtId);
-
-        final Long idOfFirstExpense = client.getNobt(nobtId).jsonPath().getLong("expenses[0].id");
-
-
-        given(this.documentationSpec)
-                .port(config.port())
-                .filter(
-                        document("delete-expense",
-                                preprocessRequest(
-                                        configureHost(),
-                                        replaceLocalhost()
-                                ),
-                                preprocessResponse(
-                                        replaceLocalhost()
-                                )
-                        )
-                )
-
-                .when()
-
-                .delete("/nobts/{nobtId}/expenses/{expenseId}", nobtId, idOfFirstExpense)
-
-                .then()
-
-                .statusCode(204);
-
-
-        client.getNobt(nobtId)
-                .then()
-                .body("expenses", response -> hasSize(0));
-    }
-
-    @Test
-    public void deletingExpenseThatDoesNotExistRespondsWith204() throws Exception {
-
-        final String nobtId = client.createGrillfeierNobt();
-        client.addFleischExpense(nobtId);
-
-        given(this.documentationSpec)
-                .port(config.port())
-
-                .when()
-
-                .delete("/nobts/{nobtId}/expenses/{expenseId}", nobtId, 104)
-
-                .then()
-
-                .statusCode(204);
-    }
-
-    @Test
     public void shouldRejectExpenseWithDuplicateDebtor() throws Exception {
 
         final String nobtId = client.createGrillfeierNobt();
