@@ -9,12 +9,21 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
 import javax.sql.DataSource;
+import java.lang.reflect.ParameterizedType;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class EntityManagerMigration<T> implements ConfigurationAware, JdbcMigration {
+public abstract class EntityManagerMigration<T extends Migratable> implements ConfigurationAware, JdbcMigration {
+
+    private final Class<T> type;
+
+    public EntityManagerMigration() {
+        type = ((Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+    }
 
     private DataSource dataSource;
 
@@ -22,10 +31,6 @@ public abstract class EntityManagerMigration<T> implements ConfigurationAware, J
     public void setFlywayConfiguration(FlywayConfiguration flywayConfiguration) {
         dataSource = flywayConfiguration.getDataSource();
     }
-
-    protected abstract List<T> retrieveEntities(EntityManager entityManager);
-
-    protected abstract T performUpdate(T entity);
 
     @Override
     public void migrate(Connection connection) throws Exception {
@@ -54,13 +59,18 @@ public abstract class EntityManagerMigration<T> implements ConfigurationAware, J
 
     private void doBatchUpdate(EntityManager entityManager) {
 
-        final List<T> entities = retrieveEntities(entityManager);
+        final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+
+        final CriteriaQuery<T> query = criteriaBuilder.createQuery(type);
+        query.select(query.from(type));
+
+        final List<T> entities = entityManager.createQuery(query).getResultList();
 
         for (final T entity : entities) {
 
-            final T newEntity = performUpdate(entity);
+            entity.migrate();
 
-            entityManager.persist(newEntity);
+            entityManager.persist(entity);
         }
     }
 }

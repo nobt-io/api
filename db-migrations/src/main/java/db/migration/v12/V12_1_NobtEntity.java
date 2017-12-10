@@ -1,5 +1,6 @@
 package db.migration.v12;
 
+import db.migration.Migratable;
 import io.nobt.persistence.JacksonUtil;
 import org.hibernate.annotations.Type;
 
@@ -12,7 +13,7 @@ import static java.util.stream.Collectors.toSet;
 
 @Table(name = "nobts")
 @Entity
-public class V12_1_NobtEntity {
+public class V12_1_NobtEntity implements Migratable {
 
     /**
      * Need value 2 for backwards compatibility with V4.1__insert_data.sql
@@ -44,13 +45,6 @@ public class V12_1_NobtEntity {
     @Column(name = "createdOn", nullable = false)
     private ZonedDateTime createdOn = ZonedDateTime.now();
 
-    public void convert() {
-
-        final String[] names = explicitParticipants_legacy.split(";");
-
-        explicitParticipants = Arrays.stream(names).filter(name -> !name.isEmpty()).map(V12Person::forName).collect(toSet());
-    }
-
     public Set<V12Person> getExplicitParticipants() {
         return explicitParticipants;
     }
@@ -68,4 +62,11 @@ public class V12_1_NobtEntity {
     }
 
 
+    @Override
+    public void migrate() {
+
+        final String[] names = explicitParticipants_legacy.split(";");
+
+        explicitParticipants = Arrays.stream(names).filter(name -> !name.isEmpty()).map(V12Person::forName).collect(toSet());
+    }
 }
