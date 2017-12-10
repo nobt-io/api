@@ -39,7 +39,7 @@ public class NobtEntity {
     @Column(name = "explicitParticipants")
     private Set<Person> explicitParticipants = new HashSet<>();
 
-    @Column(name = "createdOn", nullable = false)
+    @Column(name = "createdOn", nullable = false, updatable = false)
     private ZonedDateTime createdOn;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL, orphanRemoval = true)
