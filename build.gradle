@@ -2,7 +2,7 @@ allprojects {
     apply plugin: 'maven'
 
     group = 'io.nobt'
-    version = '0.0.10'
+    version = '1.0.0'
 
     repositories {
         mavenCentral()
