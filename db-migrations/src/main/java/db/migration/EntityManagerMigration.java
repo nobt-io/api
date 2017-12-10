@@ -2,6 +2,7 @@ package db.migration;
 
 import org.flywaydb.core.api.configuration.ConfigurationAware;
 import org.flywaydb.core.api.configuration.FlywayConfiguration;
+import org.flywaydb.core.api.migration.MigrationChecksumProvider;
 import org.flywaydb.core.api.migration.jdbc.JdbcMigration;
 import org.hibernate.jpa.AvailableSettings;
 
@@ -17,7 +18,7 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class EntityManagerMigration<T extends Migratable> implements ConfigurationAware, JdbcMigration {
+public abstract class EntityManagerMigration<T extends Migratable> implements ConfigurationAware, JdbcMigration, MigrationChecksumProvider {
 
     private final Class<T> type;
     private DataSource dataSource;
@@ -71,5 +72,10 @@ public abstract class EntityManagerMigration<T extends Migratable> implements Co
 
             entityManager.persist(entity);
         }
+    }
+
+    @Override
+    public Integer getChecksum() {
+        return type.getName().hashCode();
     }
 }
