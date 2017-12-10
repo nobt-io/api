@@ -13,7 +13,7 @@ addons:
   artifacts:
     s3_region: "eu-central-1"
     paths:
-      - "rest-api/build/distributions/rest-api-*.zip"
+      - $(rest-api/build/distributions/rest-api-*.zip)
 
 before_deploy:
 - pip install --user awsebcli
