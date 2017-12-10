@@ -25,26 +25,26 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author Hardy Ferentschik
  */
 @Documented
-@Constraint(validatedBy = { })
-@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
+@Constraint(validatedBy = {})
+@Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
 @Retention(RUNTIME)
 @ReportAsSingleViolation
 @NotNull
 @Size(min = 1)
 public @interface NotEmpty {
-	String message() default "{org.hibernate.validator.constraints.NotEmpty.message}";
+    String message() default "{org.hibernate.validator.constraints.NotEmpty.message}";
 
-	Class<?>[] groups() default { };
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default { };
+    Class<? extends Payload>[] payload() default {};
 
-	/**
-	 * Defines several {@code @NotEmpty} annotations on the same element.
-	 */
-	@Target({ METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER })
-	@Retention(RUNTIME)
-	@Documented
-	public @interface List {
-		NotEmpty[] value();
-	}
+    /**
+     * Defines several {@code @NotEmpty} annotations on the same element.
+     */
+    @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
+    @Retention(RUNTIME)
+    @Documented
+    public @interface List {
+        NotEmpty[] value();
+    }
 }

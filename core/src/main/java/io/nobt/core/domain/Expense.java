@@ -39,6 +39,10 @@ public class Expense implements CashFlow {
         this.createdOn = createdOn;
     }
 
+    private Expense(long id, ExpenseDraft draft, ConversionInformation conversionInformation) {
+        this(id, draft.getName(), draft.getSplitStrategy(), draft.getDebtee(), conversionInformation, new HashSet<>(draft.getShares()), draft.getDate(), ZonedDateTime.now(ZoneOffset.UTC));
+    }
+
     public static Expense fromDraft(long id, CurrencyKey nobtCurrency, ExpenseDraft draft) {
 
         final ConversionInformation conversionInformation = draft
@@ -50,10 +54,6 @@ public class Expense implements CashFlow {
         }
 
         return new Expense(id, draft, conversionInformation);
-    }
-
-    private Expense(long id, ExpenseDraft draft, ConversionInformation conversionInformation) {
-        this(id, draft.getName(), draft.getSplitStrategy(), draft.getDebtee(), conversionInformation, new HashSet<>(draft.getShares()), draft.getDate(), ZonedDateTime.now(ZoneOffset.UTC));
     }
 
     @Override

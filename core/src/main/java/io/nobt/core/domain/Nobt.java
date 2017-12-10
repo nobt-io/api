@@ -45,6 +45,10 @@ public class Nobt {
         return name;
     }
 
+    private static long incrementByOne(long value) {
+        return value + 1;
+    }
+
     public Optimizer getOptimizer() {
         return optimizer;
     }
@@ -78,6 +82,10 @@ public class Nobt {
         return optimizer.apply(getAllDebts());
     }
 
+    public ZonedDateTime getCreatedOn() {
+        return createdOn;
+    }
+
     private List<Debt> getAllDebts() {
         return getAllCashFlows()
                 .sorted(comparing(CashFlow::getCreatedOn))
@@ -85,10 +93,6 @@ public class Nobt {
                 .sequential()
                 .flatMap(Collection::stream)
                 .collect(toList());
-    }
-
-    public ZonedDateTime getCreatedOn() {
-        return createdOn;
     }
 
     public void createExpenseFrom(ExpenseDraft expenseDraft) {
@@ -111,10 +115,6 @@ public class Nobt {
                 .max(comparingLong(id -> id))
                 .map(Nobt::incrementByOne)
                 .orElse(1L);
-    }
-
-    private static long incrementByOne(long value) {
-        return value + 1;
     }
 
     public void removeExpense(long expenseId) {

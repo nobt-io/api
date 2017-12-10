@@ -31,14 +31,12 @@ import static org.springframework.restdocs.restassured.operation.preprocess.Rest
 public class ApiDocumentationTest {
 
     private static final int DOCUMENTED_PORT = 80;
-    private static NobtApplication nobtApplication;
-
-    @Rule
-    public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
-
     @ClassRule
     public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9.6");
 
+    private static NobtApplication nobtApplication;
+    @Rule
+    public final JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation("build/generated-snippets");
     private static Config config;
 
     @BeforeClass

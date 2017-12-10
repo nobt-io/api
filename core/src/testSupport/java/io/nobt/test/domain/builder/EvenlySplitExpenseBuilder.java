@@ -16,6 +16,8 @@ import static java.util.stream.Collectors.toSet;
 public class EvenlySplitExpenseBuilder {
 
     private final ExpenseBuilder expenseBuilder;
+    private Set<Person> debtors;
+    private Amount total;
 
     public EvenlySplitExpenseBuilder(ExpenseBuilder expenseBuilder) {
         this.expenseBuilder = expenseBuilder;
@@ -24,9 +26,6 @@ public class EvenlySplitExpenseBuilder {
     public EvenlySplitExpenseBuilder() {
         expenseBuilder = new ExpenseBuilder();
     }
-
-    private Set<Person> debtors;
-    private Amount total;
 
     public EvenlySplitExpenseBuilder withDebtee(Person debtee) {
         expenseBuilder.withDebtee(debtee);

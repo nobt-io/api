@@ -1,6 +1,7 @@
 package io.nobt.persistence.repository;
 
 import io.nobt.core.UnknownNobtException;
+import io.nobt.core.commands.RetrieveNobtCommand;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtId;
 import io.nobt.core.domain.Person;
@@ -8,7 +9,7 @@ import io.nobt.core.domain.Share;
 import io.nobt.persistence.DatabaseConfig;
 import io.nobt.persistence.DefaultEntityManagerNobtRepositoryFactory;
 import io.nobt.persistence.EntityManagerFactoryProvider;
-import io.nobt.persistence.EntityManagerNobtRepository;
+import io.nobt.persistence.TransactionalNobtRepositoryCommandInvoker;
 import io.nobt.sql.flyway.MigrationService;
 import io.nobt.test.domain.factories.ShareFactory;
 import io.nobt.test.persistence.PostgreSQLContainerDatabaseConfig;
@@ -17,9 +18,9 @@ import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -38,19 +39,13 @@ import static org.junit.Assume.assumeThat;
 
 public class EntityManagerNobtRepositoryIT {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Rule
-    public TransactionRule transactionRule;
-
     @ClassRule
     public static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer("postgres:9.6");
-
-    private static EntityManagerFactory entityManagerFactory;
-    private static DefaultEntityManagerNobtRepositoryFactory entityManagerNobtRepositoryFactory;
-
-    private EntityManagerNobtRepository sut;
+    private static TransactionalNobtRepositoryCommandInvoker invoker;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public TransactionRule transactionRule;
 
     @BeforeClass
     public static void setupEnvironment() {
@@ -60,27 +55,14 @@ public class EntityManagerNobtRepositoryIT {
         new MigrationService(databaseConfig).migrate();
 
         final EntityManagerFactoryProvider entityManagerFactoryProvider = new EntityManagerFactoryProvider();
+        final EntityManagerFactory entityManagerFactory = entityManagerFactoryProvider.create(databaseConfig);
 
-        entityManagerNobtRepositoryFactory = new DefaultEntityManagerNobtRepositoryFactory();
-        entityManagerFactory = entityManagerFactoryProvider.create(databaseConfig);
+        invoker = new TransactionalNobtRepositoryCommandInvoker(entityManagerFactory, new DefaultEntityManagerNobtRepositoryFactory());
     }
 
     @AfterClass
     public static void tearDownEnvironment() throws IOException {
-        entityManagerFactory.close();
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        EntityManager entityManager = entityManagerFactory.createEntityManager();
-
-        sut = entityManagerNobtRepositoryFactory.create(entityManager);
-        transactionRule = new TransactionRule(entityManager);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        sut.close();
+        invoker.close();
     }
 
     @Test
@@ -90,7 +72,6 @@ public class EntityManagerNobtRepositoryIT {
         final Person[] explicitParticipants = {thomas, david};
 
         final Nobt nobtToSave = aNobt()
-                .withId(null)
                 .withName(name)
                 .withParticipants(explicitParticipants)
                 .build();
@@ -110,7 +91,7 @@ public class EntityManagerNobtRepositoryIT {
     @Test
     public void shouldThrowExceptionForUnknownNobt() throws Exception {
 
-        final NobtId unknownId = new NobtId(1234L);
+        final NobtId unknownId = new NobtId("foobar");
 
         expectedException.expect(UnknownNobtException.class);
         fetch(unknownId);
@@ -124,7 +105,6 @@ public class EntityManagerNobtRepositoryIT {
         final LocalDate expenseDate = LocalDate.now();
 
         final Nobt nobtToSave = aNobt()
-                .withId(null)
                 .withExpenses(anExpense().withDebtee(thomas).withShares(thomasShare, matthiasShare).happendOn(expenseDate))
                 .build();
 
@@ -149,7 +129,7 @@ public class EntityManagerNobtRepositoryIT {
     @Test
     public void savingAndFetchingResultsInDifferentInstance() throws Exception {
 
-        final Nobt nobtToSave = aNobt().withId(null).build();
+        final Nobt nobtToSave = aNobt().build();
 
         final NobtId id = save(nobtToSave);
 
@@ -166,7 +146,6 @@ public class EntityManagerNobtRepositoryIT {
         final LocalDate expenseDate = LocalDate.now();
 
         final Nobt nobtToSave = aNobt()
-                .withId(null)
                 .withExpenses(anExpense().withDebtee(thomas).withShares(thomasShare, matthiasShare).happendOn(expenseDate))
                 .build();
 
@@ -194,25 +173,21 @@ public class EntityManagerNobtRepositoryIT {
         final ZonedDateTime firstOf2017 = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
 
         final Nobt nobtToSave = aNobt()
-                .withId(null)
                 .onDate(firstOf2017)
                 .build();
 
         final NobtId id = save(nobtToSave);
 
         final Nobt loadedNobt = fetch(id);
-        final ZonedDateTime persistedTimestamp = loadedNobt.getCreatedOn();
+        final Instant persistedTimestamp = loadedNobt.getCreatedOn().toInstant();
 
-        final ZonedDateTime expected = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
-
-        assertThat(persistedTimestamp, is(expected));
+        assertThat(persistedTimestamp, is(firstOf2017.toInstant()));
     }
 
     @Test
     public void shouldPersistPayment() throws Exception {
 
         final Nobt nobt = aNobt()
-                .withId(null)
                 .withParticipants(thomas, matthias)
                 .withPayments(
                         aPayment().withSender(thomas).withRecipient(matthias).withAmount(amount(3L))
@@ -233,10 +208,10 @@ public class EntityManagerNobtRepositoryIT {
     }
 
     private NobtId save(Nobt nobtToSave) {
-        return sut.save(nobtToSave);
+        return invoker.invoke(repository -> repository.save(nobtToSave));
     }
 
     private Nobt fetch(NobtId id) {
-        return sut.getById(id);
+        return invoker.invoke(new RetrieveNobtCommand(id));
     }
 }

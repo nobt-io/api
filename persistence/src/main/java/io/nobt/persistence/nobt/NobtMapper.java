@@ -4,6 +4,7 @@ import io.nobt.core.domain.*;
 import io.nobt.persistence.DomainModelMapper;
 import io.nobt.persistence.cashflow.expense.ExpenseEntity;
 import io.nobt.persistence.cashflow.payment.PaymentEntity;
+import io.nobt.persistence.mapping.NobtDatabaseIdResolver;
 
 import java.util.Set;
 
@@ -11,10 +12,12 @@ import static java.util.stream.Collectors.toSet;
 
 public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
 
+    private final NobtDatabaseIdResolver nobtDatabaseIdResolver;
     private final DomainModelMapper<ExpenseEntity, Expense> expenseMapper;
     private final DomainModelMapper<PaymentEntity, Payment> paymentMapper;
 
-    public NobtMapper(DomainModelMapper<ExpenseEntity, Expense> expenseMapper, DomainModelMapper<PaymentEntity, Payment> paymentMapper) {
+    public NobtMapper(NobtDatabaseIdResolver nobtDatabaseIdResolver, DomainModelMapper<ExpenseEntity, Expense> expenseMapper, DomainModelMapper<PaymentEntity, Payment> paymentMapper) {
+        this.nobtDatabaseIdResolver = nobtDatabaseIdResolver;
         this.expenseMapper = expenseMapper;
         this.paymentMapper = paymentMapper;
     }
@@ -27,7 +30,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         final Set<Payment> payments = databaseModel.getPayments().stream().map(paymentMapper::mapToDomainModel).collect(toSet());
 
         return new Nobt(
-                new NobtId(databaseModel.getId()),
+                new NobtId(databaseModel.getExternalId()),
                 new CurrencyKey(databaseModel.getCurrency()),
                 databaseModel.getName(),
                 explicitParticipants,
@@ -43,10 +46,13 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
 
         final NobtEntity nobtEntity = new NobtEntity();
 
-        if (domainModel.getId() != null) {
-            nobtEntity.setId(domainModel.getId().getId());
-        }
+        final NobtId nobtId = domainModel.getId();
 
+        nobtDatabaseIdResolver
+                .resolveDatabaseId(nobtId.getValue())
+                .ifPresent(nobtEntity::setId);
+
+        nobtEntity.setExternalId(nobtId.getValue());
         nobtEntity.setName(domainModel.getName());
         nobtEntity.setCurrency(domainModel.getCurrencyKey().getKey());
         nobtEntity.setCreatedOn(domainModel.getCreatedOn());

@@ -18,9 +18,9 @@ public final class StaticPersonFactory {
 	public static Person harald = Person.forName("Harald");
 	public static Person martin = Person.forName("Martin");
 
-	public static List<Person> ALL = Arrays.asList(
-			thomas, matthias, simon, lukas, thomasB, jacqueline, david, harald, martin
-	);
+    public static List<Person> ALL = Arrays.asList(
+            thomas, matthias, simon, lukas, thomasB, jacqueline, david, harald, martin
+    );
 
 	private StaticPersonFactory() { }
 }

@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static io.nobt.core.optimizer.Optimizer.defaultOptimizer;
-import static io.nobt.test.domain.provider.IDProvider.nextId;
 import static java.util.Collections.emptySet;
 
 public final class NobtBuilderProvider {
@@ -19,7 +18,7 @@ public final class NobtBuilderProvider {
 
     public static NobtBuilder aNobt() {
         return new NobtBuilder()
-                .withId(new NobtId(nextId()))
+                .withId(NobtId.newInstance())
                 .withExpenses(emptySet())
                 .withParticipants(emptySet())
                 .withPayments(emptySet())

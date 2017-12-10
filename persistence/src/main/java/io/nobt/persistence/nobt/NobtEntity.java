@@ -15,6 +15,9 @@ import java.util.Set;
 
 @Table(name = "nobts")
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "getByExternalId", query = "SELECT n FROM NobtEntity n WHERE n.externalId = :externalId")
+})
 public class NobtEntity {
 
     static {
@@ -48,6 +51,9 @@ public class NobtEntity {
     @Column(name = "optimizer")
     @Enumerated(EnumType.STRING)
     private Optimizer optimizer;
+
+    @Column(name = "externalId", length = 20, nullable = false, unique = true, updatable = false)
+    private String externalId;
 
     public String getName() {
         return name;
@@ -114,11 +120,19 @@ public class NobtEntity {
         this.createdOn = createdOn;
     }
 
-	public Optimizer getOptimizer() {
-		return optimizer;
-	}
+    public Optimizer getOptimizer() {
+        return optimizer;
+    }
 
-	public void setOptimizer(Optimizer optimizer) {
-		this.optimizer = optimizer;
-	}
+    public void setOptimizer(Optimizer optimizer) {
+        this.optimizer = optimizer;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }

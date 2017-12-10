@@ -70,12 +70,12 @@ public abstract class CashFlowEntity {
             return id;
         }
 
-        public NobtEntity getNobt() {
-            return nobt;
-        }
-
         public void setId(long id) {
             this.id = id;
+        }
+
+        public NobtEntity getNobt() {
+            return nobt;
         }
 
         public void setNobt(NobtEntity nobtId) {

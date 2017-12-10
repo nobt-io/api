@@ -2,7 +2,7 @@ package io.nobt.core.domain;
 
 import io.nobt.core.optimizer.Optimizer;
 
-import java.time.ZoneOffset;
+import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -11,19 +11,19 @@ import static java.util.Collections.emptySet;
 
 public final class NobtFactory {
 
+    private final Clock clock;
     private final Supplier<Optimizer> optimizerFactory;
-    private final Supplier<ZonedDateTime> nowFactory;
 
     public NobtFactory() {
-        this(Optimizer::defaultOptimizer, () -> ZonedDateTime.now(ZoneOffset.UTC));
+        this(Optimizer::defaultOptimizer, Clock.systemUTC());
     }
 
-    public NobtFactory(Supplier<Optimizer> optimizerFactory, Supplier<ZonedDateTime> nowFactory) {
+    public NobtFactory(Supplier<Optimizer> optimizerFactory, Clock clock) {
         this.optimizerFactory = optimizerFactory;
-        this.nowFactory = nowFactory;
+        this.clock = clock;
     }
 
     public Nobt create(String name, Set<Person> explicitParticipants, CurrencyKey currencyKey) {
-        return new Nobt(null, currencyKey, name, explicitParticipants, emptySet(), emptySet(), nowFactory.get(), optimizerFactory.get());
+        return new Nobt(NobtId.newInstance(), currencyKey, name, explicitParticipants, emptySet(), emptySet(), ZonedDateTime.now(clock), optimizerFactory.get());
     }
 }

@@ -73,14 +73,6 @@ applicationDefaultJvmArgs = [
         "-Djava.util.logging.manager=org.apache.logging.log4j.jul.LogManager"
 ]
 
-test {
-    useJUnit {
-        if (!project.hasProperty("includeSlowTests")) {
-            excludeCategories 'io.nobt.rest.Slow'
-        }
-    }
-}
-
 distTar {
     enabled = false
 }

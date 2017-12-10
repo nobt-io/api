@@ -4,9 +4,9 @@ import java.io.IOException;
 
 public class InMemoryRepositoryCommandInvoker implements NobtRepositoryCommandInvoker {
 
-    private final NobtRepository repository;
+    private final InMemoryNobtRepository repository;
 
-    public InMemoryRepositoryCommandInvoker(NobtRepository repository) {
+    public InMemoryRepositoryCommandInvoker(InMemoryNobtRepository repository) {
         this.repository = repository;
     }
 

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(JUnitParamsRunner.class)
 public class DebtTest {
 
-	@Test
+    @Test
     @Parameters(source = DebtTestCases.class)
     public void testCombineDebts(Debt first, Debt second, CombinationResult expected) throws Exception {
 

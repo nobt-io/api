@@ -28,7 +28,6 @@ public class NobtRepositoryCommandInvokerFactory {
         }
     }
 
-
     private NobtRepositoryCommandInvoker transactional() {
         return TransactionalNobtRepositoryCommandInvoker.forDatabaseConfig(config.database());
     }

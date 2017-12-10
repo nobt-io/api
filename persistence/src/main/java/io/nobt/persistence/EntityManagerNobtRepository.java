@@ -27,12 +27,15 @@ public class EntityManagerNobtRepository implements NobtRepository, Closeable {
 
         final NobtEntity persistedEntity = persistOrMerge(entityToPersist);
 
-        return new NobtId(persistedEntity.getId());
+        return new NobtId(persistedEntity.getExternalId());
     }
 
     private NobtEntity persistOrMerge(NobtEntity entity) {
         if (entity.getId() == null) {
             em.persist(entity);
+
+            // We have to flush for the DB-generated values to be present (externalId).
+            em.flush();
 
             return entity;
         } else {
@@ -43,7 +46,12 @@ public class EntityManagerNobtRepository implements NobtRepository, Closeable {
     @Override
     public Nobt getById(NobtId id) {
 
-        final Optional<NobtEntity> nobt = Optional.ofNullable(em.find(NobtEntity.class, id.getId()));
+        final Optional<NobtEntity> nobt = em
+                .createNamedQuery("getByExternalId", NobtEntity.class)
+                .setParameter("externalId", id.getValue())
+                .getResultList()
+                .stream()
+                .findFirst();
 
         return nobt.map(nobtMapper::mapToDomainModel).orElseThrow(UnknownNobtException::new);
     }

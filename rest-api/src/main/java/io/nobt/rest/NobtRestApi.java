@@ -75,9 +75,8 @@ public class NobtRestApi implements Closeable {
     private void registerCreateExpenseRoute() {
         http.post("/nobts/:nobtId/expenses", "application/json", (req, resp) -> {
 
-            final NobtId nobtId = decodeNobtIdentifierToDatabaseId(req);
+            final NobtId nobtId = extractNobtId(req);
             final ExpenseDraft expenseDraft = bodyParser.parseBodyAs(req, ExpenseDraft.class);
-
 
             nobtRepositoryCommandInvoker.invoke(new CreateExpenseCommand(nobtId, expenseDraft));
 
@@ -91,7 +90,7 @@ public class NobtRestApi implements Closeable {
     private void registerCreatePaymentRoute() {
         http.post("/nobts/:nobtId/payments", "application/json", (req, resp) -> {
 
-            final NobtId nobtId = decodeNobtIdentifierToDatabaseId(req);
+            final NobtId nobtId = extractNobtId(req);
             final PaymentDraft paymentDraft = bodyParser.parseBodyAs(req, PaymentDraft.class);
 
 
@@ -108,7 +107,7 @@ public class NobtRestApi implements Closeable {
 
         http.delete("/nobts/:nobtId/expenses/:expenseId", (req, res) -> {
 
-            final NobtId nobtId = decodeNobtIdentifierToDatabaseId(req);
+            final NobtId nobtId = extractNobtId(req);
             final Long expenseId = Long.parseLong(req.params(":expenseId"));
 
 
@@ -124,7 +123,7 @@ public class NobtRestApi implements Closeable {
     private void registerRetrieveNobtRoute() {
         http.get("/nobts/:nobtId", (req, res) -> {
 
-            final NobtId nobtId = decodeNobtIdentifierToDatabaseId(req);
+            final NobtId nobtId = extractNobtId(req);
 
 
             final Nobt nobt = nobtRepositoryCommandInvoker.invoke(new RetrieveNobtCommand(nobtId));
@@ -152,7 +151,7 @@ public class NobtRestApi implements Closeable {
 
 
             res.status(201);
-            res.header("Location", req.url() + "/" + nobt.getId().toExternalIdentifier());
+            res.header("Location", req.url() + "/" + nobt.getId().getValue());
             res.header("Content-Type", "application/json");
 
             return nobt;
@@ -165,9 +164,9 @@ public class NobtRestApi implements Closeable {
         });
     }
 
-    private static NobtId decodeNobtIdentifierToDatabaseId(Request req) {
+    private static NobtId extractNobtId(Request req) {
         final String externalIdentifier = req.params(":nobtId");
-        return NobtId.fromExternalIdentifier(externalIdentifier);
+        return new NobtId(externalIdentifier);
     }
 
     private void setupCORS() {
