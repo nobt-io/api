@@ -1,0 +1,24 @@
+language: java
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - sudo apt-get -y install python3-pip
+  - pip install awsebcli --upgrade --user
+
+script:
+  - ./gradlew clean build
+
+addons:
+  artifacts:
+    s3_region: "eu-central-1"
+    paths:
+      - "rest-api/build/distributions/rest-api-*.zip"
+
+deploy:
+  provider: script
+  script: .aws/deploy api-prod
+  on:
+    branch: master
