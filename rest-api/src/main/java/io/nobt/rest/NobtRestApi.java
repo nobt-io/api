@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.application.BodyParser;
 import io.nobt.application.NobtApplication;
 import io.nobt.core.ConversionInformationInconsistentException;
+import io.nobt.core.UnknownExpenseException;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.commands.CreateExpenseCommand;
 import io.nobt.core.commands.CreatePaymentCommand;
@@ -48,6 +49,10 @@ public class NobtRestApi implements Closeable {
         this.nobtFactory = nobtFactory;
     }
 
+    private static Long extractExpenseId(Request req) {
+        return Long.parseLong(req.params(":expenseId"));
+    }
+
     public void run(int port) {
         http.port(port);
 
@@ -59,16 +64,10 @@ public class NobtRestApi implements Closeable {
         registerTestFailRoute();
 
         registerUnknownNobtExceptionHandler();
+        registerUnknownExpenseExceptionHandler();
         registerConversionInformationInconsistentExceptionHandler();
         registerValidationErrorExceptionHandler();
         registerUncaughtExceptionHandler();
-    }
-
-    private void registerApplicationRoutes() {
-        registerCreateNobtRoute();
-        registerRetrieveNobtRoute();
-        registerCreateExpenseRoute();
-        registerCreatePaymentRoute();
     }
 
     private void registerCreateExpenseRoute() {
@@ -84,6 +83,14 @@ public class NobtRestApi implements Closeable {
 
             return "";
         });
+    }
+
+    private void registerApplicationRoutes() {
+        registerCreateNobtRoute();
+        registerRetrieveNobtRoute();
+        registerCreateExpenseRoute();
+        registerDeleteExpenseRoute();
+        registerCreatePaymentRoute();
     }
 
     private void registerCreatePaymentRoute() {
@@ -151,6 +158,15 @@ public class NobtRestApi implements Closeable {
         return new NobtId(externalIdentifier);
     }
 
+    private void registerDeleteExpenseRoute() {
+        http.delete("/nobts/:nobtId/expenses/:expenseId", "application/json", (req, resp) -> {
+
+            nobtRepositoryCommandInvoker.invoke(new DeleteExpenseCommand(extractNobtId(req), extractExpenseId(req)));
+            resp.status(204);
+            return "";
+        });
+    }
+
     private void setupCORS() {
         http.before(new CORSHandler());
 
@@ -174,6 +190,18 @@ public class NobtRestApi implements Closeable {
             final ThrowableProblem problem = Problem.builder()
                     .withStatus(NOT_FOUND)
                     .withDetail("The nobt you are looking for cannot be found.")
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
+        });
+    }
+
+    private void registerUnknownExpenseExceptionHandler() {
+        http.exception(UnknownExpenseException.class, (e, request, response) -> {
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(NOT_FOUND)
+                    .withDetail("The expense you are looking for cannot be found.")
                     .build();
 
             writeProblemAsJsonToResponse(response, problem);

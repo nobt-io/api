@@ -136,14 +136,17 @@ public class EntityManagerNobtRepositoryIT {
     }
 
     @Test
-    public void shouldRemoveOrphanExpense() throws Exception {
+    public void shouldDeleteExpense() throws Exception {
 
         final Share thomasShare = ShareFactory.randomShare(thomas);
         final Share matthiasShare = ShareFactory.randomShare(matthias);
         final LocalDate expenseDate = LocalDate.now();
 
         final Nobt nobtToSave = aNobt()
-                .withExpenses(anExpense().withDebtee(thomas).withShares(thomasShare, matthiasShare).happendOn(expenseDate))
+                .withExpenses(anExpense()
+                        .withDebtee(thomas)
+                        .withShares(thomasShare, matthiasShare)
+                        .happendOn(expenseDate))
                 .build();
 
         final NobtId id = save(nobtToSave);
@@ -156,11 +159,13 @@ public class EntityManagerNobtRepositoryIT {
 
         save(retrievedNobt);
 
-
         final Nobt nobtWithoutExpense = fetch(id);
 
         assertThat(nobtWithoutExpense, hasExpenses(
                 iterableWithSize(0)
+        ));
+        assertThat(nobtWithoutExpense, hasDeletedExpenses(
+                iterableWithSize(1)
         ));
     }
 
@@ -211,4 +216,5 @@ public class EntityManagerNobtRepositoryIT {
     private Nobt fetch(NobtId id) {
         return invoker.invoke(new RetrieveNobtCommand(id));
     }
+
 }

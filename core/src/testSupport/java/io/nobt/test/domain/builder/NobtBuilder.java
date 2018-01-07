@@ -12,6 +12,7 @@ import static java.util.stream.Collectors.toSet;
 public class NobtBuilder {
 
     private Set<Expense> expenses;
+    private Set<Expense> deletedExpenses;
     private Set<Person> participants;
     private Set<Payment> payments;
     private ZonedDateTime dateTime;
@@ -31,6 +32,19 @@ public class NobtBuilder {
 
     public NobtBuilder withExpenses(ExpenseBuilder... expenseBuilders) {
         return withExpenses(Arrays.stream(expenseBuilders).map(ExpenseBuilder::build).collect(toSet()));
+    }
+
+    public NobtBuilder withDeletedExpenses(Set<Expense> expenses) {
+        this.deletedExpenses = expenses;
+        return this;
+    }
+
+    public NobtBuilder withDeletedExpenses(Expense... expenses) {
+        return withDeletedExpenses(Arrays.stream(expenses).collect(toSet()));
+    }
+
+    public NobtBuilder withDeletedExpenses(ExpenseBuilder... expenseBuilders) {
+        return withDeletedExpenses(Arrays.stream(expenseBuilders).map(ExpenseBuilder::build).collect(toSet()));
     }
 
     public NobtBuilder withPayments(PaymentBuilder... payments) {
@@ -87,6 +101,7 @@ public class NobtBuilder {
                 name,
                 participants,
                 expenses,
+                deletedExpenses,
                 payments,
                 dateTime,
                 optimizer

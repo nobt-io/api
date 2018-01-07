@@ -1,5 +1,6 @@
 package io.nobt.core.domain;
 
+import io.nobt.core.UnknownExpenseException;
 import io.nobt.core.domain.debt.Debt;
 import io.nobt.core.optimizer.Optimizer;
 
@@ -18,16 +19,18 @@ public class Nobt {
     private final String name;
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
+    private final Set<Expense> deletedExpenses;
     private final Set<Payment> payments;
     private final ZonedDateTime createdOn;
     private final Optimizer optimizer;
 
-    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, Set<Payment> payments, ZonedDateTime createdOn, Optimizer optimizer) {
+    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, Set<Expense> deletedExpenses, Set<Payment> payments, ZonedDateTime createdOn, Optimizer optimizer) {
         this.id = id;
         this.currencyKey = currencyKey;
         this.name = name;
         this.explicitParticipants = new HashSet<>(explicitParticipants);
         this.expenses = new HashSet<>(expenses);
+        this.deletedExpenses = new HashSet<>(deletedExpenses);
         this.payments = new HashSet<>(payments);
         this.createdOn = createdOn;
         this.optimizer = optimizer;
@@ -55,6 +58,10 @@ public class Nobt {
 
     public Set<Expense> getExpenses() {
         return Collections.unmodifiableSet(expenses);
+    }
+
+    public Set<Expense> getDeletedExpenses() {
+        return Collections.unmodifiableSet(deletedExpenses);
     }
 
     public Set<Payment> getPayments() {
@@ -118,6 +125,14 @@ public class Nobt {
     }
 
     public void removeExpense(long expenseId) {
-        this.expenses.removeIf(e -> e.getId() == expenseId);
+
+        Expense expenseToDelete = expenses.stream()
+                .filter(e -> e.getId() == expenseId)
+                .findFirst()
+                .orElseThrow(UnknownExpenseException::new);
+
+        expenses.remove(expenseToDelete);
+        deletedExpenses.add(expenseToDelete);
     }
+
 }

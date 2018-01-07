@@ -37,6 +37,9 @@ public class ExpenseEntity extends CashFlowEntity {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted;
+
     public String getName() {
         return name;
     }
@@ -93,4 +96,15 @@ public class ExpenseEntity extends CashFlowEntity {
         this.date = date;
     }
 
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public boolean isNotDeleted() {
+        return !isDeleted();
+    }
 }

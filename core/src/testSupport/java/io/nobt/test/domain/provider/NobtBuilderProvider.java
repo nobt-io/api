@@ -20,6 +20,7 @@ public final class NobtBuilderProvider {
         return new NobtBuilder()
                 .withId(NobtId.newInstance())
                 .withExpenses(emptySet())
+                .withDeletedExpenses(emptySet())
                 .withParticipants(emptySet())
                 .withPayments(emptySet())
                 .withCurrency(new CurrencyKey("EUR"))

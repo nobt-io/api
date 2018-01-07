@@ -52,4 +52,5 @@ public class ExpenseMapper implements DomainModelMapper<ExpenseEntity, Expense> 
 
         return expense;
     }
+
 }
