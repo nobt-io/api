@@ -49,10 +49,6 @@ public class NobtRestApi implements Closeable {
         this.nobtFactory = nobtFactory;
     }
 
-    private static Long extractExpenseId(Request req) {
-        return Long.parseLong(req.params(":expenseId"));
-    }
-
     public void run(int port) {
         http.port(port);
 
@@ -109,6 +105,10 @@ public class NobtRestApi implements Closeable {
         });
     }
 
+    private static Long extractExpenseId(Request req) {
+        return Long.parseLong(req.params(":expenseId"));
+    }
+
     private void registerRetrieveNobtRoute() {
         http.get("/nobts/:nobtId", (req, res) -> {
 
@@ -120,8 +120,8 @@ public class NobtRestApi implements Closeable {
 
             res.header("Content-Type", "application/json");
 
-            return nobt;
-        }, objectMapper::writeValueAsString);
+            return serialize(nobt, req, nobtId);
+        });
     }
 
     private void registerCreateNobtRoute() {
@@ -143,14 +143,20 @@ public class NobtRestApi implements Closeable {
             res.header("Location", req.url() + "/" + nobt.getId().getValue());
             res.header("Content-Type", "application/json");
 
-            return nobt;
-        }, objectMapper::writeValueAsString);
+            return serialize(nobt, req, nobt.getId());
+        });
     }
 
     private void registerTestFailRoute() {
         http.get("/fail", (req, res) -> {
             throw new RuntimeException("This should go wrong.");
         });
+    }
+
+    private String serialize(Object entity, Request req, NobtId nobtId) throws JsonProcessingException {
+        return objectMapper.writer()
+                .withAttribute(ExpenseLinkFactory.class.getName(), new ExpenseLinkFactory(req.scheme(), req.host(), nobtId))
+                .writeValueAsString(entity);
     }
 
     private static NobtId extractNobtId(Request req) {

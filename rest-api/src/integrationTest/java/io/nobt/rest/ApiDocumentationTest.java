@@ -182,7 +182,7 @@ public class ApiDocumentationTest {
         final String nobtId = client.createGrillfeierNobt();
         client.addFleischExpense(nobtId);
 
-        final Long idOfFirstExpense = client.getNobt(nobtId).jsonPath().getLong("expenses[0].id");
+        final String linkToDelete = client.getNobt(nobtId).jsonPath().getString("expenses[0]._links.delete");
 
 
         given(this.documentationSpec)
@@ -201,7 +201,7 @@ public class ApiDocumentationTest {
 
                 .when()
 
-                .delete("/nobts/{nobtId}/expenses/{expenseId}", nobtId, idOfFirstExpense)
+                .delete(linkToDelete)
 
                 .then()
 
