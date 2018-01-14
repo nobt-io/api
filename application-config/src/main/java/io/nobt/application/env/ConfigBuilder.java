@@ -19,6 +19,7 @@ public class ConfigBuilder implements AcceptEnvironment, AcceptOverrides {
     private Integer port;
     private Boolean useInMemoryDatabase;
     private Boolean migrateDatabaseAtStartup;
+    private String schemeOverrideHeader;
 
     public static AcceptEnvironment newInstance() {
         return new ConfigBuilder();
@@ -55,6 +56,12 @@ public class ConfigBuilder implements AcceptEnvironment, AcceptOverrides {
     }
 
     @Override
+    public AcceptOverrides overrideSchemeOverrideHeader(String schemeOverrideHeader) {
+        this.schemeOverrideHeader = schemeOverrideHeader;
+        return this;
+    }
+
+    @Override
     public Config build() {
 
         if (port() == null) {
@@ -85,7 +92,7 @@ public class ConfigBuilder implements AcceptEnvironment, AcceptOverrides {
             ));
         }
 
-        return new Config(port(), useInMemoryDatabase(), migrateDatabaseAtStartup(), databaseConfig());
+        return new Config(port(), useInMemoryDatabase(), migrateDatabaseAtStartup(), databaseConfig(), schemeOverrideHeader());
     }
 
     private DatabaseConfig databaseConfig() {
@@ -122,6 +129,15 @@ public class ConfigBuilder implements AcceptEnvironment, AcceptOverrides {
         }
 
         return getEnvVariableValue(environment, PORT, Integer::parseInt).orElse(null);
+    }
+
+    private String schemeOverrideHeader() {
+
+        if (schemeOverrideHeader != null) {
+            return schemeOverrideHeader;
+        }
+
+        return getEnvVariableValue(environment, SCHEME_OVERRIDE_HEADER, Function.identity()).orElse(null);
     }
 
     private static <T> Optional<T> getEnvVariableValue(Environment environment, Config.Keys key, Function<String, T> mapper) {

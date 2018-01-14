@@ -49,14 +49,14 @@ public class NobtRestApi implements Closeable {
         this.nobtFactory = nobtFactory;
     }
 
-    public void run(int port) {
+    public void run(int port, String schemeOverrideHeader) {
         http.port(port);
 
         http.staticFiles.externalLocation("../docs");
 
         setupCORS();
 
-        registerApplicationRoutes();
+        registerApplicationRoutes(schemeOverrideHeader);
         registerTestFailRoute();
 
         registerUnknownNobtExceptionHandler();
@@ -81,9 +81,9 @@ public class NobtRestApi implements Closeable {
         });
     }
 
-    private void registerApplicationRoutes() {
-        registerCreateNobtRoute();
-        registerRetrieveNobtRoute();
+    private void registerApplicationRoutes(String schemeOverrideHeader) {
+        registerCreateNobtRoute(schemeOverrideHeader);
+        registerRetrieveNobtRoute(schemeOverrideHeader);
         registerCreateExpenseRoute();
         registerDeleteExpenseRoute();
         registerCreatePaymentRoute();
@@ -109,7 +109,7 @@ public class NobtRestApi implements Closeable {
         return Long.parseLong(req.params(":expenseId"));
     }
 
-    private void registerRetrieveNobtRoute() {
+    private void registerRetrieveNobtRoute(String schemeOverrideHeader) {
         http.get("/nobts/:nobtId", (req, res) -> {
 
             final NobtId nobtId = extractNobtId(req);
@@ -120,11 +120,11 @@ public class NobtRestApi implements Closeable {
 
             res.header("Content-Type", "application/json");
 
-            return serialize(nobt, req, nobtId);
+            return serialize(new SparkRequestParameters(req, schemeOverrideHeader), nobtId, nobt);
         });
     }
 
-    private void registerCreateNobtRoute() {
+    private void registerCreateNobtRoute(String schemeOverrideHeader) {
         http.post("/nobts", "application/json", (req, res) -> {
 
             final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
@@ -143,7 +143,7 @@ public class NobtRestApi implements Closeable {
             res.header("Location", req.url() + "/" + nobt.getId().getValue());
             res.header("Content-Type", "application/json");
 
-            return serialize(nobt, req, nobt.getId());
+            return serialize(new SparkRequestParameters(req, schemeOverrideHeader), nobt.getId(), nobt);
         });
     }
 
@@ -153,9 +153,9 @@ public class NobtRestApi implements Closeable {
         });
     }
 
-    private String serialize(Object entity, Request req, NobtId nobtId) throws JsonProcessingException {
+    private String serialize(RequestParameters requestParameters, NobtId nobtId, Object entity) throws JsonProcessingException {
         return objectMapper.writer()
-                .withAttribute(ExpenseLinkFactory.class.getName(), new ExpenseLinkFactory(req.scheme(), req.host(), nobtId))
+                .withAttribute(ExpenseLinkFactory.class.getName(), new ExpenseLinkFactory(requestParameters, nobtId))
                 .writeValueAsString(entity);
     }
 

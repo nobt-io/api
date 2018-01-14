@@ -22,6 +22,7 @@ Available configuration values:
 |USE_IN_MEMORY_DATABASE|bool|Subtitutes the actual datastore with a non-persistent hashtable.|false|
 |MIGRATE_DATABASE_AT_STARTUP|bool|Migrates the defined database to the latest version. Incompatible with `USE_IN_MEMORY_DATABASE`.|false|
 |DATABASE_CONNECTION_STRING|string|The connection string the application should use to connect to a database.|-|
+|SCHEME_OVERRIDE_HEADER|string|The HTTP-Header that the API uses to override the scheme of generated links, if present.|-|
 
 ## Documentation
 

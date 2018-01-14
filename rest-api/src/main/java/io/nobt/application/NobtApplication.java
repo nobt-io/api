@@ -76,7 +76,7 @@ public class NobtApplication implements Closeable {
 
         final int httpPort = config.port();
 
-        api.run(httpPort);
+        api.run(httpPort, config.schemeOverrideHeader());
     }
 
     private void migrateDatabase() {

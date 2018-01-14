@@ -34,12 +34,12 @@ public class ConfigBuilderTest {
     private static Object[] parseExamples() {
         return $(
                 $(
-                        staticEnvironment("8080", "false", "true", VALID_CONNECTION_STRING),
-                        new Config(8080, false, true, ConnectionStringAdapter.parse(VALID_CONNECTION_STRING))
+                        staticEnvironment("8080", "false", "true", VALID_CONNECTION_STRING, "X-Custom-Header"),
+                        new Config(8080, false, true, ConnectionStringAdapter.parse(VALID_CONNECTION_STRING), "X-Custom-Header")
                 ),
                 $(
-                        staticEnvironment("8080", "true", "false", unset()),
-                        new Config(8080, true, false, null)
+                        staticEnvironment("8080", "true", "false", unset(), unset()),
+                        new Config(8080, true, false, null, null)
                 )
         );
     }
@@ -62,16 +62,16 @@ public class ConfigBuilderTest {
 
     private static Object[] invalidEnvironments() {
         return $(
-                staticEnvironment(aPort(), unset(), unset(), unset()),
+                staticEnvironment(aPort(), unset(), unset(), unset(), "X-Custom-Header"),
 
-                staticEnvironment(aPort(), "false", "true", unset()),
-                staticEnvironment(aPort(), unset(), "true", unset()),
-                staticEnvironment(aPort(), "false", unset(), unset()),
+                staticEnvironment(aPort(), "false", "true", unset(), "X-Custom-Header"),
+                staticEnvironment(aPort(), unset(), "true", unset(), "X-Custom-Header"),
+                staticEnvironment(aPort(), "false", unset(), unset(), "X-Custom-Header"),
 
-                staticEnvironment(aPort(), "true", "true", unset()),
-                staticEnvironment(aPort(), "true", unset(), unset()),
+                staticEnvironment(aPort(), "true", "true", unset(), "X-Custom-Header"),
+                staticEnvironment(aPort(), "true", unset(), unset(), "X-Custom-Header"),
 
-                staticEnvironment(aPort(), "false", "false", unset())
+                staticEnvironment(aPort(), "false", "false", unset(), "X-Custom-Header")
         );
     }
 
@@ -83,10 +83,10 @@ public class ConfigBuilderTest {
 
     private static Object[] validEnvironments() {
         return $(
-                staticEnvironment(aPort(), "true", "false", unset()),
-                staticEnvironment(aPort(), "false", unset(), VALID_CONNECTION_STRING),
-                staticEnvironment(aPort(), unset(), "true", VALID_CONNECTION_STRING),
-                staticEnvironment(aPort(), unset(), unset(), VALID_CONNECTION_STRING)
+                staticEnvironment(aPort(), "true", "false", unset(), "X-Custom-Header"),
+                staticEnvironment(aPort(), "false", unset(), VALID_CONNECTION_STRING, "X-Custom-Header"),
+                staticEnvironment(aPort(), unset(), "true", VALID_CONNECTION_STRING, "X-Custom-Header"),
+                staticEnvironment(aPort(), unset(), unset(), VALID_CONNECTION_STRING, "X-Custom-Header")
         );
     }
 
@@ -98,12 +98,13 @@ public class ConfigBuilderTest {
         return "8080";
     }
 
-    private static StaticEnvironment staticEnvironment(final String port, final String inMemory, final String migrate, final String dbConnection) {
+    private static StaticEnvironment staticEnvironment(final String port, final String inMemory, final String migrate, final String dbConnection, String schemeOverrideHeader) {
         return new StaticEnvironment(new HashMap<String, String>() {{
             put(PORT.name(), port);
             put(MIGRATE_DATABASE_AT_STARTUP.name(), migrate);
             put(USE_IN_MEMORY_DATABASE.name(), inMemory);
             put(DATABASE_CONNECTION_STRING.name(), dbConnection);
+            put(SCHEME_OVERRIDE_HEADER.name(), schemeOverrideHeader);
         }});
     }
 }

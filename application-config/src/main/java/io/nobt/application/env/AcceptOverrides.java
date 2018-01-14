@@ -12,4 +12,6 @@ public interface AcceptOverrides extends AcceptEnvironment, BuildConfig {
 
     AcceptOverrides overrideDatabase(DatabaseConfig databaseConfig);
 
+    AcceptOverrides overrideSchemeOverrideHeader(String schemeOverrideHeader);
+
 }
