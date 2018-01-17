@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition;
 import com.fasterxml.jackson.databind.ser.VirtualBeanPropertyWriter;
 import com.fasterxml.jackson.databind.util.Annotations;
 import io.nobt.core.domain.Expense;
-import io.nobt.rest.ExpenseLinkFactory;
+import io.nobt.rest.links.ExpenseLinkFactory;
 
 import java.util.HashMap;
 

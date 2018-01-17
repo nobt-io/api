@@ -1,4 +1,4 @@
-package io.nobt.rest;
+package io.nobt.rest.links;
 
 import org.hamcrest.Matchers;
 import org.junit.Before;
@@ -9,7 +9,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SparkRequestParametersTest {
+public class BasePathTest {
 
     private Request requestMock;
 
@@ -22,36 +22,33 @@ public class SparkRequestParametersTest {
     public void shouldReadHostFromRequest() {
 
         when(requestMock.host()).thenReturn("localhost:8080");
-        final SparkRequestParameters sut = new SparkRequestParameters(requestMock, null);
+        when(requestMock.scheme()).thenReturn("http");
 
-        assertThat(sut.getHost(), Matchers.is("localhost:8080"));
+        final BasePath basePath = BasePath.parse(requestMock, null);
+
+        assertThat(basePath.asString(), Matchers.is("http://localhost:8080"));
     }
 
     @Test
     public void givenCustomSchemeFromCustomHeader_shouldOverrideRequestScheme() {
 
+        when(requestMock.host()).thenReturn("localhost:8080");
         when(requestMock.headers("X-Custom-Header")).thenReturn("https");
         when(requestMock.scheme()).thenReturn("http");
-        final SparkRequestParameters sut = new SparkRequestParameters(requestMock, "X-Custom-Header");
 
-        assertThat(sut.getScheme(), Matchers.is("https"));
+        final BasePath basePath = BasePath.parse(requestMock, "X-Custom-Header");
+
+        assertThat(basePath.asString(), Matchers.is("https://localhost:8080"));
     }
 
     @Test
     public void givenNoCustomSchemeFromCustomHeader_shouldUseRequestScheme() {
 
+        when(requestMock.host()).thenReturn("localhost:8080");
         when(requestMock.scheme()).thenReturn("http");
-        final SparkRequestParameters sut = new SparkRequestParameters(requestMock, "X-Custom-Header");
 
-        assertThat(sut.getScheme(), Matchers.is("http"));
-    }
+        final BasePath basePath = BasePath.parse(requestMock, "X-Custom-Header");
 
-    @Test
-    public void givenNoCustomHeader_shouldUseRequestScheme() {
-
-        when(requestMock.scheme()).thenReturn("http");
-        final SparkRequestParameters sut = new SparkRequestParameters(requestMock, null);
-
-        assertThat(sut.getScheme(), Matchers.is("http"));
+        assertThat(basePath.asString(), Matchers.is("http://localhost:8080"));
     }
 }

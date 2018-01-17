@@ -13,6 +13,9 @@ import io.nobt.core.commands.DeleteExpenseCommand;
 import io.nobt.core.commands.RetrieveNobtCommand;
 import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
+import io.nobt.rest.links.BasePath;
+import io.nobt.rest.links.ExpenseLinkFactory;
+import io.nobt.rest.links.NobtLinkFactory;
 import io.nobt.rest.payloads.CreateNobtInput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -120,7 +123,10 @@ public class NobtRestApi implements Closeable {
 
             res.header("Content-Type", "application/json");
 
-            return serialize(new SparkRequestParameters(req, schemeOverrideHeader), nobtId, nobt);
+            final BasePath basePath = BasePath.parse(req, schemeOverrideHeader);
+            final ExpenseLinkFactory expenseLinkFactory = new ExpenseLinkFactory(basePath, nobt);
+
+            return serialize(nobt, expenseLinkFactory);
         });
     }
 
@@ -138,12 +144,16 @@ public class NobtRestApi implements Closeable {
                 return repository.getById(id);
             });
 
+            final BasePath basePath = BasePath.parse(req, schemeOverrideHeader);
+
+            final NobtLinkFactory nobtLinkFactory = new NobtLinkFactory(basePath);
+            final ExpenseLinkFactory expenseLinkFactory = new ExpenseLinkFactory(basePath, nobt);
 
             res.status(201);
-            res.header("Location", req.url() + "/" + nobt.getId().getValue());
+            res.header("Location", nobtLinkFactory.createLinkToNobt(nobt).toString());
             res.header("Content-Type", "application/json");
 
-            return serialize(new SparkRequestParameters(req, schemeOverrideHeader), nobt.getId(), nobt);
+            return serialize(nobt, expenseLinkFactory);
         });
     }
 
@@ -153,9 +163,9 @@ public class NobtRestApi implements Closeable {
         });
     }
 
-    private String serialize(RequestParameters requestParameters, NobtId nobtId, Object entity) throws JsonProcessingException {
+    private String serialize(Object entity, ExpenseLinkFactory expenseLinkFactory) throws JsonProcessingException {
         return objectMapper.writer()
-                .withAttribute(ExpenseLinkFactory.class.getName(), new ExpenseLinkFactory(requestParameters, nobtId))
+                .withAttribute(ExpenseLinkFactory.class.getName(), expenseLinkFactory)
                 .writeValueAsString(entity);
     }
 
