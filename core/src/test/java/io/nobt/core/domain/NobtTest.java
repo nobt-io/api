@@ -161,8 +161,10 @@ public class NobtTest {
         nobt.removeExpense(1L);
 
 
-        assertThat(nobt, hasExpenses(iterableWithSize(0)));
-        assertThat(nobt, hasDeletedExpenses(iterableWithSize(1)));
+        assertThat(nobt, allOf(
+                hasExpenses(iterableWithSize(0)),
+                hasDeletedExpenses(iterableWithSize(1))
+        ));
     }
 
     @Test
