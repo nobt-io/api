@@ -3,9 +3,9 @@ package io.nobt.core.domain;
 import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.domain.debt.Debt;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -26,9 +26,9 @@ public class Expense implements CashFlow {
     private final ConversionInformation conversionInformation;
     private final Set<Share> shares;
     private final LocalDate date;
-    private final ZonedDateTime createdOn;
+    private final Instant createdOn;
 
-    public Expense(long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, ZonedDateTime createdOn) {
+    public Expense(long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, Instant createdOn) {
         this.id = id;
         this.name = name;
         this.splitStrategy = splitStrategy;
@@ -40,7 +40,7 @@ public class Expense implements CashFlow {
     }
 
     private Expense(long id, ExpenseDraft draft, ConversionInformation conversionInformation) {
-        this(id, draft.getName(), draft.getSplitStrategy(), draft.getDebtee(), conversionInformation, new HashSet<>(draft.getShares()), draft.getDate(), ZonedDateTime.now(ZoneOffset.UTC));
+        this(id, draft.getName(), draft.getSplitStrategy(), draft.getDebtee(), conversionInformation, new HashSet<>(draft.getShares()), draft.getDate(), Instant.now(Clock.systemUTC()));
     }
 
     public static Expense fromDraft(long id, CurrencyKey nobtCurrency, ExpenseDraft draft) {
@@ -89,7 +89,7 @@ public class Expense implements CashFlow {
                 .collect(toSet());
     }
 
-    public ZonedDateTime getCreatedOn() {
+    public Instant getCreatedOn() {
         return createdOn;
     }
 

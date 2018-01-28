@@ -7,8 +7,8 @@ import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static com.fasterxml.jackson.databind.annotation.JsonAppend.Prop;
@@ -18,7 +18,7 @@ import static com.fasterxml.jackson.databind.annotation.JsonAppend.Prop;
 )
 public abstract class ExpenseMixin extends Expense {
 
-    public ExpenseMixin(Long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, ZonedDateTime createdOn) {
+    public ExpenseMixin(Long id, String name, String splitStrategy, Person debtee, ConversionInformation conversionInformation, Set<Share> shares, LocalDate date, Instant createdOn) {
         super(id, name, splitStrategy, debtee, conversionInformation, shares, date, createdOn);
     }
 

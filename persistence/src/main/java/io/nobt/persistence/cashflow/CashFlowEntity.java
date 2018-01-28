@@ -4,7 +4,7 @@ import io.nobt.persistence.nobt.NobtEntity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Objects;
 
 import static javax.persistence.InheritanceType.TABLE_PER_CLASS;
@@ -21,7 +21,7 @@ public abstract class CashFlowEntity {
     private NobtEntity nobt;
 
     @Column(name = "createdOn", nullable = false, updatable = false)
-    private ZonedDateTime createdOn;
+    private Instant createdOn;
 
     public NobtEntity getNobt() {
         return nobt;
@@ -40,11 +40,11 @@ public abstract class CashFlowEntity {
         this.key = id;
     }
 
-    public ZonedDateTime getCreatedOn() {
+    public Instant getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(ZonedDateTime createdOn) {
+    public void setCreatedOn(Instant createdOn) {
         this.createdOn = createdOn;
     }
 

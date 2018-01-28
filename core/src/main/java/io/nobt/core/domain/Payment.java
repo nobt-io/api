@@ -4,9 +4,9 @@ import io.nobt.core.ConversionInformationInconsistentException;
 import io.nobt.core.domain.debt.Debt;
 import io.nobt.util.Sets;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
@@ -22,9 +22,9 @@ public class Payment implements CashFlow {
     private final String description;
     private final LocalDate date;
     private final ConversionInformation conversionInformation;
-    private final ZonedDateTime createdOn;
+    private final Instant createdOn;
 
-    public Payment(long id, Person sender, Person recipient, Amount amount, String description, LocalDate date, ConversionInformation conversionInformation, ZonedDateTime createdOn) {
+    public Payment(long id, Person sender, Person recipient, Amount amount, String description, LocalDate date, ConversionInformation conversionInformation, Instant createdOn) {
         this.id = id;
         this.sender = sender;
         this.recipient = recipient;
@@ -46,7 +46,7 @@ public class Payment implements CashFlow {
             throw new ConversionInformationInconsistentException(conversionInformation, nobtCurrency);
         }
 
-        return new Payment(id, draft.getSender(), draft.getRecipient(), draft.getAmount(), draft.getDescription(), draft.getDate(), conversionInformation, ZonedDateTime.now(ZoneOffset.UTC));
+        return new Payment(id, draft.getSender(), draft.getRecipient(), draft.getAmount(), draft.getDescription(), draft.getDate(), conversionInformation, Instant.now(Clock.systemUTC()));
     }
 
     @Override
@@ -84,7 +84,7 @@ public class Payment implements CashFlow {
     }
 
     @Override
-    public ZonedDateTime getCreatedOn() {
+    public Instant getCreatedOn() {
         return createdOn;
     }
 

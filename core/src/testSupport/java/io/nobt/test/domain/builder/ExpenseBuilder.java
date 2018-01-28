@@ -5,8 +5,8 @@ import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.Share;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -21,7 +21,7 @@ public class ExpenseBuilder {
     private String name;
     private String splitStrategy;
     private ConversionInformation conversionInformation;
-    private ZonedDateTime createdOn;
+    private Instant createdOn;
 
     public ExpenseBuilder withShares(Share... shares) {
         return withShares(Arrays.stream(shares).collect(toSet()));
@@ -62,7 +62,7 @@ public class ExpenseBuilder {
         return this;
     }
 
-    public ExpenseBuilder createdOn(ZonedDateTime dateTime) {
+    public ExpenseBuilder createdOn(Instant dateTime) {
         this.createdOn = dateTime;
         return this;
     }

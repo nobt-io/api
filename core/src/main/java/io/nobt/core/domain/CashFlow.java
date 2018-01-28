@@ -2,7 +2,7 @@ package io.nobt.core.domain;
 
 import io.nobt.core.domain.debt.Debt;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 public interface CashFlow {
@@ -11,7 +11,7 @@ public interface CashFlow {
 
     Set<Debt> calculateAccruingDebts();
 
-    ZonedDateTime getCreatedOn();
+    Instant getCreatedOn();
 
     Set<Person> getParticipants();
 }
