@@ -94,7 +94,7 @@ Once we add at least one expense, it makes sense to re-retrieve the nobt we crea
 
 include::{snippets}/get-nobt/http-request.adoc[]
 
-This time, the response is way more interesting, as it includes debts. Note that we also already added payment, which is immediately reflected in the resulting debts.
+This time, the response is way more interesting, as it includes debts. Note that we also already added a payment, which is immediately reflected in the resulting debts.
 
 include::{snippets}/get-nobt/http-response.adoc[]
 include::{snippets}/get-nobt/response-fields.adoc[]
