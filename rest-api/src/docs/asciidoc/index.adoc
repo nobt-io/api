@@ -108,3 +108,7 @@ If an expense can be deleted, it has a link attached with a link relation `delet
 include::{snippets}/delete-expense/http-request.adoc[]
 
 include::{snippets}/delete-expense/http-response.adoc[]
+
+After marking the expense as deleted, it is returned in a separate collection `deletedExpenses`:
+
+include::{snippets}/get-nobt-with-deleted-expense/http-response.adoc[]

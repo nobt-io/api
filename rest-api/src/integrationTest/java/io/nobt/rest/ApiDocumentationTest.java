@@ -208,9 +208,22 @@ public class ApiDocumentationTest {
                 .statusCode(204);
 
 
-        client.getNobt(nobtId)
+        given(this.documentationSpec)
+                .filter(
+                        document("get-nobt-with-deleted-expense",
+                                preprocessRequest(
+                                        configureHost(),
+                                        replaceLocalhost()
+                                ),
+                                preprocessResponse(
+                                        replaceLocalhost()
+                                )
+                        )
+                )
+                .get("/nobts/{id}", nobtId)
                 .then()
-                .body("expenses", response -> hasSize(0));
+                .body("expenses", response -> hasSize(0))
+                .body("deletedExpenses[0]._links", response -> not(hasKey("delete")));
     }
 
     @Test
