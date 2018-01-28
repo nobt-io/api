@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ser.VirtualBeanPropertyWriter;
 import com.fasterxml.jackson.databind.util.Annotations;
 import io.nobt.core.domain.Expense;
 import io.nobt.rest.links.ExpenseLinkFactory;
+import io.nobt.rest.links.LinkFactory;
 
 import java.util.HashMap;
 
@@ -25,10 +26,10 @@ public class ExpenseLinksPropertyWriter extends VirtualBeanPropertyWriter {
     @Override
     protected Object value(Object bean, JsonGenerator gen, SerializerProvider prov) throws Exception {
 
-        final ExpenseLinkFactory expenseLinkFactory = (ExpenseLinkFactory) prov.getAttribute(ExpenseLinkFactory.class.getName());
+        final LinkFactory<Expense> expenseLinkFactory = (LinkFactory<Expense>) prov.getAttribute(ExpenseLinkFactory.class.getName());
 
         return new HashMap<String, String>() {{
-            put("delete", expenseLinkFactory.createLinkToExpense((Expense) bean).toString());
+            put("delete", expenseLinkFactory.createLinkTo((Expense) bean).toString());
         }};
     }
 

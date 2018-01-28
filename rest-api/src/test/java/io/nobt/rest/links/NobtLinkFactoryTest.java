@@ -17,7 +17,7 @@ public class NobtLinkFactoryTest {
         final NobtLinkFactory nobtLinkFactory = new NobtLinkFactory(new BasePath("http", "localhost:1234"));
 
         final Nobt nobt = aNobt().withId(new NobtId("foo")).build();
-        final URI linkToNobt = nobtLinkFactory.createLinkToNobt(nobt);
+        final URI linkToNobt = nobtLinkFactory.createLinkTo(nobt);
 
         Assert.assertEquals("http://localhost:1234/nobts/foo", linkToNobt.toString());
     }

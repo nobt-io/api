@@ -15,6 +15,7 @@ import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
 import io.nobt.rest.links.BasePath;
 import io.nobt.rest.links.ExpenseLinkFactory;
+import io.nobt.rest.links.LinkFactory;
 import io.nobt.rest.links.NobtLinkFactory;
 import io.nobt.rest.payloads.CreateNobtInput;
 import org.apache.logging.log4j.LogManager;
@@ -124,7 +125,7 @@ public class NobtRestApi implements Closeable {
             res.header("Content-Type", "application/json");
 
             final BasePath basePath = BasePath.parse(req, schemeOverrideHeader);
-            final ExpenseLinkFactory expenseLinkFactory = new ExpenseLinkFactory(basePath, nobt);
+            final LinkFactory<Expense> expenseLinkFactory = new ExpenseLinkFactory(basePath, nobt);
 
             return serialize(nobt, expenseLinkFactory);
         });
@@ -146,11 +147,11 @@ public class NobtRestApi implements Closeable {
 
             final BasePath basePath = BasePath.parse(req, schemeOverrideHeader);
 
-            final NobtLinkFactory nobtLinkFactory = new NobtLinkFactory(basePath);
-            final ExpenseLinkFactory expenseLinkFactory = new ExpenseLinkFactory(basePath, nobt);
+            final LinkFactory<Nobt> nobtLinkFactory = new NobtLinkFactory(basePath);
+            final LinkFactory<Expense> expenseLinkFactory = new ExpenseLinkFactory(basePath, nobt);
 
             res.status(201);
-            res.header("Location", nobtLinkFactory.createLinkToNobt(nobt).toString());
+            res.header("Location", nobtLinkFactory.createLinkTo(nobt).toString());
             res.header("Content-Type", "application/json");
 
             return serialize(nobt, expenseLinkFactory);
@@ -163,7 +164,7 @@ public class NobtRestApi implements Closeable {
         });
     }
 
-    private String serialize(Object entity, ExpenseLinkFactory expenseLinkFactory) throws JsonProcessingException {
+    private String serialize(Object entity, LinkFactory<Expense> expenseLinkFactory) throws JsonProcessingException {
         return objectMapper.writer()
                 .withAttribute(ExpenseLinkFactory.class.getName(), expenseLinkFactory)
                 .writeValueAsString(entity);

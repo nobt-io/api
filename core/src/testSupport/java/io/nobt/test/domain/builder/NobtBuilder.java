@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toSet;
 public class NobtBuilder {
 
     private Set<Expense> expenses;
-    private Set<Expense> deletedExpenses;
+    private Set<DeletedExpense> deletedExpenses;
     private Set<Person> participants;
     private Set<Payment> payments;
     private ZonedDateTime dateTime;
@@ -35,7 +35,7 @@ public class NobtBuilder {
     }
 
     public NobtBuilder withDeletedExpenses(Set<Expense> expenses) {
-        this.deletedExpenses = expenses;
+        this.deletedExpenses = expenses.stream().map(DeletedExpense::new).collect(toSet());
         return this;
     }
 

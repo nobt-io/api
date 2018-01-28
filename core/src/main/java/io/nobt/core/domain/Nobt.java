@@ -19,12 +19,12 @@ public class Nobt {
     private final String name;
     private final Set<Person> explicitParticipants;
     private final Set<Expense> expenses;
-    private final Set<Expense> deletedExpenses;
+    private final Set<DeletedExpense> deletedExpenses;
     private final Set<Payment> payments;
     private final ZonedDateTime createdOn;
     private final Optimizer optimizer;
 
-    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, Set<Expense> deletedExpenses, Set<Payment> payments, ZonedDateTime createdOn, Optimizer optimizer) {
+    public Nobt(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, Set<DeletedExpense> deletedExpenses, Set<Payment> payments, ZonedDateTime createdOn, Optimizer optimizer) {
         this.id = id;
         this.currencyKey = currencyKey;
         this.name = name;
@@ -60,7 +60,7 @@ public class Nobt {
         return Collections.unmodifiableSet(expenses);
     }
 
-    public Set<Expense> getDeletedExpenses() {
+    public Set<DeletedExpense> getDeletedExpenses() {
         return Collections.unmodifiableSet(deletedExpenses);
     }
 
@@ -132,7 +132,7 @@ public class Nobt {
                 .orElseThrow(UnknownExpenseException::new);
 
         expenses.remove(expenseToDelete);
-        deletedExpenses.add(expenseToDelete);
+        deletedExpenses.add(new DeletedExpense(expenseToDelete));
     }
 
 }

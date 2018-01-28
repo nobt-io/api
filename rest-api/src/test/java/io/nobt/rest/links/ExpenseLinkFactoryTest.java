@@ -1,5 +1,6 @@
 package io.nobt.rest.links;
 
+import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Nobt;
 import io.nobt.core.domain.NobtId;
 import org.junit.Assert;
@@ -16,9 +17,9 @@ public class ExpenseLinkFactoryTest {
     public void shouldCreateUri() {
 
         final Nobt nobt = aNobt().withId(new NobtId("foo")).build();
-        final ExpenseLinkFactory expenseLinkFactory = new ExpenseLinkFactory(new BasePath("http", "localhost:1234"), nobt);
+        final LinkFactory<Expense> expenseLinkFactory = new ExpenseLinkFactory(new BasePath("http", "localhost:1234"), nobt);
 
-        final URI linkToExpense = expenseLinkFactory.createLinkToExpense(anExpense().withId(1).build());
+        final URI linkToExpense = expenseLinkFactory.createLinkTo(anExpense().withId(1).build());
 
         Assert.assertEquals("http://localhost:1234/nobts/foo/expenses/1", linkToExpense.toString());
     }

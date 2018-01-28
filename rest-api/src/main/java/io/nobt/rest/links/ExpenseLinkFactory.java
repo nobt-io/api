@@ -5,7 +5,7 @@ import io.nobt.core.domain.Nobt;
 
 import java.net.URI;
 
-public class ExpenseLinkFactory {
+public class ExpenseLinkFactory implements LinkFactory<Expense> {
 
     private final BasePath basePath;
     private final Nobt nobt;
@@ -15,10 +15,11 @@ public class ExpenseLinkFactory {
         this.nobt = nobt;
     }
 
-    public URI createLinkToExpense(Expense e) {
+    @Override
+    public URI createLinkTo(Expense expense) {
 
         final String nobtId = nobt.getId().getValue();
-        final long expenseId = e.getId();
+        final long expenseId = expense.getId();
 
         return URI.create(String.format("%s/nobts/%s/expenses/%d", basePath.asString(), nobtId, expenseId));
     }
