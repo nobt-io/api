@@ -98,3 +98,13 @@ This time, the response is way more interesting, as it includes debts. Note that
 
 include::{snippets}/get-nobt/http-response.adoc[]
 include::{snippets}/get-nobt/response-fields.adoc[]
+
+== Delete an expense
+
+Expenses can be deleted from the nobt in order to exclude it from the debt calculation. However, expenses are not actually deleted from the database but rather only marked as deleted.
+
+If an expense can be deleted, it has a link attached with a link relation `delete`. Sending an `HTTP` `DELETE` request to this link marks an expense as deleted. This operation cannot be undone.
+
+include::{snippets}/delete-expense/http-request.adoc[]
+
+include::{snippets}/delete-expense/http-response.adoc[]
