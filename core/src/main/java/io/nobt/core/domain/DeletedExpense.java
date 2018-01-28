@@ -1,5 +1,7 @@
 package io.nobt.core.domain;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Set;
@@ -7,9 +9,15 @@ import java.util.Set;
 public class DeletedExpense {
 
     private final Expense originalExpense;
+    private final Instant deletedOn;
 
     public DeletedExpense(Expense originalExpense) {
+        this(originalExpense, Clock.systemUTC().instant());
+    }
+
+    public DeletedExpense(Expense originalExpense, Instant deletedOn) {
         this.originalExpense = originalExpense;
+        this.deletedOn = deletedOn;
     }
 
     public long getId() {
@@ -50,5 +58,9 @@ public class DeletedExpense {
 
     public Expense getOriginalExpense() {
         return originalExpense;
+    }
+
+    public Instant getDeletedOn() {
+        return deletedOn;
     }
 }

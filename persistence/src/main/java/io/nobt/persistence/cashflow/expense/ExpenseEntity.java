@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -37,8 +38,8 @@ public class ExpenseEntity extends CashFlowEntity {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Column(name = "deleted", nullable = false, insertable = false)
-    private boolean deleted;
+    @Column(name = "deletedOn", insertable = false)
+    private Instant deletedOn;
 
     public String getName() {
         return name;
@@ -97,14 +98,18 @@ public class ExpenseEntity extends CashFlowEntity {
     }
 
     public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void markDeleted() {
-        this.deleted = true;
+        return deletedOn != null;
     }
 
     public boolean isNotDeleted() {
         return !isDeleted();
+    }
+
+    public Instant getDeletedOn() {
+        return deletedOn;
+    }
+
+    public void setDeletedOn(Instant deletedOn) {
+        this.deletedOn = deletedOn;
     }
 }

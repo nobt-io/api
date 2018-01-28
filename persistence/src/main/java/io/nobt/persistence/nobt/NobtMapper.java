@@ -34,8 +34,10 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
                 .collect(toSet());
         final Set<DeletedExpense> deletedExpenses = databaseModel.getExpenses().stream()
                 .filter(ExpenseEntity::isDeleted)
-                .map(expenseMapper::mapToDomainModel)
-                .map(DeletedExpense::new)
+                .map(expenseEntity -> {
+                    final Expense expense = expenseMapper.mapToDomainModel(expenseEntity);
+                    return new DeletedExpense(expense, expenseEntity.getDeletedOn());
+                })
                 .collect(toSet());
         final Set<Payment> payments = databaseModel.getPayments().stream()
                 .map(paymentMapper::mapToDomainModel)
@@ -74,9 +76,15 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
 
         domainModel.getExpenses().stream().map(expenseMapper::mapToDatabaseModel).forEach(nobtEntity::addExpense);
         domainModel.getDeletedExpenses().stream()
-                .map(DeletedExpense::getOriginalExpense)
-                .map(expenseMapper::mapToDatabaseModel)
-                .peek(ExpenseEntity::markDeleted)
+                .map(deletedExpense -> {
+
+                    final Expense originalExpense = deletedExpense.getOriginalExpense();
+                    final ExpenseEntity expenseEntity = expenseMapper.mapToDatabaseModel(originalExpense);
+
+                    expenseEntity.setDeletedOn(deletedExpense.getDeletedOn());
+
+                    return expenseEntity;
+                })
                 .forEach(nobtEntity::addExpense);
         domainModel.getPayments().stream().map(paymentMapper::mapToDatabaseModel).forEach(nobtEntity::addPayment);
 

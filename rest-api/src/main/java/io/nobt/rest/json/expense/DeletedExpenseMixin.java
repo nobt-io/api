@@ -5,12 +5,13 @@ import io.nobt.core.domain.DeletedExpense;
 import io.nobt.core.domain.Expense;
 import io.nobt.core.domain.Person;
 
+import java.time.Instant;
 import java.util.Set;
 
 public abstract class DeletedExpenseMixin extends DeletedExpense {
 
-    public DeletedExpenseMixin(Expense originalExpense) {
-        super(originalExpense);
+    public DeletedExpenseMixin(Expense originalExpense, Instant deletedOn) {
+        super(originalExpense, deletedOn);
     }
 
     @Override
