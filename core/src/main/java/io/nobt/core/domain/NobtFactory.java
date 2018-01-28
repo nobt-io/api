@@ -3,7 +3,7 @@ package io.nobt.core.domain;
 import io.nobt.core.optimizer.Optimizer;
 
 import java.time.Clock;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -24,6 +24,6 @@ public final class NobtFactory {
     }
 
     public Nobt create(String name, Set<Person> explicitParticipants, CurrencyKey currencyKey) {
-        return new Nobt(NobtId.newInstance(), currencyKey, name, explicitParticipants, emptySet(), emptySet(), emptySet(), ZonedDateTime.now(clock), optimizerFactory.get());
+        return new Nobt(NobtId.newInstance(), currencyKey, name, explicitParticipants, emptySet(), emptySet(), emptySet(), Instant.now(clock), optimizerFactory.get());
     }
 }

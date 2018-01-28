@@ -170,7 +170,7 @@ public class EntityManagerNobtRepositoryIT {
     @Test
     public void shouldCorrectlyHandleTimezones() throws Exception {
 
-        final ZonedDateTime firstOf2017 = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5));
+        final Instant firstOf2017 = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.ofHours(5)).toInstant();
 
         final Nobt nobtToSave = aNobt()
                 .onDate(firstOf2017)
@@ -179,9 +179,9 @@ public class EntityManagerNobtRepositoryIT {
         final NobtId id = save(nobtToSave);
 
         final Nobt loadedNobt = fetch(id);
-        final Instant persistedTimestamp = loadedNobt.getCreatedOn().toInstant();
+        final Instant persistedTimestamp = loadedNobt.getCreatedOn();
 
-        assertThat(persistedTimestamp, is(firstOf2017.toInstant()));
+        assertThat(persistedTimestamp, is(firstOf2017));
     }
 
     @Test

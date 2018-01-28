@@ -36,7 +36,7 @@ public class NobtFactoryTest {
                 hasCurrency(equalTo(EUR)),
                 hasParticipants(containsInAnyOrder(thomas)),
                 hasId(notNullValue(NobtId.class)),
-                hasCreationTime(equalTo(ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)))
+                hasCreationTime(equalTo(ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).toInstant()))
         ));
     }
 }

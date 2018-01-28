@@ -9,7 +9,7 @@ import io.nobt.persistence.json.NobtEntityModule;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,7 +40,7 @@ public class NobtEntity {
     private Set<Person> explicitParticipants = new HashSet<>();
 
     @Column(name = "createdOn", nullable = false, updatable = false)
-    private ZonedDateTime createdOn;
+    private Instant createdOn;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "nobt", cascade = CascadeType.ALL)
     private Set<ExpenseEntity> expenses = new HashSet<>();
@@ -112,11 +112,11 @@ public class NobtEntity {
         return id;
     }
 
-    public ZonedDateTime getCreatedOn() {
+    public Instant getCreatedOn() {
         return createdOn;
     }
 
-    public void setCreatedOn(ZonedDateTime createdOn) {
+    public void setCreatedOn(Instant createdOn) {
         this.createdOn = createdOn;
     }
 

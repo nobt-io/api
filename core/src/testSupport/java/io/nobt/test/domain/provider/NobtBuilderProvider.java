@@ -4,8 +4,7 @@ import io.nobt.core.domain.CurrencyKey;
 import io.nobt.core.domain.NobtId;
 import io.nobt.test.domain.builder.NobtBuilder;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.Clock;
 import java.util.UUID;
 
 import static io.nobt.core.optimizer.Optimizer.defaultOptimizer;
@@ -25,7 +24,7 @@ public final class NobtBuilderProvider {
                 .withPayments(emptySet())
                 .withCurrency(new CurrencyKey("EUR"))
                 .withName(UUID.randomUUID().toString())
-                .onDate(ZonedDateTime.now(ZoneOffset.UTC))
+                .onDate(Clock.systemUTC().instant())
                 .withOptimizer(defaultOptimizer());
     }
 }

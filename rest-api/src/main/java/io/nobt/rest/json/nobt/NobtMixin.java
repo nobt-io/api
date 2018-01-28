@@ -6,7 +6,7 @@ import io.nobt.core.domain.*;
 import io.nobt.core.domain.debt.Debt;
 import io.nobt.core.optimizer.Optimizer;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -14,7 +14,7 @@ import java.util.Set;
 public abstract class NobtMixin extends Nobt {
 
     public NobtMixin(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses,
-                     Set<DeletedExpense> deletedExpenses, ZonedDateTime createdOn, Optimizer optimizer) {
+                     Set<DeletedExpense> deletedExpenses, Instant createdOn, Optimizer optimizer) {
         super(id, currencyKey, name, explicitParticipants, expenses, deletedExpenses, Collections.emptySet(), createdOn, optimizer);
     }
 
