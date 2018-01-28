@@ -161,11 +161,9 @@ public class EntityManagerNobtRepositoryIT {
 
         final Nobt nobtWithoutExpense = fetch(id);
 
-        assertThat(nobtWithoutExpense, hasExpenses(
-                iterableWithSize(0)
-        ));
-        assertThat(nobtWithoutExpense, hasDeletedExpenses(
-                iterableWithSize(1)
+        assertThat(nobtWithoutExpense, allOf(
+                hasExpenses(iterableWithSize(0)),
+                hasDeletedExpenses(iterableWithSize(1))
         ));
     }
 
