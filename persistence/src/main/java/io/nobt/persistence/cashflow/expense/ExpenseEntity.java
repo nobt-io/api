@@ -37,7 +37,7 @@ public class ExpenseEntity extends CashFlowEntity {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    @Column(name = "deleted", nullable = false)
+    @Column(name = "deleted", nullable = false, insertable = false)
     private boolean deleted;
 
     public String getName() {
@@ -100,8 +100,8 @@ public class ExpenseEntity extends CashFlowEntity {
         return deleted;
     }
 
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
+    public void markDeleted() {
+        this.deleted = true;
     }
 
     public boolean isNotDeleted() {

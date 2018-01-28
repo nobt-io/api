@@ -74,7 +74,7 @@ public class NobtMapper implements DomainModelMapper<NobtEntity, Nobt> {
         domainModel.getExpenses().stream().map(expenseMapper::mapToDatabaseModel).forEach(nobtEntity::addExpense);
         domainModel.getDeletedExpenses().stream()
                 .map(expenseMapper::mapToDatabaseModel)
-                .peek(e -> e.setDeleted(true))
+                .peek(ExpenseEntity::markDeleted)
                 .forEach(nobtEntity::addExpense);
         domainModel.getPayments().stream().map(paymentMapper::mapToDatabaseModel).forEach(nobtEntity::addPayment);
 

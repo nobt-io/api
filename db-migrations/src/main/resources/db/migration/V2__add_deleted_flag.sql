@@ -1,3 +1,3 @@
 ALTER TABLE expenses
-  ADD deleted BOOLEAN;
+  ADD deleted BOOLEAN NOT NULL;
 
