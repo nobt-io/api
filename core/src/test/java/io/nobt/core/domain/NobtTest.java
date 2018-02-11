@@ -16,8 +16,7 @@ import static io.nobt.test.domain.factories.AmountFactory.amount;
 import static io.nobt.test.domain.factories.StaticPersonFactory.david;
 import static io.nobt.test.domain.factories.StaticPersonFactory.thomas;
 import static io.nobt.test.domain.matchers.ExpenseMatchers.hasId;
-import static io.nobt.test.domain.matchers.NobtMatchers.hasExpenses;
-import static io.nobt.test.domain.matchers.NobtMatchers.hasPayments;
+import static io.nobt.test.domain.matchers.NobtMatchers.*;
 import static io.nobt.test.domain.matchers.PaymentMatchers.*;
 import static io.nobt.test.domain.provider.ExpenseBuilderProvider.anExpense;
 import static io.nobt.test.domain.provider.ExpenseDraftBuilderProvider.anExpenseDraft;
@@ -162,7 +161,10 @@ public class NobtTest {
         nobt.removeExpense(1L);
 
 
-        assertThat(nobt, hasExpenses(iterableWithSize(0)));
+        assertThat(nobt, allOf(
+                hasExpenses(iterableWithSize(0)),
+                hasDeletedExpenses(iterableWithSize(1))
+        ));
     }
 
     @Test

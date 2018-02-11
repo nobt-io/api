@@ -6,24 +6,22 @@ import java.util.Objects;
 
 public final class Config {
 
-    public enum Keys {
-        PORT,
-        DATABASE_CONNECTION_STRING,
-        USE_IN_MEMORY_DATABASE,
-        MIGRATE_DATABASE_AT_STARTUP
-    }
-
-    public Config(Integer port, Boolean useInMemoryDatabase, Boolean migrateDatabaseAtStartUp, DatabaseConfig databaseConfig) {
+    private final Integer port;
+    private final Boolean useInMemoryDatabase;
+    private final Boolean migrateDatabaseAtStartUp;
+    private final DatabaseConfig databaseConfig;
+    private final String schemeOverrideHeader;
+    public Config(Integer port, Boolean useInMemoryDatabase, Boolean migrateDatabaseAtStartUp, DatabaseConfig databaseConfig, String schemeOverrideHeader) {
         this.port = port;
         this.useInMemoryDatabase = useInMemoryDatabase;
         this.migrateDatabaseAtStartUp = migrateDatabaseAtStartUp;
         this.databaseConfig = databaseConfig;
+        this.schemeOverrideHeader = schemeOverrideHeader;
     }
 
-    private Integer port;
-    private Boolean useInMemoryDatabase;
-    private Boolean migrateDatabaseAtStartUp;
-    private DatabaseConfig databaseConfig;
+    public String schemeOverrideHeader() {
+        return schemeOverrideHeader;
+    }
 
     public Integer port() {
         return port;
@@ -49,11 +47,20 @@ public final class Config {
         return Objects.equals(port, config.port) &&
                 Objects.equals(useInMemoryDatabase, config.useInMemoryDatabase) &&
                 Objects.equals(migrateDatabaseAtStartUp, config.migrateDatabaseAtStartUp) &&
-                Objects.equals(databaseConfig, config.databaseConfig);
+                Objects.equals(databaseConfig, config.databaseConfig) &&
+                Objects.equals(schemeOverrideHeader, config.schemeOverrideHeader);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(port, useInMemoryDatabase, migrateDatabaseAtStartUp, databaseConfig);
+        return Objects.hash(port, useInMemoryDatabase, migrateDatabaseAtStartUp, databaseConfig, schemeOverrideHeader);
+    }
+
+    public enum Keys {
+        PORT,
+        DATABASE_CONNECTION_STRING,
+        USE_IN_MEMORY_DATABASE,
+        MIGRATE_DATABASE_AT_STARTUP,
+        SCHEME_OVERRIDE_HEADER
     }
 }

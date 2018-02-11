@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nobt.application.BodyParser;
 import io.nobt.application.NobtApplication;
 import io.nobt.core.ConversionInformationInconsistentException;
+import io.nobt.core.UnknownExpenseException;
 import io.nobt.core.UnknownNobtException;
 import io.nobt.core.commands.CreateExpenseCommand;
 import io.nobt.core.commands.CreatePaymentCommand;
@@ -12,6 +13,10 @@ import io.nobt.core.commands.DeleteExpenseCommand;
 import io.nobt.core.commands.RetrieveNobtCommand;
 import io.nobt.core.domain.*;
 import io.nobt.persistence.NobtRepositoryCommandInvoker;
+import io.nobt.rest.links.BasePath;
+import io.nobt.rest.links.ExpenseLinkFactory;
+import io.nobt.rest.links.LinkFactory;
+import io.nobt.rest.links.NobtLinkFactory;
 import io.nobt.rest.payloads.CreateNobtInput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -48,27 +53,21 @@ public class NobtRestApi implements Closeable {
         this.nobtFactory = nobtFactory;
     }
 
-    public void run(int port) {
+    public void run(int port, String schemeOverrideHeader) {
         http.port(port);
 
         http.staticFiles.externalLocation("../docs");
 
         setupCORS();
 
-        registerApplicationRoutes();
+        registerApplicationRoutes(schemeOverrideHeader);
         registerTestFailRoute();
 
         registerUnknownNobtExceptionHandler();
+        registerUnknownExpenseExceptionHandler();
         registerConversionInformationInconsistentExceptionHandler();
         registerValidationErrorExceptionHandler();
         registerUncaughtExceptionHandler();
-    }
-
-    private void registerApplicationRoutes() {
-        registerCreateNobtRoute();
-        registerRetrieveNobtRoute();
-        registerCreateExpenseRoute();
-        registerCreatePaymentRoute();
     }
 
     private void registerCreateExpenseRoute() {
@@ -84,6 +83,14 @@ public class NobtRestApi implements Closeable {
 
             return "";
         });
+    }
+
+    private void registerApplicationRoutes(String schemeOverrideHeader) {
+        registerCreateNobtRoute(schemeOverrideHeader);
+        registerRetrieveNobtRoute(schemeOverrideHeader);
+        registerCreateExpenseRoute();
+        registerDeleteExpenseRoute();
+        registerCreatePaymentRoute();
     }
 
     private void registerCreatePaymentRoute() {
@@ -102,7 +109,11 @@ public class NobtRestApi implements Closeable {
         });
     }
 
-    private void registerRetrieveNobtRoute() {
+    private static Long extractExpenseId(Request req) {
+        return Long.parseLong(req.params(":expenseId"));
+    }
+
+    private void registerRetrieveNobtRoute(String schemeOverrideHeader) {
         http.get("/nobts/:nobtId", (req, res) -> {
 
             final NobtId nobtId = extractNobtId(req);
@@ -113,11 +124,14 @@ public class NobtRestApi implements Closeable {
 
             res.header("Content-Type", "application/json");
 
-            return nobt;
-        }, objectMapper::writeValueAsString);
+            final BasePath basePath = BasePath.parse(req, schemeOverrideHeader);
+            final LinkFactory<Expense> expenseLinkFactory = new ExpenseLinkFactory(basePath, nobt);
+
+            return serialize(nobt, expenseLinkFactory);
+        });
     }
 
-    private void registerCreateNobtRoute() {
+    private void registerCreateNobtRoute(String schemeOverrideHeader) {
         http.post("/nobts", "application/json", (req, res) -> {
 
             final CreateNobtInput input = bodyParser.parseBodyAs(req, CreateNobtInput.class);
@@ -131,13 +145,17 @@ public class NobtRestApi implements Closeable {
                 return repository.getById(id);
             });
 
+            final BasePath basePath = BasePath.parse(req, schemeOverrideHeader);
+
+            final LinkFactory<Nobt> nobtLinkFactory = new NobtLinkFactory(basePath);
+            final LinkFactory<Expense> expenseLinkFactory = new ExpenseLinkFactory(basePath, nobt);
 
             res.status(201);
-            res.header("Location", req.url() + "/" + nobt.getId().getValue());
+            res.header("Location", nobtLinkFactory.createLinkTo(nobt).toString());
             res.header("Content-Type", "application/json");
 
-            return nobt;
-        }, objectMapper::writeValueAsString);
+            return serialize(nobt, expenseLinkFactory);
+        });
     }
 
     private void registerTestFailRoute() {
@@ -146,9 +164,24 @@ public class NobtRestApi implements Closeable {
         });
     }
 
+    private String serialize(Object entity, LinkFactory<Expense> expenseLinkFactory) throws JsonProcessingException {
+        return objectMapper.writer()
+                .withAttribute(ExpenseLinkFactory.class.getName(), expenseLinkFactory)
+                .writeValueAsString(entity);
+    }
+
     private static NobtId extractNobtId(Request req) {
         final String externalIdentifier = req.params(":nobtId");
         return new NobtId(externalIdentifier);
+    }
+
+    private void registerDeleteExpenseRoute() {
+        http.delete("/nobts/:nobtId/expenses/:expenseId", "application/json", (req, resp) -> {
+
+            nobtRepositoryCommandInvoker.invoke(new DeleteExpenseCommand(extractNobtId(req), extractExpenseId(req)));
+            resp.status(204);
+            return "";
+        });
     }
 
     private void setupCORS() {
@@ -174,6 +207,18 @@ public class NobtRestApi implements Closeable {
             final ThrowableProblem problem = Problem.builder()
                     .withStatus(NOT_FOUND)
                     .withDetail("The nobt you are looking for cannot be found.")
+                    .build();
+
+            writeProblemAsJsonToResponse(response, problem);
+        });
+    }
+
+    private void registerUnknownExpenseExceptionHandler() {
+        http.exception(UnknownExpenseException.class, (e, request, response) -> {
+
+            final ThrowableProblem problem = Problem.builder()
+                    .withStatus(NOT_FOUND)
+                    .withDetail("The expense you are looking for cannot be found.")
                     .build();
 
             writeProblemAsJsonToResponse(response, problem);

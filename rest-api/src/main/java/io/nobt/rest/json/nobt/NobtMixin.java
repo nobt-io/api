@@ -13,8 +13,9 @@ import java.util.Set;
 
 public abstract class NobtMixin extends Nobt {
 
-    public NobtMixin(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses, ZonedDateTime createdOn, Optimizer optimizer) {
-        super(id, currencyKey, name, explicitParticipants, expenses, Collections.emptySet(), createdOn, optimizer);
+    public NobtMixin(NobtId id, CurrencyKey currencyKey, String name, Set<Person> explicitParticipants, Set<Expense> expenses,
+                     Set<DeletedExpense> deletedExpenses, ZonedDateTime createdOn, Optimizer optimizer) {
+        super(id, currencyKey, name, explicitParticipants, expenses, deletedExpenses, Collections.emptySet(), createdOn, optimizer);
     }
 
     @Override
@@ -22,10 +23,10 @@ public abstract class NobtMixin extends Nobt {
     public abstract List<Debt> getOptimizedDebts();
 
     @JsonIgnore
-	@Override
-	public abstract Optimizer getOptimizer();
+    @Override
+    public abstract Optimizer getOptimizer();
 
     @Override
-	@JsonProperty("currency")
+    @JsonProperty("currency")
     public abstract CurrencyKey getCurrencyKey();
 }

@@ -177,6 +177,74 @@ public class ApiDocumentationTest {
     }
 
     @Test
+    public void shouldDeleteExpense() throws Exception {
+
+        final String nobtId = client.createGrillfeierNobt();
+        client.addFleischExpense(nobtId);
+
+        final String linkToDelete = client.getNobt(nobtId).jsonPath().getString("expenses[0]._links.delete");
+
+
+        given(this.documentationSpec)
+                .port(config.port())
+                .filter(
+                        document("delete-expense",
+                                preprocessRequest(
+                                        configureHost(),
+                                        replaceLocalhost()
+                                ),
+                                preprocessResponse(
+                                        replaceLocalhost()
+                                )
+                        )
+                )
+
+                .when()
+
+                .delete(linkToDelete)
+
+                .then()
+
+                .statusCode(204);
+
+
+        given(this.documentationSpec)
+                .filter(
+                        document("get-nobt-with-deleted-expense",
+                                preprocessRequest(
+                                        configureHost(),
+                                        replaceLocalhost()
+                                ),
+                                preprocessResponse(
+                                        replaceLocalhost()
+                                )
+                        )
+                )
+                .get("/nobts/{id}", nobtId)
+                .then()
+                .body("expenses", response -> hasSize(0))
+                .body("deletedExpenses[0]._links", response -> not(hasKey("delete")));
+    }
+
+    @Test
+    public void deletingExpenseThatDoesNotExistRespondsWith404() throws Exception {
+
+        final String nobtId = client.createGrillfeierNobt();
+        client.addFleischExpense(nobtId);
+
+        given(this.documentationSpec)
+                .port(config.port())
+
+                .when()
+
+                .delete("/nobts/{nobtId}/expenses/{expenseId}", nobtId, 104)
+
+                .then()
+
+                .statusCode(404);
+    }
+
+    @Test
     public void shouldAddNewPayment() throws Exception {
 
         final String nobtId = client.createGrillfeierNobt();
@@ -245,6 +313,7 @@ public class ApiDocumentationTest {
                                         fieldWithPath("createdOn").type(JsonFieldType.STRING).description("An ISO6801-compliant timestamp when the nobt was created."),
 
                                         fieldWithPath("expenses").type(JsonFieldType.ARRAY).description("All expenses associated with this nobt."),
+                                        fieldWithPath("deletedExpenses").type(JsonFieldType.ARRAY).description("All deleted expenses associated with this nobt."),
                                         fieldWithPath("expenses[].id").type(JsonFieldType.NUMBER).description("The id of the expense."),
                                         fieldWithPath("expenses[].createdOn").type(JsonFieldType.STRING).description("An ISO6801-compliant timestamp when the expense was created."),
                                         fieldWithPath("expenses[].date").type(JsonFieldType.STRING).description("The given date of the expense."),
