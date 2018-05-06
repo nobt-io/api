@@ -11,7 +11,8 @@ public class CORSHandler implements Filter {
 
     private final List<String> originWhitelist = Arrays.asList(
             "http://localhost:3000",
-            "http://nobt.io"
+            "http://nobt.io",
+            "https://nobt.io"
     );
 
     @Override
