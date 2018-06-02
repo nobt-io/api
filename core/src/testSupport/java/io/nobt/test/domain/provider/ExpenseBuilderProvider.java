@@ -10,6 +10,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import static io.nobt.test.domain.factories.StaticPersonFactory.*;
 import static io.nobt.test.domain.provider.IDProvider.nextId;
 import static java.util.Collections.emptySet;
 
@@ -22,6 +23,7 @@ public final class ExpenseBuilderProvider {
         return new ExpenseBuilder()
                 .withId(nextId())
                 .withName(UUID.randomUUID().toString())
+                .withDebtee(thomas)
                 .withSplitStrategy("EVENLY")
                 .withShares(emptySet())
                 .withConversionInformation(new ConversionInformation(CurrencyKeysProvider.EUR, BigDecimal.ONE))
