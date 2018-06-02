@@ -14,6 +14,6 @@ public final class DeleteExpenseCommand extends AbstractNobtModifyingCommand<Voi
 
     @Override
     protected void modify(Nobt nobt) {
-        nobt.removeExpense(expenseId);
+        nobt.deleteExpense(expenseId);
     }
 }

@@ -128,7 +128,7 @@ public class Nobt {
                 .orElse(1L);
     }
 
-    public void removeExpense(long expenseId) {
+    public void deleteExpense(long expenseId) {
 
         Expense expenseToDelete = expenses.stream()
                 .filter(e -> e.getId() == expenseId)

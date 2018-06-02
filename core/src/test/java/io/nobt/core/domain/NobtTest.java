@@ -158,7 +158,7 @@ public class NobtTest {
                 .build();
 
 
-        nobt.removeExpense(1L);
+        nobt.deleteExpense(1L);
 
 
         assertThat(nobt, allOf(
@@ -172,7 +172,7 @@ public class NobtTest {
 
         final Nobt nobt = aNobt().withExpenses(anExpense().withId(1L)).build();
 
-        nobt.removeExpense(1L);
+        nobt.deleteExpense(1L);
 
 
         nobt.createExpenseFrom(anExpenseDraft().build());
