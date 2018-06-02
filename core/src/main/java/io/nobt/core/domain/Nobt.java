@@ -117,8 +117,12 @@ public class Nobt {
     }
 
     private long getNextIdentifier() {
-        return getAllCashFlows()
-                .map(CashFlow::getId)
+
+        final List<Long> deletedIds = deletedExpenses.stream().map(DeletedExpense::getId).collect(toList());
+        final List<Long> otherIds = getAllCashFlows().map(CashFlow::getId).collect(toList());
+
+        return Stream.of(deletedIds, otherIds)
+                .flatMap(Collection::stream)
                 .max(comparingLong(id -> id))
                 .map(Nobt::incrementByOne)
                 .orElse(1L);
