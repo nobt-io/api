@@ -155,7 +155,7 @@ public class EntityManagerNobtRepositoryIT {
 
         final Long idOfFirstExpense = retrievedNobt.getExpenses().stream().findFirst().orElseThrow(IllegalStateException::new).getId();
 
-        retrievedNobt.removeExpense(idOfFirstExpense);
+        retrievedNobt.deleteExpense(idOfFirstExpense);
 
         save(retrievedNobt);
 

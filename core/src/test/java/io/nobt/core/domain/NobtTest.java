@@ -158,13 +158,29 @@ public class NobtTest {
                 .build();
 
 
-        nobt.removeExpense(1L);
+        nobt.deleteExpense(1L);
 
 
         assertThat(nobt, allOf(
                 hasExpenses(iterableWithSize(0)),
                 hasDeletedExpenses(iterableWithSize(1))
         ));
+    }
+
+    @Test
+    public void givenDeletedExpense_whenNewExpenseIsAdded_mustNotReuseId() {
+
+        final Nobt nobt = aNobt().withExpenses(anExpense().withId(1L)).build();
+
+        nobt.deleteExpense(1L);
+
+
+        nobt.createExpenseFrom(anExpenseDraft().build());
+
+
+        assertThat(nobt, hasExpenses(contains(
+                not(hasId(equalTo(1L)))
+        )));
     }
 
     @Test
