@@ -1,0 +1,20 @@
+{
+  "name": "api",
+  "scripts": {
+  },
+  "env": {
+    "GRADLE_TASK": "installDist",
+    "MIGRATE_DATABASE_AT_STARTUP": "false",
+    "USE_IN_MEMORY_DATABASE": "true"
+  },
+  "formation": {
+  },
+  "addons": [
+
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/gradle"
+    }
+  ]
+}
