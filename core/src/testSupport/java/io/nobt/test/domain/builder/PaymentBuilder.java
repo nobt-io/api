@@ -5,8 +5,8 @@ import io.nobt.core.domain.ConversionInformation;
 import io.nobt.core.domain.Payment;
 import io.nobt.core.domain.Person;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 
 public final class PaymentBuilder {
 
@@ -15,7 +15,7 @@ public final class PaymentBuilder {
     private Person recipient;
     private Amount amount;
     private String description;
-    private ZonedDateTime dateTime;
+    private Instant dateTime;
     private LocalDate date;
     private ConversionInformation conversionInformation;
 
@@ -49,7 +49,7 @@ public final class PaymentBuilder {
         return this;
     }
 
-    public PaymentBuilder createdOn(ZonedDateTime dateTime) {
+    public PaymentBuilder createdOn(Instant dateTime) {
         this.dateTime = dateTime;
         return this;
     }

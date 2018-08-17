@@ -58,9 +58,9 @@ public class NobtTest {
         final Expense secondExpense = mock(Expense.class);
         final Payment firstPayment = mock(Payment.class);
 
-        when(firstExpense.getCreatedOn()).thenReturn(now.minusDays(3));
-        when(firstPayment.getCreatedOn()).thenReturn(now.minusDays(2));
-        when(secondExpense.getCreatedOn()).thenReturn(now.minusDays(1));
+        when(firstExpense.getCreatedOn()).thenReturn(now.minusDays(3).toInstant());
+        when(firstPayment.getCreatedOn()).thenReturn(now.minusDays(2).toInstant());
+        when(secondExpense.getCreatedOn()).thenReturn(now.minusDays(1).toInstant());
 
         final Nobt nobt = aNobt()
                 .withExpenses(firstExpense, secondExpense)

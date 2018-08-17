@@ -44,7 +44,7 @@ public class DeletedExpense {
         return originalExpense.getDate();
     }
 
-    public ZonedDateTime getCreatedOn() {
+    public Instant getCreatedOn() {
         return originalExpense.getCreatedOn();
     }
 

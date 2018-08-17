@@ -7,13 +7,13 @@ import io.nobt.core.domain.Payment;
 import io.nobt.core.domain.Person;
 import io.nobt.core.domain.debt.Debt;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
 import java.util.Set;
 
 public abstract class PaymentMixin extends Payment {
 
-    public PaymentMixin(long id, Person sender, Person recipient, Amount amount, String description, LocalDate date, ConversionInformation conversionInformation, ZonedDateTime createdOn) {
+    public PaymentMixin(long id, Person sender, Person recipient, Amount amount, String description, LocalDate date, ConversionInformation conversionInformation, Instant createdOn) {
         super(id, sender, recipient, amount, description, date, conversionInformation, createdOn);
     }
 
