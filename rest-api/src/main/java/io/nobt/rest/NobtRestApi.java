@@ -33,7 +33,9 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.util.Set;
 
-import static javax.ws.rs.core.Response.Status.*;
+import static org.zalando.problem.Status.BAD_REQUEST;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.zalando.problem.Status.NOT_FOUND;
 
 public class NobtRestApi implements Closeable {
 

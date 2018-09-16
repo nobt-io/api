@@ -2,17 +2,17 @@ package io.nobt.rest;
 
 import io.nobt.rest.payloads.SimpleViolation;
 import org.zalando.problem.Problem;
+import org.zalando.problem.StatusType;
 
 import javax.annotation.Nullable;
 import javax.validation.ConstraintViolation;
-import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
-import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
+import static org.zalando.problem.Status.BAD_REQUEST;
 
 public class ValidationProblem implements Problem {
 
@@ -34,7 +34,7 @@ public class ValidationProblem implements Problem {
     }
 
     @Override
-    public Response.StatusType getStatus() {
+    public StatusType getStatus() {
         return BAD_REQUEST;
     }
 
