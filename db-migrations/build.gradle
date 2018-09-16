@@ -2,7 +2,7 @@ dependencies {
 
     compile project(':persistence')
 
-    compile group: 'org.springframework', name: 'spring-jdbc', version: '4.3.2.RELEASE'
+    compile group: 'org.springframework', name: 'spring-jdbc', version: '5.0.9.RELEASE'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
     compile group: 'org.flywaydb', name: 'flyway-core', version: '4.0.1'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
