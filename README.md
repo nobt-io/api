@@ -1,6 +1,7 @@
 # Nobt.io API
 
 [![Build Status](https://travis-ci.org/nobt-io/api.svg?branch=master)](https://travis-ci.org/nobt-io/api)
+[![Dependabot Status](https://api.dependabot.com/badges/status?host=github&repo=nobt-io/api)](https://dependabot.com)
 
 ## Download
 
