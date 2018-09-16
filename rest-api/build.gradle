@@ -45,7 +45,7 @@ dependencies {
     compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.2.4.Final'
 
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.5'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.1'
     compile group: 'com.sparkjava', name: 'spark-core', version: '2.7.2'
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.6'
