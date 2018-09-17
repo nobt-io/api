@@ -39,7 +39,7 @@ dependencies {
     compile 'org.zalando:problem:0.22.0'
     compile 'org.zalando:jackson-datatype-problem:0.22.0'
 
-    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.1.0.Final'
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.2.17.Final'
 
     compile group: 'javax.el', name: 'javax.el-api', version: '3.0.0'
     compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.2.4.Final'
