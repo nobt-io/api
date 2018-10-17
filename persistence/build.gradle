@@ -4,7 +4,7 @@ apply from: rootProject.rootDir.path + '/gradle/testSupport.gradle'
 dependencies {
     compile project(':core')
     compile project(':hibernate-postgres-json-support')
-    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.2.17.Final'
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.3.7.Final'
     compile group: 'org.hibernate', name: 'hibernate-java8', version: '5.2.17.Final'
     compile group: 'org.hibernate', name: 'hibernate-c3p0', version: '5.3.7.Final'
     compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.2'
