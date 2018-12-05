@@ -2,7 +2,7 @@
 <Configuration status="WARN" packages="org.apache.logging.log4j.core,com.getsentry.raven.log4j2">
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %mdc{nobtId} %-5level %logger{36} - %msg%n" />
         </Console>
         <Raven name="Sentry">
             <!-- sentry is configured via env variables -->
