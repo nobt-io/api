@@ -27,7 +27,7 @@ public class Debt {
      */
     private Person debtee;
 
-    private Debt(Person debtor, Amount amount, Person debtee) {
+    protected Debt(Person debtor, Amount amount, Person debtee) {
         this.debtor = debtor;
         this.amount = amount;
         this.debtee = debtee;
@@ -166,12 +166,20 @@ public class Debt {
         return debtor;
     }
 
-    public BigDecimal getAmount() {
+    public BigDecimal getRoundedAmount() {
         return amount.getRoundedValue();
+    }
+
+    public Amount getAmount() {
+        return amount;
     }
 
     public Person getDebtee() {
         return debtee;
+    }
+
+    public Debt withNewAmount(Amount newAmount) {
+        return new Debt(this.debtor, newAmount, this.debtee);
     }
 
     @Override
