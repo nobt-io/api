@@ -35,7 +35,7 @@ public class Debt {
 
     public static Debt debt(Person debtor, Amount amount, Person debtee) {
         if (!amount.isPositive()) {
-            throw new IllegalArgumentException("Amount must be positive.");
+            throw new IllegalArgumentException("Amount must be positive, was " + amount);
         }
         return new Debt(debtor, amount, debtee);
     }

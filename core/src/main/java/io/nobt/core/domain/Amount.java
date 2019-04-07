@@ -40,6 +40,10 @@ public final class Amount {
         return fromBigDecimal(value.subtract(other.value));
     }
 
+    public Amount multiplyBy(BigDecimal other) {
+        return fromBigDecimal(value.multiply(other));
+    }
+
     public Amount plus(Amount other) {
         return fromBigDecimal(value.add(other.value));
     }
