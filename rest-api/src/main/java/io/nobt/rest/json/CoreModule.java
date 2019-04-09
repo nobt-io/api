@@ -7,10 +7,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.nobt.core.domain.*;
+import io.nobt.core.domain.debt.Debt;
 import io.nobt.rest.json.amount.AmountDeserializer;
 import io.nobt.rest.json.amount.AmountSerializer;
 import io.nobt.rest.json.currency.CurrencyKeyDeserializer;
 import io.nobt.rest.json.currency.CurrencyKeySerializer;
+import io.nobt.rest.json.debt.DebtMixin;
 import io.nobt.rest.json.expense.ConversionInformationMixin;
 import io.nobt.rest.json.expense.DeletedExpenseMixin;
 import io.nobt.rest.json.expense.ExpenseDraftMixin;
@@ -54,6 +56,8 @@ public class CoreModule extends SimpleModule {
         setMixInAnnotation(PaymentDraft.class, PaymentDraftMixin.class);
 
         setMixInAnnotation(ConversionInformation.class, ConversionInformationMixin.class);
+
+        setMixInAnnotation(Debt.class, DebtMixin.class);
     }
 
     @Override
