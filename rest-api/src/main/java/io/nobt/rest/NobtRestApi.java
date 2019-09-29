@@ -20,6 +20,7 @@ import io.nobt.rest.links.NobtLinkFactory;
 import io.nobt.rest.payloads.CreateNobtInput;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.ThreadContext;
 import org.zalando.problem.Problem;
 import org.zalando.problem.ThrowableProblem;
 import spark.ExceptionHandler;
@@ -174,6 +175,9 @@ public class NobtRestApi implements Closeable {
 
     private static NobtId extractNobtId(Request req) {
         final String externalIdentifier = req.params(":nobtId");
+
+        ThreadContext.put("nobtId", externalIdentifier);
+
         return new NobtId(externalIdentifier);
     }
 
