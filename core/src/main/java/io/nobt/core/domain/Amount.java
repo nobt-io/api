@@ -1,18 +1,15 @@
 package io.nobt.core.domain;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Objects;
 
 import static java.math.RoundingMode.HALF_UP;
 
-public final class Amount {
+public final class Amount implements Comparable<Amount> {
 
     public static final Amount ZERO = new Amount(BigDecimal.ZERO);
 
-    private static final RoundingMode ROUNDING_MODE = HALF_UP;
-    private static final int INTERNAL_SCALE = 10;
-    private static final int EXTERNAL_SCALE = 2;
+    private static final int SCALE = 2;
 
     private final BigDecimal value;
 
@@ -21,7 +18,7 @@ public final class Amount {
     }
 
     public static Amount fromBigDecimal(BigDecimal value) {
-        return new Amount(value.setScale(INTERNAL_SCALE, ROUNDING_MODE));
+        return new Amount(value.setScale(SCALE, HALF_UP));
     }
 
     public static Amount fromDouble(double value) {
@@ -29,7 +26,7 @@ public final class Amount {
     }
 
     public BigDecimal getRoundedValue() {
-        return value.setScale(EXTERNAL_SCALE, HALF_UP);
+        return value;
     }
 
     public boolean isPositive() {
@@ -49,7 +46,7 @@ public final class Amount {
     }
 
     public Amount divideBy(BigDecimal other) {
-        return fromBigDecimal(value.divide(other, INTERNAL_SCALE, HALF_UP));
+        return fromBigDecimal(value.divide(other, SCALE, HALF_UP));
     }
 
     public Amount absolute() {
@@ -61,7 +58,7 @@ public final class Amount {
         if (this == o) return true;
         if (!(o instanceof Amount)) return false;
         Amount amount = (Amount) o;
-        return Objects.equals(getRoundedValue(), amount.getRoundedValue());
+        return Objects.equals(value, amount.value);
     }
 
     @Override
@@ -71,6 +68,11 @@ public final class Amount {
 
     @Override
     public String toString() {
-        return String.format("%s EURO", getRoundedValue());
+        return String.format("%s EURO", value);
+    }
+
+    @Override
+    public int compareTo(Amount other) {
+        return this.value.compareTo(other.value);
     }
 }

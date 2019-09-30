@@ -37,7 +37,7 @@ public class MinimalNumberOfDebtsOptimizer {
 
         LOGGER.trace("Trying to minimize number of debts for {}", debts);
 
-        final List<Debt> smallToLarge = debts.stream().sorted(comparing(Debt::getRoundedAmount)).collect(toList());
+        final List<Debt> smallToLarge = debts.stream().sorted(comparing(Debt::getAmount)).collect(toList());
 
         for (Debt candidate : smallToLarge) {
 
@@ -69,19 +69,19 @@ public class MinimalNumberOfDebtsOptimizer {
                         newDebts.remove(toOriginalDebtee);
                         newDebts.add(toOriginalDebtee.withNewAmount(toOriginalDebtee.getAmount().plus(candidate.getAmount())));
 
-                        LOGGER.trace("{} pays an additional {} to {}", toOriginalDebtee.getDebtor(), candidate.getRoundedAmount(), toOriginalDebtee.getDebtee());
+                        LOGGER.trace("{} pays an additional {} to {}", toOriginalDebtee.getDebtor(), candidate.getAmount(), toOriginalDebtee.getDebtee());
 
                         final Debt fromOriginalDebtor = alternativeDebts.fromOriginalDebtor;
                         newDebts.remove(fromOriginalDebtor);
                         newDebts.add(fromOriginalDebtor.withNewAmount(fromOriginalDebtor.getAmount().plus(candidate.getAmount())));
 
-                        LOGGER.trace("{} pays an additional {} to {}", fromOriginalDebtor.getDebtor(), candidate.getRoundedAmount(), fromOriginalDebtor.getDebtee());
+                        LOGGER.trace("{} pays an additional {} to {}", fromOriginalDebtor.getDebtor(), candidate.getAmount(), fromOriginalDebtor.getDebtee());
 
                         final Debt compensationDebt = alternativeDebts.compensationDebt;
                         newDebts.remove(compensationDebt);
                         newDebts.add(compensationDebt.withNewAmount(compensationDebt.getAmount().minus(candidate.getAmount())));
 
-                        LOGGER.trace("{} now has to pay {} less to {}", compensationDebt.getDebtor(), candidate.getRoundedAmount(), compensationDebt.getDebtee());
+                        LOGGER.trace("{} now has to pay {} less to {}", compensationDebt.getDebtor(), candidate.getAmount(), compensationDebt.getDebtee());
 
                         needsFurtherOptimization = true;
 

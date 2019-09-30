@@ -44,9 +44,9 @@ public class MinimalNumberOfDebtsOptimizerStrategyTest {
 
         final List<Debt> expectedOptimizedDebts = Arrays.asList(simon_marlene_new, thomas_eva_new, simon_eva_new);
 
-        final BigDecimal initialSum = initialDebts.stream().reduce(BigDecimal.ZERO, (sum, next) -> next.getRoundedAmount().add(sum), BigDecimal::add);
-        final BigDecimal optimizedSum = optimizedDebts.stream().reduce(BigDecimal.ZERO, (sum, next) -> next.getRoundedAmount().add(sum), BigDecimal::add);
-        final BigDecimal expectedSum = expectedOptimizedDebts.stream().reduce(BigDecimal.ZERO, (sum, next) -> next.getRoundedAmount().add(sum), BigDecimal::add);
+        final Amount initialSum = initialDebts.stream().reduce(Amount.ZERO, (sum, next) -> next.getAmount().plus(sum), Amount::plus);
+        final Amount optimizedSum = optimizedDebts.stream().reduce(Amount.ZERO, (sum, next) -> next.getAmount().plus(sum), Amount::plus);
+        final Amount expectedSum = expectedOptimizedDebts.stream().reduce(Amount.ZERO, (sum, next) -> next.getAmount().plus(sum), Amount::plus);
 
         // small consistency check before the actual test
         assertThat(initialSum, equalTo(optimizedSum));
