@@ -7,7 +7,7 @@ dependencies {
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.3.7.Final'
     compile group: 'org.hibernate', name: 'hibernate-java8', version: '5.3.7.Final'
     compile group: 'org.hibernate', name: 'hibernate-c3p0', version: '5.3.7.Final'
-    compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.3'
+    compile group: 'com.mchange', name: 'c3p0', version: '0.9.5.4'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.5'
 
     testCompile project(path: ':core', configuration: 'testSupport')
