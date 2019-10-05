@@ -166,10 +166,6 @@ public class Debt {
         return debtor;
     }
 
-    public BigDecimal getRoundedAmount() {
-        return amount.getRoundedValue();
-    }
-
     public Amount getAmount() {
         return amount;
     }
