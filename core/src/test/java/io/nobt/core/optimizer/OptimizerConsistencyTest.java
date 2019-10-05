@@ -32,6 +32,11 @@ public class OptimizerConsistencyTest {
         myQt(Optimizer.MINIMAL_AMOUNTS_AND_MINIMAL_NUMBER_OF_DEBTS).check(Balances::areEqual);
     }
 
+    @Test
+    public void MINIMAL_AMOUNT_V1_balancesShouldRemainTheSameBeforeAndAfterOptimization() {
+        myQt(Optimizer.MINIMAL_AMOUNT_V1).check(Balances::areEqual);
+    }
+
     private static class Balances {
         private final Map<Person, Amount> initialBalances;
         private final Map<Person, Amount> optimizedBalances;

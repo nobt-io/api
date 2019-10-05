@@ -42,12 +42,11 @@ public class SelfSortingMinimalAmountTransferredOptimizerStrategyTest {
         List<Debt> optimalDebts = sut.optimize(debtList);
 
         assertThat(optimalDebts, allOf(
-                Matchers.<Debt>iterableWithSize(6),
+                Matchers.<Debt>iterableWithSize(5),
                 containsInAnyOrder(
-                        debt(matthias, amount(2), thomas),
-                        debt(jacqueline, amount(1), thomas),
-                        debt(jacqueline, amount(1), thomasB),
-                        debt(matthias, amount(12), thomasB),
+                        debt(matthias, amount(3), thomas),
+                        debt(jacqueline, amount(2), thomasB),
+                        debt(matthias, amount(11), thomasB),
                         debt(david, amount(5), thomas),
                         debt(david, amount(12), thomasB)
                 )
