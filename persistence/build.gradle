@@ -15,10 +15,10 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     testSupport project(':application-config')
-    testSupport group: 'org.testcontainers', name: 'postgresql', version: '1.11.1'
+    testSupport group: 'org.testcontainers', name: 'postgresql', version: '1.16.2'
 
     integrationTestCompile project(':db-migrations')
     integrationTestCompile project(':application-config')
     integrationTestCompile project(path: ':persistence', configuration: 'testSupport')
-    integrationTestCompile group: 'org.testcontainers', name: 'postgresql', version: '1.11.0'
+    integrationTestCompile group: 'org.testcontainers', name: 'postgresql', version: '1.16.2'
 }
