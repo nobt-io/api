@@ -16,7 +16,7 @@ subprojects {
     targetCompatibility = 1.8
 
     dependencies {
-        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.2'
+        compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
         runtime group: 'org.apache.logging.log4j', name: 'log4j-jul', version: '2.11.2'
         testCompile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
     }
