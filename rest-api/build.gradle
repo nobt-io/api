@@ -37,7 +37,7 @@ dependencies {
     compile 'com.getsentry.raven:raven-log4j2:8.0.3'
 
     compile 'org.zalando:problem:0.22.0'
-    compile 'org.zalando:jackson-datatype-problem:0.22.0'
+    compile 'org.zalando:jackson-datatype-problem:0.26.0'
 
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.3.7.Final'
 
