@@ -1,0 +1,2 @@
+ALTER TABLE ONLY nobts
+    ADD CONSTRAINT nobts_pkey PRIMARY KEY (id);
